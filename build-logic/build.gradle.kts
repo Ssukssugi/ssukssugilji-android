@@ -8,3 +8,12 @@ dependencies {
     implementation(libs.ksp.gradle.plugin)
     implementation(libs.compose.compiler.gradle.plugin)
 }
+
+gradlePlugin {
+    plugins {
+        register("androidApplication") {
+            id = "ssukssukdiary.android.application"
+            implementationClass = "SsukssukdiaryAndroidApplicationPlugin"
+        }
+    }
+}
