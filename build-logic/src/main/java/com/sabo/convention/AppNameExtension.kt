@@ -4,6 +4,6 @@ import org.gradle.api.Project
 
 fun Project.setNameSpace(name: String) {
     androidExtension.apply {
-        namespace = "com.sabo.ssukssukdiary.$name"
+        namespace = "com.sabo.$name"
     }
 }

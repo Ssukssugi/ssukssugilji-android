@@ -1,59 +1,42 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.lang.String
+
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+    id("ssukssukdiary.android.application")
 }
 
 android {
     namespace = "com.sabo.ssukssukdiary"
-    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.sabo.ssukssukdiary"
-        minSdk = 26
-        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+        buildTypes {
+            getByName("debug") {
+                buildConfigField("String", "KAKAO_APP_KEY", String.valueOf(getKakaoSdkAppKey()))
+            }
+            getByName("release") {
+                buildConfigField("String", "KAKAO_APP_KEY", String.valueOf(getKakaoSdkAppKey()))
+            }
         }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-    buildFeatures {
-        compose = true
     }
 }
 
 dependencies {
+    implementation(project(":feature:main"))
+    implementation(project(":feature:login"))
+    implementation(project(":core:designsystem"))
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    implementation(libs.bundles.login)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+fun getKakaoSdkAppKey(): kotlin.String {
+    return gradleLocalProperties(rootDir, providers).getProperty("KAKAO_APP_KEY") ?: ""
 }
