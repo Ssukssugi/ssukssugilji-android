@@ -18,9 +18,13 @@ android {
         buildTypes {
             getByName("debug") {
                 buildConfigField("String", "KAKAO_APP_KEY", String.valueOf(getKakaoSdkAppKey()))
+                buildConfigField("String", "NAVER_CLIENT_ID", String.valueOf(getNaverClientId()))
+                buildConfigField("String", "NAVER_CLIENT_SECRET", String.valueOf(getNaverClientSecret()))
             }
             getByName("release") {
                 buildConfigField("String", "KAKAO_APP_KEY", String.valueOf(getKakaoSdkAppKey()))
+                buildConfigField("String", "NAVER_CLIENT_ID", String.valueOf(getNaverClientId()))
+                buildConfigField("String", "NAVER_CLIENT_SECRET", String.valueOf(getNaverClientSecret()))
             }
         }
     }
@@ -39,4 +43,12 @@ dependencies {
 
 fun getKakaoSdkAppKey(): kotlin.String {
     return gradleLocalProperties(rootDir, providers).getProperty("KAKAO_APP_KEY") ?: ""
+}
+
+fun getNaverClientId(): kotlin.String {
+    return gradleLocalProperties(rootDir, providers).getProperty("NAVER_CLIENT_ID") ?: ""
+}
+
+fun getNaverClientSecret(): kotlin.String {
+    return gradleLocalProperties(rootDir, providers).getProperty("NAVER_CLIENT_SECRET") ?: ""
 }

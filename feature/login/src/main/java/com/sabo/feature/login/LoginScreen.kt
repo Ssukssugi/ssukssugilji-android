@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Text
@@ -12,9 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.navercorp.nid.NaverIdLoginSDK
+import com.navercorp.nid.oauth.OAuthLoginCallback
 
 @Composable
 fun LoginRoute(
@@ -23,15 +28,19 @@ fun LoginRoute(
 ) {
     LoginScreen(
         modifier = modifier,
-        onClickKakaoLogin = viewModel::loginWithKakao
+        onClickKakaoLogin = viewModel::loginWithKakao,
+        onClickNaverLogin = viewModel::loginWithNaver
     )
 }
 
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    onClickKakaoLogin: () -> Unit
+    onClickKakaoLogin: () -> Unit,
+    onClickNaverLogin: () -> Unit
 ) {
+
+    val context = LocalContext.current
 
     Box(
         modifier = modifier
@@ -49,9 +58,42 @@ fun LoginScreen(
                     .background(Color.Yellow)
                     .clickable { onClickKakaoLogin() }
                     .padding(horizontal = 24.dp, vertical = 18.dp)
+                    .align(Alignment.CenterHorizontally)
             ) {
                 Text(
                     text = "카카오톡으로 로그인"
+                )
+            }
+
+            Spacer(
+                modifier = modifier
+                    .height(20.dp)
+            )
+
+            Box(
+                modifier = modifier
+                    .wrapContentSize()
+                    .background(Color.Green)
+                    .clickable {
+                        NaverIdLoginSDK.authenticate(context, object : OAuthLoginCallback {
+                            override fun onSuccess() {
+                                TODO("Not yet implemented")
+                            }
+
+                            override fun onError(errorCode: Int, message: String) {
+                                TODO("Not yet implemented")
+                            }
+
+                            override fun onFailure(httpStatus: Int, message: String) {
+                                TODO("Not yet implemented")
+                            }
+                        })
+                    }
+                    .padding(horizontal = 24.dp, vertical = 18.dp)
+                    .align(Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    text = "네이버로 로그인"
                 )
             }
         }
@@ -63,6 +105,7 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview(){
     LoginScreen(
-        onClickKakaoLogin = {}
+        onClickKakaoLogin = {},
+        onClickNaverLogin = {}
     )
 }
