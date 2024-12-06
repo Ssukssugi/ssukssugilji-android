@@ -15,17 +15,25 @@ android {
     }
 
     buildTypes {
-        buildTypes {
-            getByName("debug") {
-                buildConfigField("String", "KAKAO_APP_KEY", String.valueOf(getKakaoSdkAppKey()))
-                buildConfigField("String", "NAVER_CLIENT_ID", String.valueOf(getNaverClientId()))
-                buildConfigField("String", "NAVER_CLIENT_SECRET", String.valueOf(getNaverClientSecret()))
-            }
-            getByName("release") {
-                buildConfigField("String", "KAKAO_APP_KEY", String.valueOf(getKakaoSdkAppKey()))
-                buildConfigField("String", "NAVER_CLIENT_ID", String.valueOf(getNaverClientId()))
-                buildConfigField("String", "NAVER_CLIENT_SECRET", String.valueOf(getNaverClientSecret()))
-            }
+        getByName("debug") {
+            buildConfigField("String", "KAKAO_APP_KEY", String.valueOf(getKakaoSdkAppKey()))
+            buildConfigField("String", "NAVER_CLIENT_ID", String.valueOf(getNaverClientId()))
+            buildConfigField(
+                "String",
+                "NAVER_CLIENT_SECRET",
+                String.valueOf(getNaverClientSecret())
+            )
+            manifestPlaceholders["KAKAO_APP_KEY"] = String.valueOf(getKakaoSdkAppKey())
+        }
+        getByName("release") {
+            buildConfigField("String", "KAKAO_APP_KEY", String.valueOf(getKakaoSdkAppKey()))
+            buildConfigField("String", "NAVER_CLIENT_ID", String.valueOf(getNaverClientId()))
+            buildConfigField(
+                "String",
+                "NAVER_CLIENT_SECRET",
+                String.valueOf(getNaverClientSecret())
+            )
+            manifestPlaceholders["KAKAO_APP_KEY"] = String.valueOf(getKakaoSdkAppKey())
         }
     }
 }
