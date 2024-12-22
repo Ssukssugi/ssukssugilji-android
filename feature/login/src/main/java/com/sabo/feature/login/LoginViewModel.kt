@@ -30,7 +30,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun loginWithNaver() {
+    fun onSuccessNaverLogin() {
 
     }
 }

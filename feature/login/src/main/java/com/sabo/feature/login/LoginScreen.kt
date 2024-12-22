@@ -29,7 +29,7 @@ fun LoginRoute(
     LoginScreen(
         modifier = modifier,
         onClickKakaoLogin = viewModel::loginWithKakao,
-        onClickNaverLogin = viewModel::loginWithNaver
+        onSuccessNaverLogin = viewModel::onSuccessNaverLogin
     )
 }
 
@@ -37,7 +37,7 @@ fun LoginRoute(
 fun LoginScreen(
     modifier: Modifier = Modifier,
     onClickKakaoLogin: () -> Unit,
-    onClickNaverLogin: () -> Unit
+    onSuccessNaverLogin: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -77,15 +77,15 @@ fun LoginScreen(
                     .clickable {
                         NaverIdLoginSDK.authenticate(context, object : OAuthLoginCallback {
                             override fun onSuccess() {
-                                TODO("Not yet implemented")
+                                onSuccessNaverLogin()
                             }
 
                             override fun onError(errorCode: Int, message: String) {
-                                TODO("Not yet implemented")
+                                //TODO("Not yet implemented")
                             }
 
                             override fun onFailure(httpStatus: Int, message: String) {
-                                TODO("Not yet implemented")
+                                //TODO("Not yet implemented")
                             }
                         })
                     }
@@ -106,6 +106,6 @@ fun LoginScreen(
 fun LoginScreenPreview(){
     LoginScreen(
         onClickKakaoLogin = {},
-        onClickNaverLogin = {}
+        onSuccessNaverLogin = {}
     )
 }
