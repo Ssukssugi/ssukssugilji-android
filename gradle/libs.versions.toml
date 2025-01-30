@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.0"
+agp = "8.7.3"
 kotlin = "2.0.0"
 ksp = "2.0.0-1.0.23"
 
@@ -107,3 +107,4 @@ google-service = { id = "com.google.gms.google-services", version.ref = "google-
 
 [bundles]
 login = ["kakao-login", "naver-login"]
+network = ["retrofit", "retrofit-kotlinx-serialization", "okhttp3", "okhttp3-logging-interceptor", "kotlin-serialization-json"]

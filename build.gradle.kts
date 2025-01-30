@@ -1,4 +1,7 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
+gradle.startParameter.excludedTaskNames.addAll(
+    gradle.startParameter.taskNames.filter { it.contains("testClasses") }
+)
 
 buildscript {
     repositories {
