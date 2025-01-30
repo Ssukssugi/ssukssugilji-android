@@ -16,5 +16,6 @@ class MainApplication : Application() {
             BuildConfig.NAVER_CLIENT_SECRET,
             getString(R.string.app_name)
         )
+        NaverIdLoginSDK.showDevelopersLog(BuildConfig.DEBUG)
     }
 }

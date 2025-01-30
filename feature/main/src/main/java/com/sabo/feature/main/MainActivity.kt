@@ -6,7 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.sabo.ssukssukdiary.ui.theme.SsukssukDiaryTheme
+import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
