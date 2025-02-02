@@ -39,9 +39,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:main"))
-    implementation(project(":feature:login"))
-    implementation(project(":core:designsystem"))
+    implementation(projects.feature.main)
+    implementation(projects.feature.login)
+    implementation(projects.core.designsystem)
+    implementation(projects.core.data)
 
     implementation(libs.bundles.login)
 

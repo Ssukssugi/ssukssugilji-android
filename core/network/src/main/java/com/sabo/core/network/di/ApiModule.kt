@@ -1,5 +1,6 @@
-package com.sabo.core.network
+package com.sabo.core.network.di
 
+import com.sabo.core.network.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,8 +29,7 @@ internal object ApiModule {
     fun provideOkhttpClient(
         httpLoggingInterceptor: HttpLoggingInterceptor
     ): OkHttpClient {
-        return OkHttpClient
-            .Builder()
+        return OkHttpClient.Builder()
             .addInterceptor(httpLoggingInterceptor)
             .build()
     }
@@ -56,9 +56,9 @@ internal object ApiModule {
         converterFactory: Converter.Factory
     ) : Retrofit {
         return Retrofit.Builder()
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(converterFactory)
-            .baseUrl(BuildConfig.BASE_URL)
             .build()
     }
 }
