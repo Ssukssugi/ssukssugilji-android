@@ -5,10 +5,9 @@ plugins {
 }
 
 android {
-    setNameSpace("feature.main")
+    setNameSpace("feature.signup")
 }
 
 dependencies {
-    implementation(projects.feature.login)
-    implementation(projects.feature.signup)
+
 }

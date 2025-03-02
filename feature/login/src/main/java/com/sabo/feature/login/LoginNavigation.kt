@@ -9,8 +9,12 @@ fun NavController.navigateToLogin() {
     navigate(RouteModel.Login)
 }
 
-fun NavGraphBuilder.loginNavGraph() {
+fun NavGraphBuilder.loginNavGraph(
+    navigateToSignUp: () -> Unit
+) {
     composable<RouteModel.Login> {
-        LoginRoute()
+        LoginRoute(
+            navigateToSignUp = navigateToSignUp
+        )
     }
 }

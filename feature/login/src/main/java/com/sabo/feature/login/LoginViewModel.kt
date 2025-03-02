@@ -9,8 +9,12 @@ import com.sabo.core.domain.repository.LoginRepository
 import com.sabo.feature.login.LoginUiState.SuccessLogin.LoginType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,7 +26,10 @@ class LoginViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.BeforeLogin)
     val uiState = _uiState.asStateFlow()
-    
+
+    private val _loginEvent = Channel<LoginEvent>(Channel.RENDEZVOUS)
+    val loginEvent = _loginEvent.receiveAsFlow()
+
     private val kakaoApiClient = UserApiClient.instance
 
     fun loginWithKakao() {
@@ -30,11 +37,9 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             if (kakaoApiClient.isKakaoTalkLoginAvailable(context)) {
                 kakaoApiClient.loginWithKakaoTalk(context) { token, error ->
-
                 }
             } else {
-                kakaoApiClient.loginWithKakaoAccount(context) { token, error ->  
-
+                kakaoApiClient.loginWithKakaoAccount(context) { token, error ->
                 }
             }
         }
@@ -49,11 +54,27 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             loginRepository.requestNaverLogin(token).handle(
                 onSuccess = {
-                    _uiState.value = LoginUiState.SuccessLogin(type = LoginType.NAVER)
+
                 },
                 onError = {
+                },
+                onFinish = {
+                    //FIXME : Move to on Success
+                    navigateAfterLogin(loginType = LoginType.NAVER)
                 }
             )
+        }
+    }
+
+    private fun CoroutineScope.navigateAfterLogin(
+        loginType: LoginType,
+        delayTime: Long = 200L,
+        isAlreadyMember: Boolean = false
+    ) {
+        launch {
+            _uiState.value = LoginUiState.SuccessLogin(type = loginType)
+            delay(delayTime)
+            _loginEvent.send(if (isAlreadyMember) LoginEvent.GoToMain else LoginEvent.GoToSignUp)
         }
     }
 }

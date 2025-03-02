@@ -18,7 +18,9 @@ class MainActivity: ComponentActivity() {
             statusBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
         )
         setContent {
-            SsukssukDiaryTheme {
+            SsukssukDiaryTheme(
+                darkTheme = false
+            ) {
                 MainScreen()
             }
         }

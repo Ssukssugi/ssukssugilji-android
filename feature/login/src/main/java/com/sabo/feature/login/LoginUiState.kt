@@ -12,3 +12,8 @@ sealed interface LoginUiState {
         }
     }
 }
+
+sealed interface LoginEvent {
+    data object GoToMain : LoginEvent
+    data object GoToSignUp : LoginEvent
+}

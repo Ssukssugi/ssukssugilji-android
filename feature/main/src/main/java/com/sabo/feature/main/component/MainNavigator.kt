@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.sabo.core.navigator.RouteModel
 import com.sabo.feature.login.navigateToLogin
+import com.sabo.feature.signup.navigateToSignUp
 
 class MainNavigator(
     val navController: NavHostController
@@ -14,6 +15,10 @@ class MainNavigator(
 
     fun navigateToLogin() {
         navController.navigateToLogin()
+    }
+
+    fun navigateToSignUp() {
+        navController.navigateToSignUp()
     }
 }
 

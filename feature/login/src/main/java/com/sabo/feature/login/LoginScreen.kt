@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,16 +34,28 @@ import com.navercorp.nid.oauth.OAuthLoginCallback
 @Composable
 fun LoginRoute(
     modifier: Modifier = Modifier,
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel(),
+    navigateToSignUp: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.loginEvent.collect {
+            when(it) {
+                LoginEvent.GoToMain -> {
+
+                }
+                LoginEvent.GoToSignUp -> navigateToSignUp()
+            }
+        }
+    }
 
     Box(
         modifier = modifier
             .fillMaxSize()
-            .statusBarsPadding()
     ) {
         LoginContent(
+            modifier = modifier,
             uiState = uiState,
             onClickKakaoLogin = viewModel::loginWithKakao,
             onClickNaverLogin = viewModel::onRedirectLogin,
@@ -62,6 +74,7 @@ fun LoginContent(
 ) {
     when (uiState) {
         LoginUiState.BeforeLogin -> LoginScreen(
+            modifier = modifier,
             onClickNaverLogin = onClickNaverLogin,
             onClickKakaoLogin = onClickKakaoLogin,
             onSuccessNaverLogin = onSuccessNaverLogin
@@ -84,7 +97,6 @@ fun LoginScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(color = Color.White)
     ) {
         Column(
             modifier = modifier

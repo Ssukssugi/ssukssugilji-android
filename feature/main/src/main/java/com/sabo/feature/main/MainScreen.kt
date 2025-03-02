@@ -1,5 +1,8 @@
 package com.sabo.feature.main
 
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,7 +25,10 @@ private fun MainScreenContent(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
-        modifier = modifier,
+        modifier = modifier
+            .imePadding()
+            .navigationBarsPadding()
+            .statusBarsPadding(),
         content = { padding ->
             MainNavHost(
                 navigator = navigator,
