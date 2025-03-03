@@ -37,9 +37,11 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             if (kakaoApiClient.isKakaoTalkLoginAvailable(context)) {
                 kakaoApiClient.loginWithKakaoTalk(context) { token, error ->
+
                 }
             } else {
                 kakaoApiClient.loginWithKakaoAccount(context) { token, error ->
+
                 }
             }
         }

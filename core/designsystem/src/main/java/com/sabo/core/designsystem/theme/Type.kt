@@ -11,7 +11,7 @@ private val SansSerifStyle = TextStyle(
     fontWeight = FontWeight.Normal
 )
 
-internal val DiaryTypography = LocalDiaryTypography(
+val DiaryTypography = LocalDiaryTypography(
     // BOLD
     headlineLargeBold = SansSerifStyle.copy(
         fontSize = 32.sp,
