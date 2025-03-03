@@ -8,3 +8,7 @@ plugins {
 android {
     setNameSpace("core.designsystem")
 }
+
+dependencies {
+    implementation(libs.androidx.appcompat)
+}

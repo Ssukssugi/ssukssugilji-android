@@ -8,18 +8,19 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = DarkDiaryColors.green500,
+    tertiary = DarkDiaryColors.gray900,
+    error = DarkDiaryColors.red400
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = LightDiaryColors.green400,
+    tertiary = LightDiaryColors.gray900,
+    error = LightDiaryColors.red500
 )
 
 @Composable
@@ -38,9 +39,14 @@ fun SsukssukDiaryTheme(
         else -> LightColorScheme
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    val diaryColorPalette = if (darkTheme) DarkDiaryColors else LightDiaryColors
+
+    CompositionLocalProvider(
+        DiaryColorsPalette provides diaryColorPalette
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            content = content
+        )
+    }
 }
