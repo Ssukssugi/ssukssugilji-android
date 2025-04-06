@@ -20,6 +20,7 @@ android {
 
 dependencies {
     implementation(libs.bundles.network)
+    implementation(projects.core.domain)
 }
 
 fun getApiBaseUrl(): String {

@@ -1,6 +1,7 @@
 package com.sabo.core.network.di
 
 import com.sabo.core.network.service.LoginService
+import com.sabo.core.network.service.SignUpService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,5 +17,11 @@ object ServiceModule {
     @Provides
     fun provideLoginService(retrofit: Retrofit): LoginService {
         return retrofit.create(LoginService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideSignUpService(retrofit: Retrofit): SignUpService {
+        return retrofit.create(SignUpService::class.java)
     }
 }

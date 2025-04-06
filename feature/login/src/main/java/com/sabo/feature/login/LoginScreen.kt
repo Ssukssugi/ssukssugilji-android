@@ -1,5 +1,6 @@
 package com.sabo.feature.login
 
+import android.view.Gravity
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -25,22 +27,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.DialogWindowProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.OAuthLoginCallback
+import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
+import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
 
 @Composable
 internal fun LoginRoute(
@@ -49,6 +54,9 @@ internal fun LoginRoute(
     navigateToSignUp: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val kakaoLoginManager = rememberKakaoLoginManager {
+        viewModel.onSuccessKakaoLogin(it)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.loginEvent.collect {
@@ -69,9 +77,9 @@ internal fun LoginRoute(
         LoginContent(
             modifier = modifier,
             uiState = uiState,
-            onClickKakaoLogin = viewModel::loginWithKakao,
-            onClickNaverLogin = viewModel::onRedirectLogin,
-            onSuccessNaverLogin = viewModel::onSuccessNaverLogin
+            onClickKakaoLogin = kakaoLoginManager::requestToken,
+            onSuccessNaverLogin = viewModel::onSuccessNaverLogin,
+            onClickNextButton = viewModel::applyTermsAgreement
         )
     }
 }
@@ -81,18 +89,19 @@ private fun LoginContent(
     modifier: Modifier = Modifier,
     uiState: LoginUiState,
     onClickKakaoLogin: () -> Unit,
-    onClickNaverLogin: () -> Unit,
-    onSuccessNaverLogin: (String) -> Unit
+    onSuccessNaverLogin: (String) -> Unit,
+    onClickNextButton: () -> Unit
 ) {
     when (uiState) {
-        LoginUiState.BeforeLogin -> LoginScreen(
+        is LoginUiState.BeforeLogin -> LoginScreen(
             modifier = modifier,
-            onClickNaverLogin = onClickNaverLogin,
             onClickKakaoLogin = onClickKakaoLogin,
-            onSuccessNaverLogin = onSuccessNaverLogin
+            onSuccessNaverLogin = onSuccessNaverLogin,
+            isShownTermsAgreeDialog = uiState.isShownTermsAgree,
+            termsState = uiState.termsState,
+            onClickNextButton = onClickNextButton
         )
-
-        LoginUiState.RedirectLoading -> RedirectLoadingScreen()
+        LoginUiState.SignUpLoading -> RedirectLoadingScreen()
         is LoginUiState.SuccessLogin -> LoginSuccessScreen(state = uiState)
     }
 }
@@ -101,10 +110,11 @@ private fun LoginContent(
 private fun LoginScreen(
     modifier: Modifier = Modifier,
     onClickKakaoLogin: () -> Unit,
-    onClickNaverLogin: () -> Unit,
-    onSuccessNaverLogin: (String) -> Unit
+    onSuccessNaverLogin: (String) -> Unit,
+    isShownTermsAgreeDialog: Boolean = false,
+    termsState: LoginUiState.BeforeLogin.TermsAgreeState,
+    onClickNextButton: () -> Unit = {}
 ) {
-
     val context = LocalContext.current
     Column(
         modifier = modifier
@@ -136,13 +146,14 @@ private fun LoginScreen(
         ) {
             LoginIcon(
                 resId = R.drawable.img_login_kakao,
-                onClick = onClickKakaoLogin
+                onClick = {
+                    onClickKakaoLogin()
+                }
             )
             Spacer(modifier = modifier.width(16.dp))
             LoginIcon(
                 resId = R.drawable.img_login_naver,
                 onClick = {
-                    onClickNaverLogin()
                     NaverIdLoginSDK.authenticate(context, object : OAuthLoginCallback {
                         override fun onSuccess() {
                             NaverIdLoginSDK.getAccessToken()?.let { token ->
@@ -165,6 +176,92 @@ private fun LoginScreen(
                 resId = R.drawable.icon_login_google
             )
         }
+    }
+
+    if (isShownTermsAgreeDialog) {
+        TermAgreeDialog(
+            termsState = termsState,
+            onClickNextButton = onClickNextButton
+        )
+    }
+}
+
+@Composable
+private fun TermAgreeDialog(
+    modifier: Modifier = Modifier,
+    onDismissRequest: () -> Unit = {},
+    termsState: LoginUiState.BeforeLogin.TermsAgreeState,
+    onClickNextButton: () -> Unit = {}
+) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        (LocalView.current.parent as DialogWindowProvider).apply {
+            window.setGravity(Gravity.BOTTOM)
+        }
+        Surface(
+            shape = RoundedCornerShape(24.dp),
+            modifier = modifier
+                .padding(horizontal = 10.dp)
+                .fillMaxWidth()
+                .wrapContentHeight()
+        ) {
+            Column(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            ) {
+                Text(
+                    text = "필수 약관에 동의해주세요",
+                    style = DiaryTypography.subtitleLargeBold,
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(20.dp)
+                )
+                TermAgreeContent(
+                    modifier = modifier,
+                    isServiceTermAgree = termsState.serviceTerms,
+                    isPrivateTermAgree = termsState.privateTerms,
+                    isAgeTermAgree = termsState.ageTerms,
+                    isMarketingTermAgree = termsState.marketingTerms,
+                    onClickNextButton = onClickNextButton
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ColumnScope.TermAgreeContent(
+    modifier: Modifier = Modifier,
+    isServiceTermAgree: Boolean,
+    isPrivateTermAgree: Boolean,
+    isAgeTermAgree: Boolean,
+    isMarketingTermAgree: Boolean,
+    onClickNextButton: () -> Unit = {}
+) {
+
+    Box(
+        modifier = modifier
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .clip(RoundedCornerShape(16.dp))
+            .background(color = DiaryColorsPalette.current.green400)
+            .clickable { 
+                onClickNextButton()
+            }
+    ) {
+        Text(
+            text = "시작하기",
+            style = DiaryTypography.subtitleMediumBold,
+            color = DiaryColorsPalette.current.gray50,
+            modifier = modifier
+                .padding(vertical = 16.dp)
+                .align(Alignment.Center)
+        )
     }
 }
 
@@ -215,11 +312,7 @@ private fun LoginMainInfo(
                 .align(Alignment.CenterHorizontally),
             text = title,
             color = Color(0xFF333333),
-            style = TextStyle(
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            ),
+            style = DiaryTypography.headlineSmallBold,
             textAlign = TextAlign.Center
         )
 
@@ -230,11 +323,7 @@ private fun LoginMainInfo(
                 .align(Alignment.CenterHorizontally),
             text = subTitle,
             color = Color(0xFF777777),
-            style = TextStyle(
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.Normal,
-                fontSize = 18.sp
-            ),
+            style = DiaryTypography.subtitleMediumMedium,
             textAlign = TextAlign.Center
         )
     }
@@ -291,6 +380,18 @@ private fun RowScope.LoginIcon(
     }
 }
 
+@Composable
+fun rememberKakaoLoginManager(
+    onSuccess: (String) -> Unit
+): KakaoLoginManager {
+    val context = LocalContext.current
+    return KakaoLoginManager(context, object : KakaoLoginManager.CallbackListener {
+        override fun onSuccess(token: String) {
+            onSuccess(token)
+        }
+    })
+}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -298,7 +399,7 @@ fun LoginScreenPreview() {
     LoginScreen(
         onClickKakaoLogin = {},
         onSuccessNaverLogin = {},
-        onClickNaverLogin = {}
+        termsState = LoginUiState.BeforeLogin.TermsAgreeState()
     )
 }
 
@@ -323,6 +424,16 @@ fun LoginIconPreview() {
     Row {
         LoginIcon(
             resId = R.drawable.img_login_kakao
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun TermsAgreeDialogPreview() {
+    SsukssukDiaryTheme {
+        TermAgreeDialog(
+            termsState = LoginUiState.BeforeLogin.TermsAgreeState()
         )
     }
 }

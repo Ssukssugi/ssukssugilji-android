@@ -1,16 +1,32 @@
 package com.sabo.feature.login
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
+import com.sabo.core.domain.model.LoginType
+
+@Stable
 sealed interface LoginUiState {
-    data object BeforeLogin : LoginUiState
-    data object RedirectLoading : LoginUiState
+    @Immutable
+    data class BeforeLogin(
+        val isShownTermsAgree: Boolean = false,
+        val termsState: TermsAgreeState = TermsAgreeState()
+    ) : LoginUiState {
+        @Immutable
+        data class TermsAgreeState(
+            val serviceTerms: Boolean = false,
+            val privateTerms: Boolean = false,
+            val ageTerms: Boolean = false,
+            val marketingTerms: Boolean = false
+        )
+    }
+
+    data object SignUpLoading : LoginUiState
+
+    @Immutable
     data class SuccessLogin(
         val type: LoginType,
         val isMarketingReceiveAccepted: Boolean = false
-    ) : LoginUiState {
-        enum class LoginType(val text: String) {
-            KAKAO("카카오"), NAVER("네이버")
-        }
-    }
+    ) : LoginUiState
 }
 
 sealed interface LoginEvent {

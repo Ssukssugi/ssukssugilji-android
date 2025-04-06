@@ -1,6 +1,7 @@
 package com.sabo.core.network.di
 
 import com.sabo.core.network.BuildConfig
+import com.sabo.core.network.interceptor.TokenInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,10 +28,12 @@ internal object ApiModule {
     @Provides
     @Singleton
     fun provideOkhttpClient(
-        httpLoggingInterceptor: HttpLoggingInterceptor
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+        tokenInterceptor: TokenInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(httpLoggingInterceptor)
+            .addInterceptor(tokenInterceptor)
             .build()
     }
 

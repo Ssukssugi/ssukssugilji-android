@@ -1,30 +1,60 @@
 package com.sabo.feature.signup
 
+import android.content.res.Configuration
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.maxLength
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sabo.core.designsystem.R
+import com.sabo.core.designsystem.theme.DiaryColorsPalette
+import com.sabo.core.designsystem.theme.DiaryTypography
+import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
+import com.sabo.feature.signup.component.SignUpContentTitle
+import com.sabo.feature.signup.component.SignUpTitle
+import com.sabo.feature.signup.model.AgeChip
+import com.sabo.feature.signup.model.HowKnownChip
+import com.sabo.feature.signup.model.PlantReasonChip
+import com.sabo.feature.signup.model.SignUpStep
+import com.sabo.feature.signup.model.SignUpUiState
 
 @Composable
 internal fun SignUpRoute(
@@ -35,23 +65,47 @@ internal fun SignUpRoute(
 
     SignUpContent(
         modifier = modifier,
-        uiState = uiState
+        uiState = uiState,
+        onClickNicknameCheck = viewModel::checkIsNicknameDuplicated,
+        onClickBackButton = viewModel::onClickBackScreen,
+        onClickNextButton = viewModel::moveToNextStep,
+        onClickAgeChip = { viewModel.selectAge(it) },
+        onClickPlantReasonChip = { viewModel.selectPlantReason(it) }
     )
 }
 
 @Composable
 private fun SignUpContent(
     modifier: Modifier = Modifier,
-    uiState: SignUpUiState
+    uiState: SignUpUiState,
+    onClickNicknameCheck: () -> Unit = {},
+    onClickBackButton: () -> Unit = {},
+    onClickNextButton: () -> Unit = {},
+    onClickAgeChip: (AgeChip) -> Unit = {},
+    onClickPlantReasonChip: (PlantReasonChip) -> Unit = {},
+    onClickHowKnownChip: (HowKnownChip) -> Unit = {}
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
     ) {
-        when(uiState) {
-            is SignUpUiState.CreateNickname -> NicknameCreate(
-                initialNickname = uiState.nickname,
-                errorState = uiState.errorState
+        if (uiState.step == SignUpStep.NICKNAME) {
+            NicknameCreate(
+                nicknameState = uiState.nickname,
+                isNicknameAvailable = uiState.isNicknameCheckable,
+                errorState = uiState.nicknameErrorState,
+                onClickNextButton = onClickNicknameCheck
+            )
+        } else {
+            SignUpExtraInfoScreen(
+                modifier = modifier,
+                uiState = uiState,
+                onClickBackButton = onClickBackButton,
+                onClickSkipButton = {},
+                onClickNextButton = onClickNextButton,
+                onClickAgeChip = onClickAgeChip,
+                onClickPlantReasonChip = onClickPlantReasonChip,
+                onClickHowKnownChip = onClickHowKnownChip
             )
         }
     }
@@ -60,128 +114,299 @@ private fun SignUpContent(
 @Composable
 private fun NicknameCreate(
     modifier: Modifier = Modifier,
-    initialNickname: String,
-    errorState: SignUpUiState.CreateNickname.ErrorState
+    nicknameState: TextFieldState,
+    isNicknameAvailable: Boolean,
+    errorState: SignUpUiState.NicknameErrorState,
+    onClickNextButton: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
     ) {
-        Title(
+        SignUpTopBar()
+        SignUpTitle(
             mainTitle = "원하는 닉네임이\n있으신가요?",
             subTitle = "서비스를 사용할 닉네임을 설정해보세요"
         )
 
         Spacer(modifier = modifier.height(8.dp))
 
-        ContentTitle(text = "닉네임", colorCode = 0xFF3283F7)
+        SignUpContentTitle(text = "닉네임")
 
         NickNameInput(
-            initialNickname = initialNickname,
+            nicknameState = nicknameState,
             errorState = errorState
         )
-    }
-}
 
-@Composable
-private fun Title(
-    modifier: Modifier = Modifier,
-    mainTitle: String,
-    subTitle: String = ""
-) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(horizontal = 20.dp, vertical = 20.dp)
-    ) {
-        Text(
+        Spacer(modifier = modifier.weight(1f))
+
+        NextButton(
             modifier = modifier
                 .fillMaxWidth(),
-            text = mainTitle,
-            color = Color(0xFF333333),
-            style = TextStyle(
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-            )
-        )
-
-        Spacer(modifier = modifier.height(8.dp))
-
-        Text(
-            modifier = modifier
-                .fillMaxWidth(),
-            text = subTitle,
-            color = Color(0xFF777777),
-            style = TextStyle(
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.Normal,
-                fontSize = 16.sp
-            )
+            isActive = isNicknameAvailable,
+            text = "확인",
+            onClicked = onClickNextButton
         )
     }
-}
-
-@Composable
-private fun ContentTitle(
-    modifier: Modifier = Modifier,
-    text: String,
-    colorCode: Long
-) {
-    Text(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
-        text = text,
-        color = Color(colorCode),
-        style = TextStyle(
-            fontStyle = FontStyle.Normal,
-            fontWeight = FontWeight.Normal,
-            fontSize = 14.sp
-        )
-    )
 }
 
 @Composable
 private fun NickNameInput(
     modifier: Modifier = Modifier,
-    initialNickname: String = "",
-    errorState: SignUpUiState.CreateNickname.ErrorState
+    nicknameState: TextFieldState,
+    errorState: SignUpUiState.NicknameErrorState
 ) {
-    var inputted by remember { mutableStateOf(initialNickname) }
-
-    Row(
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(focusRequester) {
+        focusRequester.requestFocus()
+    }
+    BasicTextField(
+        state = nicknameState,
         modifier = modifier
+            .padding(horizontal = 20.dp)
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(horizontal = 20.dp)
-    ) {
-        TextField(
-            modifier = modifier
-                .fillMaxWidth(),
-            value = inputted,
-            onValueChange = {
-                inputted = it
+            .focusRequester(focusRequester = focusRequester),
+        lineLimits = TextFieldLineLimits.SingleLine,
+        inputTransformation = InputTransformation.maxLength(12),
+        decorator = { innerTextField ->
+            Column(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            ) {
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(vertical = 18.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    innerTextField()
+                    Spacer(modifier = modifier.weight(1f))
+                    Text(
+                        modifier = modifier,
+                        text = nicknameState.text.length.toString(),
+                        color = DiaryColorsPalette.current.green400,
+                        style = DiaryTypography.bodyLargeRegular
+                    )
+                    Text(
+                        modifier = modifier,
+                        text = "/12",
+                        color = DiaryColorsPalette.current.gray600,
+                        style = DiaryTypography.bodyLargeRegular
+                    )
+                }
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(color = DiaryColorsPalette.current.green400)
+                ) {}
+            }
+        }
+    )
+}
+
+@Composable
+private fun NextButton(
+    modifier: Modifier = Modifier,
+    isActive: Boolean,
+    text: String,
+    onClicked: () -> Unit = {}
+) {
+    Box(
+        modifier = modifier
+            .wrapContentHeight()
+            .background(
+                color = if (isActive) DiaryColorsPalette.current.green400 else DiaryColorsPalette.current.gray500
+            )
+            .clickable {
+                onClicked()
             },
-            singleLine = true
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            modifier = modifier
+                .padding(vertical = 14.dp)
+                .wrapContentSize(),
+            text = text,
+            style = DiaryTypography.subtitleMediumBold,
+            color = DiaryColorsPalette.current.gray50
         )
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-private fun CreateNicknamePreview() {
-    NicknameCreate(
-        initialNickname = "씩씩한몬스테라",
-        errorState = SignUpUiState.CreateNickname.ErrorState.NONE
+private fun SignUpExtraInfoScreen(
+    modifier: Modifier = Modifier,
+    uiState: SignUpUiState,
+    onClickBackButton: () -> Unit = {},
+    onClickSkipButton: () -> Unit = {},
+    onClickNextButton: () -> Unit = {},
+    onClickAgeChip: (AgeChip) -> Unit = {},
+    onClickPlantReasonChip: (PlantReasonChip) -> Unit = {},
+    onClickHowKnownChip: (HowKnownChip) -> Unit = {}
+) {
+    val pagerState = rememberPagerState(pageCount = { SignUpExtraStep.entries.size })
+
+    LaunchedEffect(uiState.step) {
+        val page = uiState.step.ordinal - 1
+        if (page in 0..pagerState.pageCount) {
+            pagerState.animateScrollToPage(page = page)
+        }
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        SignUpTopBar(
+            modifier = modifier,
+            leftContent = {
+                TopBarLeftControl(
+                    modifier = modifier,
+                    onClickBackButton = onClickBackButton
+                )
+            },
+            rightContent = {
+                TopBarRightControl(
+                    onClickSkipButton = onClickSkipButton
+                )
+            }
+        )
+
+        Column(
+            modifier = modifier
+                .weight(1f)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            HorizontalPager(
+                modifier = modifier
+                    .fillMaxSize(),
+                state = pagerState
+            ) { page ->
+                when (page) {
+                    0 -> SignUpAgeContent(
+                        modifier = modifier,
+                        nickname = uiState.nickname.text.toString(),
+                        selectedAge = uiState.age,
+                        onClickItem = { onClickAgeChip(it) }
+                    )
+                    1 -> SignUpPlantReasonContent(
+                        modifier = modifier,
+                        selectedItems = uiState.plantReason,
+                        onClickItem = { onClickPlantReasonChip(it) }
+                    )
+                    2 -> SignUpHowKnowContent(
+                        modifier = modifier,
+                        selectedItems = uiState.howKnown,
+                        onClickItem = { onClickHowKnownChip(it) }
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier.height(16.dp))
+
+        NextButton(
+            modifier = modifier
+                .padding(horizontal = 20.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(size = 16.dp)),
+            isActive = uiState.age != null,
+            text = if (pagerState.currentPage == pagerState.pageCount) "시작하기" else "다음",
+            onClicked = onClickNextButton
+        )
+
+        Spacer(modifier = modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun SignUpTopBar(
+    modifier: Modifier = Modifier,
+    leftContent: @Composable () -> Unit = {},
+    rightContent: @Composable () -> Unit = {}
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(42.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        leftContent()
+        Spacer(
+            modifier = modifier
+                .fillMaxHeight()
+                .weight(1f)
+        )
+        rightContent()
+    }
+}
+
+@Composable
+private fun TopBarLeftControl(
+    modifier: Modifier = Modifier,
+    onClickBackButton: () -> Unit
+) {
+    IconButton(
+        modifier = modifier
+            .fillMaxHeight()
+            .wrapContentWidth(),
+        onClick = onClickBackButton,
+    ) {
+        Icon(
+            imageVector = ImageVector.vectorResource(R.drawable.icon_arrow_left),
+            contentDescription = null,
+            tint = DiaryColorsPalette.current.gray900
+        )
+    }
+}
+
+@Composable
+private fun TopBarRightControl(
+    modifier: Modifier = Modifier,
+    onClickSkipButton: () -> Unit
+) {
+    Text(
+        text = "건너뛰기",
+        style = DiaryTypography.bodyMediumRegular,
+        color = DiaryColorsPalette.current.gray600,
+        modifier = modifier
+            .padding(end = 20.dp)
+            .clickable {
+                onClickSkipButton()
+            }
     )
 }
 
-@Preview(showBackground = true)
+private enum class SignUpExtraStep {
+    AGE, PLANT_REASON, HOW_KNOWN
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, showBackground = true)
 @Composable
-private fun TitleTextPreview() {
-    Title(
-        mainTitle = "원하는 닉네임이\n있으신가요?"
-    )
+private fun CreateNicknamePreview() {
+    SsukssukDiaryTheme {
+        NicknameCreate(
+            nicknameState = TextFieldState("씩씩한몬스테라"),
+            errorState = SignUpUiState.NicknameErrorState.NONE,
+            isNicknameAvailable = true
+        )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, showBackground = true)
+@Composable
+private fun SignUpTopBarPreview() {
+    SsukssukDiaryTheme {
+        SignUpExtraInfoScreen(
+            uiState = SignUpUiState(),
+            onClickSkipButton = {},
+            onClickBackButton = {},
+            onClickNextButton = {}
+        )
+    }
 }

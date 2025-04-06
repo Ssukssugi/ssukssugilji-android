@@ -14,6 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SsukssukDiary"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="35">
 
         <activity
@@ -27,7 +28,7 @@
 
                 <data
                     android:host="oauth"
-                    android:scheme="kakao${KAKAO_APP_KEY}" />
+                    android:scheme="kakao27e28861b0170e541e8d639639d93bfc" />
             </intent-filter>
         </activity>
     </application>
