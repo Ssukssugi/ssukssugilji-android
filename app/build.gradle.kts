@@ -17,7 +17,7 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("./ssukssukdiary-keystore.jks")
+            storeFile = file("ssukssukdiary-keystore")
             storePassword = gradleLocalProperties(rootDir, providers).getProperty("SIGNING_STORE_PASSWORD")
             keyAlias =  gradleLocalProperties(rootDir, providers).getProperty("SIGNING_KEY_ALIAS")
             keyPassword =  gradleLocalProperties(rootDir, providers).getProperty("SIGNING_KEY_PASSWORD")
@@ -34,6 +34,7 @@ android {
                 String.valueOf(getNaverClientSecret())
             )
             manifestPlaceholders["KAKAO_APP_KEY"] = String.valueOf(getKakaoSdkAppKey())
+            isMinifyEnabled = false
         }
         getByName("release") {
             buildConfigField("String", "KAKAO_APP_KEY", String.valueOf(getKakaoSdkAppKey()))
@@ -43,7 +44,9 @@ android {
                 "NAVER_CLIENT_SECRET",
                 String.valueOf(getNaverClientSecret())
             )
+            signingConfig = signingConfigs.getByName("release")
             manifestPlaceholders["KAKAO_APP_KEY"] = String.valueOf(getKakaoSdkAppKey())
+            isMinifyEnabled = true
         }
     }
 }
