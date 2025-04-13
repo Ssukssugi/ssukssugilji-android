@@ -182,7 +182,15 @@ private fun NickNameInput(
                         .padding(vertical = 18.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    innerTextField()
+                    if (nicknameState.text.isEmpty()) {
+                        Text(
+                            text = "한글, 숫자, 영문 12글자만 입력 가능해요",
+                            color = DiaryColorsPalette.current.gray400,
+                            style = DiaryTypography.bodyLargeRegular
+                        )
+                    } else {
+                        innerTextField()
+                    }
                     Spacer(modifier = modifier.weight(1f))
                     Text(
                         modifier = modifier,
@@ -203,6 +211,8 @@ private fun NickNameInput(
                         .height(1.dp)
                         .background(color = DiaryColorsPalette.current.green400)
                 ) {}
+
+
             }
         }
     )

@@ -12,7 +12,7 @@ android {
         targetSdk = 35
         applicationId = "com.sabo.ssukssukdiary"
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
     }
 
     signingConfigs {
@@ -54,6 +54,7 @@ dependencies {
     implementation(projects.core.designsystem)
     implementation(projects.core.data)
 
+    implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.login)
 
     testImplementation(libs.junit)
