@@ -7,5 +7,6 @@ import com.sabo.core.domain.model.SocialLogin
 interface LoginRepository {
     suspend fun requestNaverLogin(token: String): Result<SocialLogin>
     suspend fun requestKakaoLogin(token: String): Result<SocialLogin>
+    suspend fun requestGoogleLogin(token: String): Result<SocialLogin>
     suspend fun applyTermsAgreement(token: String, type: LoginType, isMarketingAgree: Boolean): Result<Unit>
 }

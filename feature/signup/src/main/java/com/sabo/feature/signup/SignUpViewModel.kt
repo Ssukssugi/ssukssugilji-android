@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.sabo.core.domain.handle
 import com.sabo.core.domain.repository.SignUpRepository
 import com.sabo.feature.signup.model.AgeChip
+import com.sabo.feature.signup.model.HowKnownChip
 import com.sabo.feature.signup.model.PlantReasonChip
 import com.sabo.feature.signup.model.SignUpEvent
 import com.sabo.feature.signup.model.SignUpStep
@@ -89,6 +90,21 @@ class SignUpViewModel @Inject constructor(
         }
         _uiState.value = uiState.value.copy(
             plantReason = newSet
+        )
+    }
+
+    fun selectHowKnown(item: HowKnownChip) {
+        val newSet = uiState.value.howKnown.toMutableSet().apply {
+            if (removeIf { it.name == item.howKnown.name }.not()) {
+                SignUpUiState.HowKnown.entries.find {
+                    it.name == item.howKnown.name
+                }?.let {
+                    add(it)
+                }
+            }
+        }
+        _uiState.value = uiState.value.copy(
+            howKnown = newSet
         )
     }
 

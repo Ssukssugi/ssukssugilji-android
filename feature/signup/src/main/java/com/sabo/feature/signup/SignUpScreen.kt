@@ -31,8 +31,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +57,8 @@ import com.sabo.feature.signup.model.HowKnownChip
 import com.sabo.feature.signup.model.PlantReasonChip
 import com.sabo.feature.signup.model.SignUpStep
 import com.sabo.feature.signup.model.SignUpUiState
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 @Composable
 internal fun SignUpRoute(
@@ -70,7 +74,8 @@ internal fun SignUpRoute(
         onClickBackButton = viewModel::onClickBackScreen,
         onClickNextButton = viewModel::moveToNextStep,
         onClickAgeChip = { viewModel.selectAge(it) },
-        onClickPlantReasonChip = { viewModel.selectPlantReason(it) }
+        onClickPlantReasonChip = { viewModel.selectPlantReason(it) },
+        onClickHowKnownChip = { viewModel.selectHowKnown(it) }
     )
 }
 
@@ -92,7 +97,6 @@ private fun SignUpContent(
         if (uiState.step == SignUpStep.NICKNAME) {
             NicknameCreate(
                 nicknameState = uiState.nickname,
-                isNicknameAvailable = uiState.isNicknameCheckable,
                 errorState = uiState.nicknameErrorState,
                 onClickNextButton = onClickNicknameCheck
             )
@@ -115,10 +119,19 @@ private fun SignUpContent(
 private fun NicknameCreate(
     modifier: Modifier = Modifier,
     nicknameState: TextFieldState,
-    isNicknameAvailable: Boolean,
     errorState: SignUpUiState.NicknameErrorState,
     onClickNextButton: () -> Unit = {}
 ) {
+    val regex = remember { "^[가-힣A-Za-z0-9]{1,12}$".toRegex() }
+    var isValid by remember { mutableStateOf(false) }
+
+    LaunchedEffect(nicknameState) {
+        snapshotFlow { nicknameState.text }
+            .map { input -> regex.matches(input) }
+            .distinctUntilChanged()
+            .collect { isValid = it }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -143,7 +156,7 @@ private fun NicknameCreate(
         NextButton(
             modifier = modifier
                 .fillMaxWidth(),
-            isActive = isNicknameAvailable,
+            isActive = isValid,
             text = "확인",
             onClicked = onClickNextButton
         )
@@ -231,9 +244,10 @@ private fun NextButton(
             .background(
                 color = if (isActive) DiaryColorsPalette.current.green400 else DiaryColorsPalette.current.gray500
             )
-            .clickable {
-                onClicked()
-            },
+            .clickable(
+                enabled = isActive,
+                onClick = { onClicked() }
+            ),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -403,7 +417,6 @@ private fun CreateNicknamePreview() {
         NicknameCreate(
             nicknameState = TextFieldState("씩씩한몬스테라"),
             errorState = SignUpUiState.NicknameErrorState.NONE,
-            isNicknameAvailable = true
         )
     }
 }

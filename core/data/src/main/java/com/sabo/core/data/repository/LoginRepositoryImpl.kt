@@ -39,6 +39,19 @@ class LoginRepositoryImpl @Inject constructor(
         }
     )
 
+    override suspend fun requestGoogleLogin(token: String): Result<SocialLogin> = handleResult(
+        execute = {
+            val request = SocialLoginRequest(
+                accessToken = token,
+                loginType = LoginType.GOOGLE
+            )
+            loginService.requestSocialLogin(request)
+        },
+        transform = {
+            SocialLogin(it.isRegistered, it.existInfo)
+        }
+    )
+
     override suspend fun applyTermsAgreement(
         token: String,
         type: LoginType,

@@ -33,3 +33,7 @@ sealed interface LoginEvent {
     data object GoToMain : LoginEvent
     data object GoToSignUp : LoginEvent
 }
+
+enum class TermsAgree {
+    ALL, SERVICE, PRIVATE, AGE, MARKETING
+}

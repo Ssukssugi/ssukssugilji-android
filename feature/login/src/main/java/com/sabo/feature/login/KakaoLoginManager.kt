@@ -6,11 +6,8 @@ import com.kakao.sdk.user.UserApiClient
 class KakaoLoginManager(
     private val context: Context,
     private val callbackListener: CallbackListener
-) {
+): LoginManager(context, callbackListener) {
 
-    interface CallbackListener {
-        fun onSuccess(token: String)
-    }
     private val kakaoApiClient = UserApiClient.instance
 
     fun requestToken() {

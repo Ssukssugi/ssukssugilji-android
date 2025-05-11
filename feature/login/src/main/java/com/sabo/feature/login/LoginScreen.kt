@@ -21,20 +21,24 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,6 +52,7 @@ import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun LoginRoute(
@@ -58,6 +63,9 @@ internal fun LoginRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val kakaoLoginManager = rememberKakaoLoginManager {
         viewModel.onSuccessKakaoLogin(it)
+    }
+    val googleLoginManager = rememberGoogleLoginManager {
+        viewModel.onSuccessGoogleLogin(it)
     }
 
     LaunchedEffect(Unit) {
@@ -80,6 +88,7 @@ internal fun LoginRoute(
             modifier = modifier,
             uiState = uiState,
             onClickKakaoLogin = kakaoLoginManager::requestToken,
+            onClickGoogleLogin = googleLoginManager::requestToken,
             onSuccessNaverLogin = viewModel::onSuccessNaverLogin,
             onClickNextButton = viewModel::applyTermsAgreement
         )
@@ -91,6 +100,7 @@ private fun LoginContent(
     modifier: Modifier = Modifier,
     uiState: LoginUiState,
     onClickKakaoLogin: () -> Unit,
+    onClickGoogleLogin: suspend () -> Unit,
     onSuccessNaverLogin: (String) -> Unit,
     onClickNextButton: () -> Unit
 ) {
@@ -98,6 +108,7 @@ private fun LoginContent(
         is LoginUiState.BeforeLogin -> LoginScreen(
             modifier = modifier,
             onClickKakaoLogin = onClickKakaoLogin,
+            onClickGoogleLogin = onClickGoogleLogin,
             onSuccessNaverLogin = onSuccessNaverLogin,
             isShownTermsAgreeDialog = uiState.isShownTermsAgree,
             termsState = uiState.termsState,
@@ -112,12 +123,15 @@ private fun LoginContent(
 private fun LoginScreen(
     modifier: Modifier = Modifier,
     onClickKakaoLogin: () -> Unit,
+    onClickGoogleLogin: suspend () -> Unit,
     onSuccessNaverLogin: (String) -> Unit,
     isShownTermsAgreeDialog: Boolean = false,
     termsState: LoginUiState.BeforeLogin.TermsAgreeState,
     onClickNextButton: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -175,7 +189,12 @@ private fun LoginScreen(
             )
             Spacer(modifier = modifier.width(16.dp))
             LoginIcon(
-                resId = R.drawable.icon_login_google
+                resId = R.drawable.icon_login_google,
+                onClick = {
+                    scope.launch {
+                        onClickGoogleLogin()
+                    }
+                }
             )
         }
     }
@@ -264,6 +283,29 @@ private fun ColumnScope.TermAgreeContent(
                 .padding(vertical = 16.dp)
                 .align(Alignment.Center)
         )
+    }
+}
+
+@Composable
+private fun TermAgreeContentItem(
+    modifier: Modifier = Modifier,
+    isChecked: Boolean,
+    item: RowScope.() -> Unit,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 12.dp)
+    ) {
+        Icon(
+            imageVector = ImageVector.vectorResource(com.sabo.core.designsystem.R.drawable.icon_check_24),
+            contentDescription = null,
+            tint = if (isChecked) DiaryColorsPalette.current.green400 else DiaryColorsPalette.current.gray400
+        )
+
+        item()
     }
 }
 
@@ -390,7 +432,19 @@ fun rememberKakaoLoginManager(
     onSuccess: (String) -> Unit
 ): KakaoLoginManager {
     val context = LocalContext.current
-    return KakaoLoginManager(context, object : KakaoLoginManager.CallbackListener {
+    return KakaoLoginManager(context, object : LoginManager.CallbackListener {
+        override fun onSuccess(token: String) {
+            onSuccess(token)
+        }
+    })
+}
+
+@Composable
+fun rememberGoogleLoginManager(
+    onSuccess: (String) -> Unit
+): GoogleLoginManager {
+    val context = LocalContext.current
+    return GoogleLoginManager(context, object : LoginManager.CallbackListener {
         override fun onSuccess(token: String) {
             onSuccess(token)
         }
@@ -403,6 +457,7 @@ fun rememberKakaoLoginManager(
 fun LoginScreenPreview() {
     LoginScreen(
         onClickKakaoLogin = {},
+        onClickGoogleLogin = {},
         onSuccessNaverLogin = {},
         termsState = LoginUiState.BeforeLogin.TermsAgreeState()
     )

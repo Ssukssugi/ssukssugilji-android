@@ -9,7 +9,6 @@ data class SignUpUiState(
     val step: SignUpStep = SignUpStep.NICKNAME,
     val nickname: TextFieldState = TextFieldState(),
     val nicknameErrorState: NicknameErrorState = NicknameErrorState.NONE,
-    val isNicknameCheckable: Boolean = false,
     val age: Age? = null,
     val plantReason: Set<PlantReason> = emptySet(),
     val howKnown: Set<HowKnown> = emptySet()

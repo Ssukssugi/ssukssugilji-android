@@ -8,9 +8,9 @@ import com.sabo.core.navigator.RouteModel
 
 fun NavController.navigateToLogin(
     navOptions: NavOptions = androidx.navigation.navOptions {
-        popUpTo<RouteModel.Login>({
+        popUpTo<RouteModel.Login> {
             inclusive = true
-        })
+        }
     }
 ) {
     this.navigate(RouteModel.Login, navOptions)

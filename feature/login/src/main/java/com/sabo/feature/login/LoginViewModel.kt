@@ -73,7 +73,26 @@ class LoginViewModel @Inject constructor(
                 onError = {
                 },
                 onFinish = {
+                }
+            )
+        }
+    }
 
+    fun onSuccessGoogleLogin(token: String) {
+        val state = uiState.value as? LoginUiState.BeforeLogin ?: return
+        viewModelScope.launch {
+            loginRepository.requestGoogleLogin(token = token).handle(
+                onSuccess = {
+                    socialAccessToken = token
+                    loginType = LoginType.GOOGLE
+                    if (it.isRegistered) {
+                        navigateAfterLogin(
+                            loginType = LoginType.GOOGLE,
+                            isAlreadyMember = it.existInfo
+                        )
+                    } else {
+                        _uiState.value = state.copy(isShownTermsAgree = true)
+                    }
                 }
             )
         }
