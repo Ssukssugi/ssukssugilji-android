@@ -22,10 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version("0.5.0")
-}
-
 rootProject.name = "SsukssukDiary"
 include(":app")
 include(":feature:main")
@@ -38,3 +34,5 @@ include(":core:data")
 include(":core:domain")
 include(":feature:signup")
 include(":core:datastore")
+include(":feature:home")
+include(":feature:diary")

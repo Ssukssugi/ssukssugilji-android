@@ -3,6 +3,7 @@ import java.lang.String
 
 plugins {
     id("ssukssukdiary.android.application")
+    alias(libs.plugins.google.service)
 }
 
 android {

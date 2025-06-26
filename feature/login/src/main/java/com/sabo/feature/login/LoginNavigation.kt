@@ -17,11 +17,13 @@ fun NavController.navigateToLogin(
 }
 
 fun NavGraphBuilder.loginNavGraph(
-    navigateToSignUp: () -> Unit
+    navigateToSignUp: () -> Unit,
+    navigateToHome: () -> Unit
 ) {
     composable<RouteModel.Login> {
         LoginRoute(
-            navigateToSignUp = navigateToSignUp
+            navigateToSignUp = navigateToSignUp,
+            navigateToHome = navigateToHome
         )
     }
 }

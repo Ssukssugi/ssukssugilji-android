@@ -26,6 +26,7 @@ internal fun Project.configureComposeAndroid() {
             implementation(libs.findLibrary("androidx.material").get())
             implementation(libs.findLibrary("androidx.navigation.compose").get())
             implementation(libs.findLibrary("androidx.hilt.navigation.compose").get())
+            implementation(libs.findLibrary("coil").get())
 
             debugImplementation(libs.findLibrary("androidx.ui.tooling").get())
             debugImplementation(libs.findLibrary("androidx.ui.test.manifest").get())

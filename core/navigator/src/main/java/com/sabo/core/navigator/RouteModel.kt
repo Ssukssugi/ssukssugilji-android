@@ -9,4 +9,7 @@ sealed interface RouteModel {
 
     @Serializable
     data object SignUp : RouteModel
+
+    @Serializable
+    data object Home : RouteModel
 }

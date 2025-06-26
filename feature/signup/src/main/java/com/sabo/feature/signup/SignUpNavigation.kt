@@ -16,8 +16,12 @@ fun NavController.navigateToSignUp(
     this.navigate(RouteModel.SignUp, navOptions)
 }
 
-fun NavGraphBuilder.signUpNavGraph() {
+fun NavGraphBuilder.signUpNavGraph(
+    onCompletedSignUp: () -> Unit
+) {
     composable<RouteModel.SignUp> {
-        SignUpRoute()
+        SignUpRoute(
+            onCompletedSignUp = onCompletedSignUp
+        )
     }
 }

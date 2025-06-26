@@ -6,10 +6,10 @@ ksp = "2.0.0-1.0.23"
 kotlinxSerializationJson = "1.7.0"
 
 ## Coroutines
-coroutine = "1.9.0-RC"
+coroutine = "1.10.1"
 
 ## Hilt
-hilt = "2.51.1"
+hilt = "2.55"
 hilt-navigation-compose = "1.2.0"
 
 ## Network
@@ -20,17 +20,21 @@ okhttp3 = "4.12.0"
 dataStore-preferences = "1.1.1"
 
 ## Compose
-composeBom = "2024.11.00"
-activityCompose = "1.9.3"
-composeMaterial = "1.7.5"
-navigation-compose = "2.8.4"
+composeBom = "2025.05.01"
+activityCompose = "1.10.1"
+composeMaterial = "1.8.2"
+navigation-compose = "2.9.0"
+coil = "3.2.0"
+
+## Google
+accompanist = "0.37.3"
 
 ## Google Service
 google-service = "4.4.2"
 firebase-bom = "33.12.0"
 
 ## Google OAuth
-credential = "1.3.0"
+credential = "1.5.0"
 identity = "1.1.1"
 
 ## kakao
@@ -47,6 +51,7 @@ lifecycleRuntimeKtx = "2.8.6"
 jetbrainsKotlinJvm = "2.0.0"
 appcompat = "1.7.0"
 material = "1.12.0"
+uiTooling = "1.8.1"
 
 [libraries]
 android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -88,6 +93,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-material = { group = "androidx.compose.material", name = "material", version.ref = "composeMaterial"}
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" }
+coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 
 ## Kakao
 kakao-login = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao" }
@@ -96,6 +102,8 @@ kakao-login = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao"
 naver-login = { group = "com.navercorp.nid", name = "oauth", version.ref = "naver" }
 
 ## Google
+accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
+
 ## Google OAuth
 credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credential" }
 credentials-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credential" }
@@ -112,6 +120,7 @@ androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecyc
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

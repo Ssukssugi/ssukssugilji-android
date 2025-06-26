@@ -100,6 +100,7 @@ class LoginViewModel @Inject constructor(
 
     fun applyTermsAgreement() {
         val state = uiState.value as? LoginUiState.BeforeLogin ?: return
+        if (state.termsState.isRequiredAgree().not()) return
         val accessToken = socialAccessToken ?: return
         val loginType = this.loginType ?: return
         viewModelScope.launch {
@@ -120,6 +121,11 @@ class LoginViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    fun changeAgreeTermState(newState: TermsAgreeState) {
+        val state = uiState.value as? LoginUiState.BeforeLogin ?: return
+        _uiState.value = state.copy(termsState = newState)
     }
 
     private fun CoroutineScope.navigateAfterLogin(

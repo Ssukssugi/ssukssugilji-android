@@ -63,9 +63,16 @@ import kotlinx.coroutines.flow.map
 @Composable
 internal fun SignUpRoute(
     modifier: Modifier = Modifier,
-    viewModel: SignUpViewModel = hiltViewModel()
+    viewModel: SignUpViewModel = hiltViewModel(),
+    onCompletedSignUp: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        if (uiState.step == SignUpStep.COMPLETED) {
+            onCompletedSignUp()
+        }
+    }
 
     SignUpContent(
         modifier = modifier,
@@ -309,7 +316,8 @@ private fun SignUpExtraInfoScreen(
             HorizontalPager(
                 modifier = modifier
                     .fillMaxSize(),
-                state = pagerState
+                state = pagerState,
+                userScrollEnabled = false
             ) { page ->
                 when (page) {
                     0 -> SignUpAgeContent(

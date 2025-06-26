@@ -4,7 +4,6 @@ import java.lang.String
 
 plugins {
     id("ssukssukdiary.android.feature")
-    alias(libs.plugins.google.service)
 }
 
 android {

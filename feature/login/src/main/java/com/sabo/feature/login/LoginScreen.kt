@@ -9,12 +9,12 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -58,7 +58,8 @@ import kotlinx.coroutines.launch
 internal fun LoginRoute(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
-    navigateToSignUp: () -> Unit
+    navigateToSignUp: () -> Unit,
+    navigateToHome: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val kakaoLoginManager = rememberKakaoLoginManager {
@@ -71,10 +72,7 @@ internal fun LoginRoute(
     LaunchedEffect(Unit) {
         viewModel.loginEvent.collect {
             when (it) {
-                LoginEvent.GoToMain -> {
-
-                }
-
+                LoginEvent.GoToMain -> navigateToHome()
                 LoginEvent.GoToSignUp -> navigateToSignUp()
             }
         }
@@ -90,6 +88,7 @@ internal fun LoginRoute(
             onClickKakaoLogin = kakaoLoginManager::requestToken,
             onClickGoogleLogin = googleLoginManager::requestToken,
             onSuccessNaverLogin = viewModel::onSuccessNaverLogin,
+            onClickTermAgreeItem = { viewModel.changeAgreeTermState(it) },
             onClickNextButton = viewModel::applyTermsAgreement
         )
     }
@@ -102,6 +101,7 @@ private fun LoginContent(
     onClickKakaoLogin: () -> Unit,
     onClickGoogleLogin: suspend () -> Unit,
     onSuccessNaverLogin: (String) -> Unit,
+    onClickTermAgreeItem: (TermsAgreeState) -> Unit,
     onClickNextButton: () -> Unit
 ) {
     when (uiState) {
@@ -112,6 +112,7 @@ private fun LoginContent(
             onSuccessNaverLogin = onSuccessNaverLogin,
             isShownTermsAgreeDialog = uiState.isShownTermsAgree,
             termsState = uiState.termsState,
+            onClickTermAgreeItem = onClickTermAgreeItem,
             onClickNextButton = onClickNextButton
         )
         LoginUiState.SignUpLoading -> RedirectLoadingScreen()
@@ -126,7 +127,8 @@ private fun LoginScreen(
     onClickGoogleLogin: suspend () -> Unit,
     onSuccessNaverLogin: (String) -> Unit,
     isShownTermsAgreeDialog: Boolean = false,
-    termsState: LoginUiState.BeforeLogin.TermsAgreeState,
+    termsState: TermsAgreeState,
+    onClickTermAgreeItem: (TermsAgreeState) -> Unit,
     onClickNextButton: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -202,6 +204,7 @@ private fun LoginScreen(
     if (isShownTermsAgreeDialog) {
         TermAgreeDialog(
             termsState = termsState,
+            onClickTermAgreeItem = onClickTermAgreeItem,
             onClickNextButton = onClickNextButton
         )
     }
@@ -210,8 +213,9 @@ private fun LoginScreen(
 @Composable
 private fun TermAgreeDialog(
     modifier: Modifier = Modifier,
+    termsState: TermsAgreeState,
     onDismissRequest: () -> Unit = {},
-    termsState: LoginUiState.BeforeLogin.TermsAgreeState,
+    onClickTermAgreeItem: (TermsAgreeState) -> Unit = {},
     onClickNextButton: () -> Unit = {}
 ) {
     Dialog(
@@ -224,7 +228,7 @@ private fun TermAgreeDialog(
         Surface(
             shape = RoundedCornerShape(24.dp),
             modifier = modifier
-                .padding(horizontal = 10.dp)
+                .padding(horizontal = 10.dp, vertical = 25.dp)
                 .fillMaxWidth()
                 .wrapContentHeight()
         ) {
@@ -233,6 +237,14 @@ private fun TermAgreeDialog(
                     .fillMaxWidth()
                     .wrapContentHeight()
             ) {
+                Box(
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .width(64.dp)
+                        .height(4.dp)
+                        .background(color = Color(0xFFDDDDDD))
+                        .align(Alignment.CenterHorizontally),
+                )
                 Text(
                     text = "필수 약관에 동의해주세요",
                     style = DiaryTypography.subtitleLargeBold,
@@ -243,10 +255,8 @@ private fun TermAgreeDialog(
                 )
                 TermAgreeContent(
                     modifier = modifier,
-                    isServiceTermAgree = termsState.serviceTerms,
-                    isPrivateTermAgree = termsState.privateTerms,
-                    isAgeTermAgree = termsState.ageTerms,
-                    isMarketingTermAgree = termsState.marketingTerms,
+                    state = termsState,
+                    onClickTermAgreeItem = onClickTermAgreeItem,
                     onClickNextButton = onClickNextButton
                 )
             }
@@ -255,14 +265,92 @@ private fun TermAgreeDialog(
 }
 
 @Composable
-private fun ColumnScope.TermAgreeContent(
+private fun TermAgreeContent(
     modifier: Modifier = Modifier,
-    isServiceTermAgree: Boolean,
-    isPrivateTermAgree: Boolean,
-    isAgeTermAgree: Boolean,
-    isMarketingTermAgree: Boolean,
+    state: TermsAgreeState,
+    onClickTermAgreeItem: (TermsAgreeState) -> Unit = {},
     onClickNextButton: () -> Unit = {}
 ) {
+    TermAgreeContentItem(
+        isChecked = state.isAllAgree(),
+        item = {
+            Text(
+                text = "전체동의",
+                style = DiaryTypography.bodyLargeMedium,
+                color = DiaryColorsPalette.current.gray700
+            )
+        },
+        onClick = {
+            onClickTermAgreeItem(
+                state.copy(
+                    serviceTerms = state.isAllAgree().not(),
+                    privateTerms = state.isAllAgree().not(),
+                    ageTerms = state.isAllAgree().not(),
+                    marketingTerms = state.isAllAgree().not()
+                )
+            )
+        }
+    )
+
+    TermAgreeContentItem(
+        isChecked = state.serviceTerms,
+        item = {
+            Text(
+                text = "[필수] 서비스 이용약관",
+                style = DiaryTypography.bodyMediumRegular,
+                color = DiaryColorsPalette.current.gray700
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Icon(
+                imageVector = ImageVector.vectorResource(com.sabo.core.designsystem.R.drawable.icon_arrow_right_24),
+                contentDescription = null,
+                tint = Color(0xFFCCCCCC)
+            )
+        },
+        onClick = { onClickTermAgreeItem(state.copy(serviceTerms = state.serviceTerms.not())) }
+    )
+
+    TermAgreeContentItem(
+        isChecked = state.privateTerms,
+        item = {
+            Text(
+                text = "[필수] 개인정보 수집 / 이용동의서",
+                style = DiaryTypography.bodyMediumRegular,
+                color = DiaryColorsPalette.current.gray700
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Icon(
+                imageVector = ImageVector.vectorResource(com.sabo.core.designsystem.R.drawable.icon_arrow_right_24),
+                contentDescription = null,
+                tint = Color(0xFFCCCCCC)
+            )
+        },
+        onClick = { onClickTermAgreeItem(state.copy(privateTerms = state.privateTerms.not())) }
+    )
+
+    TermAgreeContentItem(
+        isChecked = state.ageTerms,
+        item = {
+            Text(
+                text = "[필수] 만 14세 이상 확인",
+                style = DiaryTypography.bodyMediumRegular,
+                color = DiaryColorsPalette.current.gray700
+            )
+        },
+        onClick = { onClickTermAgreeItem(state.copy(ageTerms = state.ageTerms.not())) }
+    )
+
+    TermAgreeContentItem(
+        isChecked = state.marketingTerms,
+        item = {
+            Text(
+                text = "마케팅 정보 수신 동의",
+                style = DiaryTypography.bodyMediumRegular,
+                color = DiaryColorsPalette.current.gray700
+            )
+        },
+        onClick = { onClickTermAgreeItem(state.copy(marketingTerms = state.marketingTerms.not())) }
+    )
 
     Box(
         modifier = modifier
@@ -270,10 +358,14 @@ private fun ColumnScope.TermAgreeContent(
             .fillMaxWidth()
             .wrapContentHeight()
             .clip(RoundedCornerShape(16.dp))
-            .background(color = DiaryColorsPalette.current.green400)
-            .clickable { 
-                onClickNextButton()
-            }
+            .background(
+                color = if (state.isRequiredAgree()) DiaryColorsPalette.current.green400
+                else DiaryColorsPalette.current.green100
+            )
+            .clickable(
+                enabled = state.isRequiredAgree(),
+                onClick = { onClickNextButton() }
+            )
     ) {
         Text(
             text = "시작하기",
@@ -290,7 +382,7 @@ private fun ColumnScope.TermAgreeContent(
 private fun TermAgreeContentItem(
     modifier: Modifier = Modifier,
     isChecked: Boolean,
-    item: RowScope.() -> Unit,
+    item: @Composable RowScope.() -> Unit,
     onClick: () -> Unit
 ) {
     Row(
@@ -298,13 +390,15 @@ private fun TermAgreeContentItem(
             .wrapContentHeight()
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 12.dp)
+            .clickable { onClick() },
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = ImageVector.vectorResource(com.sabo.core.designsystem.R.drawable.icon_check_24),
             contentDescription = null,
             tint = if (isChecked) DiaryColorsPalette.current.green400 else DiaryColorsPalette.current.gray400
         )
-
+        Spacer(modifier = Modifier.width(8.dp))
         item()
     }
 }
@@ -459,7 +553,9 @@ fun LoginScreenPreview() {
         onClickKakaoLogin = {},
         onClickGoogleLogin = {},
         onSuccessNaverLogin = {},
-        termsState = LoginUiState.BeforeLogin.TermsAgreeState()
+        termsState = TermsAgreeState(),
+        onClickTermAgreeItem = {},
+        onClickNextButton = {}
     )
 }
 
@@ -493,7 +589,7 @@ fun LoginIconPreview() {
 private fun TermsAgreeDialogPreview() {
     SsukssukDiaryTheme {
         TermAgreeDialog(
-            termsState = LoginUiState.BeforeLogin.TermsAgreeState()
+            termsState = TermsAgreeState()
         )
     }
 }

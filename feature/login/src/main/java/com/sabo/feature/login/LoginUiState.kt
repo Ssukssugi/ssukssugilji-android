@@ -10,15 +10,7 @@ sealed interface LoginUiState {
     data class BeforeLogin(
         val isShownTermsAgree: Boolean = false,
         val termsState: TermsAgreeState = TermsAgreeState()
-    ) : LoginUiState {
-        @Immutable
-        data class TermsAgreeState(
-            val serviceTerms: Boolean = false,
-            val privateTerms: Boolean = false,
-            val ageTerms: Boolean = false,
-            val marketingTerms: Boolean = false
-        )
-    }
+    ) : LoginUiState
 
     data object SignUpLoading : LoginUiState
 
@@ -34,6 +26,13 @@ sealed interface LoginEvent {
     data object GoToSignUp : LoginEvent
 }
 
-enum class TermsAgree {
-    ALL, SERVICE, PRIVATE, AGE, MARKETING
+@Immutable
+data class TermsAgreeState(
+    val serviceTerms: Boolean = false,
+    val privateTerms: Boolean = false,
+    val ageTerms: Boolean = false,
+    val marketingTerms: Boolean = false
+) {
+    fun isAllAgree() = serviceTerms && privateTerms && ageTerms && marketingTerms
+    fun isRequiredAgree() = serviceTerms && privateTerms && ageTerms
 }

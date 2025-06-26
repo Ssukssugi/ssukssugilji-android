@@ -65,7 +65,6 @@ class SignUpViewModel @Inject constructor(
                 applyUserDetails()
                 return
             }
-
             SignUpStep.COMPLETED -> return
         }
 

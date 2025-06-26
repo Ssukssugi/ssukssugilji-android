@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
+import com.sabo.feature.home.homeNavGraph
 import com.sabo.feature.login.loginNavGraph
 import com.sabo.feature.signup.signUpNavGraph
 
@@ -29,9 +30,13 @@ internal fun MainNavHost(
             startDestination = navigator.startDestination
         ) {
             loginNavGraph(
-                navigateToSignUp = navigator::navigateToSignUp
+                navigateToSignUp = navigator::navigateToSignUp,
+                navigateToHome = navigator::navigateToHome
             )
-            signUpNavGraph()
+            signUpNavGraph(
+                onCompletedSignUp = navigator::navigateToHome
+            )
+            homeNavGraph()
         }
     }
 }
