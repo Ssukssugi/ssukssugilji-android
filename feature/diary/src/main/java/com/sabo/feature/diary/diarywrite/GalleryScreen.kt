@@ -1,4 +1,4 @@
-package com.sabo.feature.diary.diarywrite.ui
+package com.sabo.feature.diary.diarywrite
 
 import android.Manifest
 import android.content.Context

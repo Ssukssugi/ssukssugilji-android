@@ -5,5 +5,11 @@ plugins {
     id("com.android.application")
 }
 
+android {
+    lint {
+        disable += "NullSafeMutableLiveData"
+    }
+}
+
 configureKotlinAndroid()
 configureHiltAndroid()

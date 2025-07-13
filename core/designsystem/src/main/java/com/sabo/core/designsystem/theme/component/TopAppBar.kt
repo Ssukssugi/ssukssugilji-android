@@ -53,13 +53,14 @@ fun SsukssukTopAppBar(
             modifier = modifier
                 .fillMaxWidth()
                 .height(42.dp)
-                .background(color = containerColor)
-                .padding(horizontal = 14.dp),
+                .background(color = containerColor),
             contentAlignment = Alignment.CenterStart
         ) {
             navigationType.iconResId?.let {
                 icon(
-                    modifier.align(Alignment.CenterStart),
+                    modifier
+                        .padding(start = 14.dp)
+                        .align(Alignment.CenterStart),
                     ImageVector.vectorResource(id = it)
                 )
             }

@@ -1,4 +1,4 @@
-package com.sabo.feature.diary.diarywrite.ui
+package com.sabo.feature.diary.diarywrite
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image

@@ -16,7 +16,9 @@ android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    lint {
+        disable += "NullSafeMutableLiveData"
+    }
 }
 
 configureKotlinAndroid()
