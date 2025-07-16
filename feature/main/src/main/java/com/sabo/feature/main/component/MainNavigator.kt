@@ -5,6 +5,8 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.sabo.core.navigator.RouteModel
+import com.sabo.feature.diary.plantadd.categorySearch.navigateToCategorySearch
+import com.sabo.feature.diary.plantadd.navigateToPlantAdd
 import com.sabo.feature.home.navigateToHome
 import com.sabo.feature.login.navigateToLogin
 import com.sabo.feature.signup.navigateToSignUp
@@ -24,6 +26,18 @@ class MainNavigator(
 
     fun navigateToHome() {
         navController.navigateToHome()
+    }
+
+    fun navigateToPlantAdd() {
+        navController.navigateToPlantAdd()
+    }
+
+    fun navigateToCategorySearch(keyword: String) {
+        navController.navigateToCategorySearch(keyword)
+    }
+
+    fun popBackStack() {
+        navController.popBackStack()
     }
 }
 

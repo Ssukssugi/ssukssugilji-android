@@ -40,6 +40,7 @@ internal fun Project.configureKotlinAndroid() {
         tasks.withType<KotlinCompile>().configureEach {
             compilerOptions {
                 jvmTarget.set(JvmTarget.JVM_17)
+                freeCompilerArgs.add("-opt-in=kotlinx.serialization.InternalSerializationApi")
             }
         }
 

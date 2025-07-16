@@ -9,6 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
+import com.sabo.feature.diary.plantadd.categorySearch.categorySearchScreen
+import com.sabo.feature.diary.plantadd.categorySearch.popBackStackWithResult
+import com.sabo.feature.diary.plantadd.plantAddNavGraph
 import com.sabo.feature.home.homeNavGraph
 import com.sabo.feature.login.loginNavGraph
 import com.sabo.feature.signup.signUpNavGraph
@@ -37,6 +40,15 @@ internal fun MainNavHost(
                 onCompletedSignUp = navigator::navigateToHome
             )
             homeNavGraph()
+            plantAddNavGraph(
+                onClickCategory = navigator::navigateToCategorySearch,
+                onClickHome = navigator::navigateToHome,
+                onClickDiary = { /* TODO: 일지 작성 하러 가기 추가*/}
+            )
+            categorySearchScreen(
+                onClickBack = navigator::popBackStack,
+                onClickCategory = navigator.navController::popBackStackWithResult
+            )
         }
     }
 }

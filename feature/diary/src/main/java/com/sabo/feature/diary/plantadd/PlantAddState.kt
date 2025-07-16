@@ -1,16 +1,17 @@
-package com.sabo.feature.diary.plantadd.model
+package com.sabo.feature.diary.plantadd
 
 import androidx.compose.foundation.text.input.TextFieldState
-import com.sabo.feature.diary.plantadd.model.LightAmount.Companion.NOT_SET
+import com.sabo.feature.diary.plantadd.LightAmount.Companion.NOT_SET
 
 sealed interface PlantAddState {
-    data object Loading : PlantAddState
     data class Input(
         val textFieldState: TextFieldState = TextFieldState(),
         val plantCategory: PlantCategory? = null,
         val lightAmount: LightAmount = NOT_SET,
         val place: PlantPlace? = null,
     ) : PlantAddState
+
+    data object SaveSuccess : PlantAddState
 }
 
 data class PlantCategory(
@@ -59,9 +60,9 @@ data class LightAmount(
 enum class PlantPlace(val displayName: String) {
     VERANDA("베란다"),
     WINDOW("창가"),
-    CORRIDOR("복도"),
-    ROOM("거실"),
-    YARD("방 안"),
+    HALLWAY("복도"),
+    LIVINGROOM("거실"),
+    ROOM("방 안"),
     OTHER("기타")
 }
 

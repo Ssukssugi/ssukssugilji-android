@@ -15,4 +15,11 @@ sealed interface RouteModel {
 
     @Serializable
     data object PlantAdd : RouteModel
+
+    @Serializable
+    data class CategorySearch(val keyword: String): RouteModel {
+        companion object {
+            const val EXTRA_KEY = "keyword"
+        }
+    }
 }

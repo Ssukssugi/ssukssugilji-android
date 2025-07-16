@@ -1,9 +1,11 @@
 package com.sabo.core.data.di
 
 import com.sabo.core.data.provider.AuthTokenProvider
+import com.sabo.core.data.repository.DiaryRepositoryImpl
 import com.sabo.core.data.repository.LoginRepositoryImpl
 import com.sabo.core.data.repository.SignUpRepositoryImpl
 import com.sabo.core.domain.provider.TokenProvider
+import com.sabo.core.domain.repository.DiaryRepository
 import com.sabo.core.domain.repository.LoginRepository
 import com.sabo.core.domain.repository.SignUpRepository
 import dagger.Binds
@@ -23,4 +25,7 @@ internal abstract class DataModule {
 
     @Binds
     abstract fun bindTokenProvider(impl: AuthTokenProvider): TokenProvider
+
+    @Binds
+    abstract fun bindDiaryRepository(impl: DiaryRepositoryImpl): DiaryRepository
 }

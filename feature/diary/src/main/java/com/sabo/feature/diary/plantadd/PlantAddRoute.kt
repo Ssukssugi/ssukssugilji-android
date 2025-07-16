@@ -10,6 +10,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -28,10 +30,10 @@ import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.maxLength
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,7 +46,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
@@ -57,16 +61,17 @@ import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
 import com.sabo.core.designsystem.theme.component.NavigationType
 import com.sabo.core.designsystem.theme.component.SsukssukTopAppBar
-import com.sabo.feature.diary.plantadd.model.LightAmount
-import com.sabo.feature.diary.plantadd.model.PlantAddState
-import com.sabo.feature.diary.plantadd.model.PlantPlace
 
 @Composable
 internal fun PlantAddRoute(
     modifier: Modifier = Modifier,
-    viewModel: PlantAddViewModel = hiltViewModel()
+    viewModel: PlantAddViewModel = hiltViewModel(),
+    onClickCategory: (String) -> Unit = {},
+    onClickHome: () -> Unit = {},
+    onClickDiary: () -> Unit = {}
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val isAddButtonEnabled by viewModel.isAddable.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier
@@ -74,16 +79,26 @@ internal fun PlantAddRoute(
             .background(Color(0xFFFFFFFF)),
         verticalArrangement = Arrangement.Top
     ) {
-        SsukssukTopAppBar(
-            modifier = modifier,
-            navigationType = NavigationType.BACK,
-            containerColor = Color(0xFFFFFFFF)
-        )
         when (val state = uiState) {
-            PlantAddState.Loading -> {}
             is PlantAddState.Input -> {
+                SsukssukTopAppBar(
+                    modifier = modifier,
+                    navigationType = NavigationType.BACK,
+                    containerColor = Color(0xFFFFFFFF)
+                )
+
                 PlantInfoInputScreen(
                     state = state,
+                    isAddButtonEnabled = isAddButtonEnabled,
+                    onClickCategory = onClickCategory,
+                    onClickAddButton = viewModel::savePlant
+                )
+            }
+
+            PlantAddState.SaveSuccess -> {
+                SaveSuccessContent(
+                    onClickHome = onClickHome,
+                    onClickDiary = onClickDiary
                 )
             }
         }
@@ -91,21 +106,23 @@ internal fun PlantAddRoute(
 }
 
 @Composable
-private fun PlantInfoInputScreen(
+private fun ColumnScope.PlantInfoInputScreen(
     modifier: Modifier = Modifier,
     state: PlantAddState.Input = PlantAddState.Input(),
+    isAddButtonEnabled: Boolean,
+    onClickCategory: (String) -> Unit = {},
     onClickAddButton: () -> Unit = {}
 ) {
-    val isAddButtonEnabled by remember { derivedStateOf { state.textFieldState.text.isNotEmpty() && state.plantCategory != null } }
-
     Box(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .weight(1f, fill = true)
     ) {
         Column(
             modifier = modifier
                 .fillMaxWidth()
-                .wrapContentHeight(),
+                .wrapContentHeight()
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Top
         ) {
             Row(
@@ -145,7 +162,10 @@ private fun PlantInfoInputScreen(
 
             NicknameSection(textFieldState = state.textFieldState)
 
-            PlantCategorySection(plantCategoryName = state.plantCategory?.name)
+            PlantCategorySection(
+                plantCategoryName = state.plantCategory?.name,
+                onClickCategory = onClickCategory
+            )
 
             LightAmountBar(
                 currentStep = state.lightAmount,
@@ -245,7 +265,8 @@ private fun NicknameSection(
 @Composable
 private fun PlantCategorySection(
     modifier: Modifier = Modifier,
-    plantCategoryName: String? = null
+    plantCategoryName: String? = null,
+    onClickCategory: (String) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -263,9 +284,7 @@ private fun PlantCategorySection(
             modifier = modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .clickable {
-
-                }
+                .clickable { onClickCategory(plantCategoryName ?: "") }
         ) {
             Text(
                 text = plantCategoryName ?: "예) 몬스테라, 방울토마토, 스위트바질",
@@ -525,7 +544,10 @@ private fun AddButton(
         modifier = modifier
             .padding(horizontal = 20.dp, vertical = 16.dp)
             .fillMaxWidth()
-            .background(color = DiaryColorsPalette.current.green500, shape = RoundedCornerShape(16.dp))
+            .background(
+                color = DiaryColorsPalette.current.green500,
+                shape = RoundedCornerShape(16.dp)
+            )
             .clickable { onclick() }
             .padding(vertical = 16.dp)
     ) {
@@ -538,15 +560,96 @@ private fun AddButton(
     }
 }
 
+@Composable
+private fun SaveSuccessContent(
+    onClickHome: () -> Unit = {},
+    onClickDiary: () -> Unit = {}
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color.White)
+            .padding(top = 72.dp, bottom = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "키우는 식물을 등록했어요!",
+            color = Color(0xFF333333),
+            style = DiaryTypography.headlineSmallBold
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth()
+                .background(
+                    color = Color(0xFF03D379),
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .clickable { onClickHome }
+                .clip(RoundedCornerShape(16.dp))
+                .padding(vertical = 16.dp)
+        ) {
+            Text(
+                text = "홈으로 돌아가기",
+                color = DiaryColorsPalette.current.gray50,
+                style = DiaryTypography.subtitleMediumBold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .align(Alignment.Center)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth()
+                .background(
+                    color = DiaryColorsPalette.current.green50,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .clickable { onClickDiary }
+                .clip(RoundedCornerShape(16.dp))
+                .padding(vertical = 16.dp)
+        ) {
+            Text(
+                text = "일지 작성하러 가기",
+                color = DiaryColorsPalette.current.green600,
+                style = DiaryTypography.subtitleMediumBold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .align(Alignment.Center)
+            )
+        }
+    }
+}
+
 @Preview(backgroundColor = 0xFFFFFF, showBackground = true)
 @Composable
 private fun PlantInfoInputScreenPreview() {
     SsukssukDiaryTheme {
-        PlantInfoInputScreen(
-            state = PlantAddState.Input(
-                lightAmount = LightAmount.LOW,
-                place = PlantPlace.ROOM
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            PlantInfoInputScreen(
+                state = PlantAddState.Input(
+                    lightAmount = LightAmount.LOW,
+                    place = PlantPlace.LIVINGROOM
+                ),
+                isAddButtonEnabled = true,
             )
-        )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun SaveSuccessContentPreview() {
+    SsukssukDiaryTheme {
+        SaveSuccessContent()
     }
 }

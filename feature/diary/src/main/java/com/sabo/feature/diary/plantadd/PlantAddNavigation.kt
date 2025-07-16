@@ -9,8 +9,16 @@ fun NavController.navigateToPlantAdd() {
     this.navigate(RouteModel.PlantAdd)
 }
 
-fun NavGraphBuilder.loginPlantAddGraph() {
+fun NavGraphBuilder.plantAddNavGraph(
+    onClickCategory: (String) -> Unit,
+    onClickHome: () -> Unit,
+    onClickDiary: () -> Unit,
+) {
     composable<RouteModel.PlantAdd>{
-        PlantAddRoute()
+        PlantAddRoute(
+            onClickCategory = onClickCategory,
+            onClickHome = onClickHome,
+            onClickDiary = onClickDiary
+        )
     }
 }

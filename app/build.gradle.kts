@@ -10,7 +10,6 @@ android {
     namespace = "com.sabo.ssukssukdiary"
 
     defaultConfig {
-        targetSdk = 35
         applicationId = "com.sabo.ssukssukdiary"
         versionCode = 1
         versionName = "1.0.0"
