@@ -1,4 +1,5 @@
-@file:Suppress("DSL_SCOPE_VIOLATION")
+@file:Suppress("DSL_SCOPE_VIOLATION", "-opt-in=kotlinx.serialization.InternalSerializationApi")
+
 gradle.startParameter.excludedTaskNames.addAll(
     gradle.startParameter.taskNames.filter { it.contains("testClasses") }
 )
