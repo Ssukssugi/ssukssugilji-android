@@ -9,8 +9,8 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.domain)
+    api(projects.core.model)
     implementation(projects.core.network)
     implementation(projects.core.datastore)
-    implementation(libs.bundles.network)
+    implementation(libs.retrofit)
 }

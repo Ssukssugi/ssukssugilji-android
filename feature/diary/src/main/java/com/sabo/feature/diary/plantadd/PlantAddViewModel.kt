@@ -3,9 +3,9 @@ package com.sabo.feature.diary.plantadd
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sabo.core.domain.handle
-import com.sabo.core.domain.model.PlantEnvironmentPlace
-import com.sabo.core.domain.repository.DiaryRepository
+import com.sabo.core.data.handle
+import com.sabo.core.data.repository.DiaryRepository
+import com.sabo.core.model.PlantEnvironmentPlace
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

@@ -1,0 +1,28 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.sabo.core.model.test.model-mergeDebugAndroidTestResources-12:/values-v18/values-v18.xml",
+            "map": [
+                {
+                    "source": "/Users/bywindow/.gradle/caches/8.13/transforms/b7587b3d67bb1110522b1bade54672e7/transformed/core-1.6.1/res/values-v18/values.xml",
+                    "from": {
+                        "startLines": "4,12",
+                        "startColumns": "0,0",
+                        "startOffsets": "146,562",
+                        "endLines": "11,19",
+                        "endColumns": "8,8",
+                        "endOffsets": "561,975"
+                    },
+                    "to": {
+                        "startLines": "2,10",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,475",
+                        "endLines": "9,17",
+                        "endColumns": "8,8",
+                        "endOffsets": "470,888"
+                    }
+                }
+            ]
+        }
+    ]
+}

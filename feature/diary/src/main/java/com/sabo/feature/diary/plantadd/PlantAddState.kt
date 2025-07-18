@@ -44,16 +44,6 @@ data class LightAmount(
             3,
             "햇빝이 아주 쨍쨍하게 들어요"
         )
-
-        fun fromInt(value: Int): LightAmount {
-            return when (value) {
-                0 -> NONE
-                1 -> LOW
-                2 -> MEDIUM
-                3 -> HIGH
-                else -> NOT_SET
-            }
-        }
     }
 }
 

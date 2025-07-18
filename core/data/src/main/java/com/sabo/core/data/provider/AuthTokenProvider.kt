@@ -1,7 +1,7 @@
 package com.sabo.core.data.provider
 
 import com.sabo.core.datastore.AuthDataStore
-import com.sabo.core.domain.provider.TokenProvider
+import com.sabo.core.model.TokenProvider
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -9,6 +9,7 @@ import javax.inject.Singleton
 class AuthTokenProvider @Inject constructor(
     private val authDataStore: AuthDataStore
 ) : TokenProvider {
+
     override suspend fun getAccessToken(): String? {
         return authDataStore.getAccessToken()
     }

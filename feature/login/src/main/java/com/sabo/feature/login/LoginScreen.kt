@@ -52,6 +52,7 @@ import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
+import com.sabo.core.model.LoginType
 import kotlinx.coroutines.launch
 
 @Composable
@@ -115,6 +116,7 @@ private fun LoginContent(
             onClickTermAgreeItem = onClickTermAgreeItem,
             onClickNextButton = onClickNextButton
         )
+
         LoginUiState.SignUpLoading -> RedirectLoadingScreen()
         is LoginUiState.SuccessLogin -> LoginSuccessScreen(state = uiState)
     }
@@ -483,7 +485,13 @@ private fun LoginSuccessScreen(
                 .align(Alignment.TopCenter)
         ) {
             LoginMainInfo(
-                title = "${state.type.text}로 로그인했어요",
+                title = "${
+                    when (state.type) {
+                        LoginType.KAKAO -> "카카오"
+                        LoginType.GOOGLE -> "구글"
+                        LoginType.NAVER -> "네이버"
+                    }
+                }로 로그인했어요",
                 subTitle = "필수약관에 동의하고\n쑥쑥일지를 시작해보세요"
             )
             Box(

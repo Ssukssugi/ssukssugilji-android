@@ -9,12 +9,12 @@ kotlinxSerializationJson = "1.9.0"
 coroutine = "1.10.1"
 
 ## Hilt
-hilt = "2.55"
+hilt = "2.56.2"
 hilt-navigation-compose = "1.2.0"
 
 ## Network
 retrofit = "3.0.0"
-okhttp3 = "4.12.0"
+okhttp3 = "5.1.0"
 
 ## DataStore
 dataStore-preferences = "1.1.1"

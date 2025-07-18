@@ -8,6 +8,4 @@ plugins {
 dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:navigator"))
-    implementation(project(":core:android"))
-    implementation(project(":core:domain"))
 }

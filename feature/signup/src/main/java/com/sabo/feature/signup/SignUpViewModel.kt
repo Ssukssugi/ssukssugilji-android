@@ -3,8 +3,8 @@ package com.sabo.feature.signup
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sabo.core.domain.handle
-import com.sabo.core.domain.repository.SignUpRepository
+import com.sabo.core.data.handle
+import com.sabo.core.data.repository.SignUpRepository
 import com.sabo.feature.signup.model.AgeChip
 import com.sabo.feature.signup.model.HowKnownChip
 import com.sabo.feature.signup.model.PlantReasonChip

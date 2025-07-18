@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -25,7 +24,6 @@ import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
 import com.sabo.feature.signup.model.AgeChip
 import com.sabo.feature.signup.model.InfoChip
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SelectChipGroup(
     modifier: Modifier = Modifier,

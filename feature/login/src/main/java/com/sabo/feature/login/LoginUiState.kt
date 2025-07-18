@@ -2,7 +2,7 @@ package com.sabo.feature.login
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import com.sabo.core.domain.model.LoginType
+import com.sabo.core.model.LoginType
 
 @Stable
 sealed interface LoginUiState {

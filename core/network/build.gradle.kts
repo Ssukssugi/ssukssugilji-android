@@ -19,8 +19,8 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.model)
     implementation(libs.bundles.network)
-    implementation(projects.core.domain)
 }
 
 fun getApiBaseUrl(): String {

@@ -1,13 +1,13 @@
 package com.sabo.core.data.di
 
 import com.sabo.core.data.provider.AuthTokenProvider
-import com.sabo.core.data.repository.DiaryRepositoryImpl
-import com.sabo.core.data.repository.LoginRepositoryImpl
-import com.sabo.core.data.repository.SignUpRepositoryImpl
-import com.sabo.core.domain.provider.TokenProvider
-import com.sabo.core.domain.repository.DiaryRepository
-import com.sabo.core.domain.repository.LoginRepository
-import com.sabo.core.domain.repository.SignUpRepository
+import com.sabo.core.data.repository.DefaultDiaryRepository
+import com.sabo.core.data.repository.DefaultLoginRepository
+import com.sabo.core.data.repository.DefaultSignUpRepository
+import com.sabo.core.data.repository.LoginRepository
+import com.sabo.core.data.repository.SignUpRepository
+import com.sabo.core.data.repository.DiaryRepository
+import com.sabo.core.model.TokenProvider
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -18,14 +18,14 @@ import dagger.hilt.components.SingletonComponent
 internal abstract class DataModule {
 
     @Binds
-    abstract fun bindLoginRepository(impl: LoginRepositoryImpl): LoginRepository
+    abstract fun bindLoginRepository(impl: DefaultLoginRepository): LoginRepository
 
     @Binds
-    abstract fun bindSignUpRepository(impl: SignUpRepositoryImpl): SignUpRepository
+    abstract fun bindSignUpRepository(impl: DefaultSignUpRepository): SignUpRepository
 
     @Binds
     abstract fun bindTokenProvider(impl: AuthTokenProvider): TokenProvider
 
     @Binds
-    abstract fun bindDiaryRepository(impl: DiaryRepositoryImpl): DiaryRepository
+    abstract fun bindDiaryRepository(impl: DefaultDiaryRepository): DiaryRepository
 }

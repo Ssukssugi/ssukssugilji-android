@@ -1,6 +1,5 @@
 package com.sabo.core.data
 
-import com.sabo.core.domain.Result
 import retrofit2.HttpException
 import retrofit2.Response
 

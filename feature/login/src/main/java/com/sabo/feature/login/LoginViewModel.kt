@@ -2,9 +2,9 @@ package com.sabo.feature.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sabo.core.domain.handle
-import com.sabo.core.domain.model.LoginType
-import com.sabo.core.domain.repository.LoginRepository
+import com.sabo.core.data.handle
+import com.sabo.core.data.repository.LoginRepository
+import com.sabo.core.model.LoginType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -81,7 +81,7 @@ class LoginViewModel @Inject constructor(
     fun onSuccessGoogleLogin(token: String) {
         val state = uiState.value as? LoginUiState.BeforeLogin ?: return
         viewModelScope.launch {
-            loginRepository.requestGoogleLogin(token = token).handle(
+            loginRepository.requestGoogleLogin(token).handle(
                 onSuccess = {
                     socialAccessToken = token
                     loginType = LoginType.GOOGLE

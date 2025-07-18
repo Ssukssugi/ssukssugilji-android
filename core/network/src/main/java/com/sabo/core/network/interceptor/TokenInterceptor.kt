@@ -1,6 +1,6 @@
 package com.sabo.core.network.interceptor
 
-import com.sabo.core.domain.provider.TokenProvider
+import com.sabo.core.model.TokenProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
