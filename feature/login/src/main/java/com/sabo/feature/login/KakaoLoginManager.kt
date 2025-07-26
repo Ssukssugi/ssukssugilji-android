@@ -4,8 +4,8 @@ import android.content.Context
 import com.kakao.sdk.user.UserApiClient
 
 class KakaoLoginManager(
-    private val context: Context,
-    private val callbackListener: CallbackListener
+    override val context: Context,
+    override val callbackListener: CallbackListener
 ): LoginManager(context, callbackListener) {
 
     private val kakaoApiClient = UserApiClient.instance

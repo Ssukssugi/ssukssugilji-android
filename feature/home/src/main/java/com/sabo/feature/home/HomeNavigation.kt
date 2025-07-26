@@ -16,8 +16,12 @@ fun NavController.navigateToHome(
     this.navigate(RouteModel.Home, navOptions)
 }
 
-fun NavGraphBuilder.homeNavGraph() {
+fun NavGraphBuilder.homeNavGraph(
+    navigateToGallery: () -> Unit
+) {
     composable<RouteModel.Home> {
-        HomeRoute()
+        HomeRoute(
+            navigateToGallery = navigateToGallery
+        )
     }
 }

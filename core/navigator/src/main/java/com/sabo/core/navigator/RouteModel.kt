@@ -22,4 +22,7 @@ sealed interface RouteModel {
             const val EXTRA_KEY = "keyword"
         }
     }
+
+    @Serializable
+    data object Gallery : RouteModel
 }
