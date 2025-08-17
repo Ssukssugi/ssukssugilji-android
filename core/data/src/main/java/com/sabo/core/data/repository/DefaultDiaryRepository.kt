@@ -6,6 +6,9 @@ import com.sabo.core.network.model.request.SaveNewPlantRequest
 import com.sabo.core.network.service.DiaryService
 import javax.inject.Inject
 import com.sabo.core.data.Result
+import com.sabo.core.network.model.response.GetMyPlant
+import com.sabo.core.network.model.response.GetPlantDiaries
+import com.sabo.core.network.model.response.GetPlantProfile
 
 class DefaultDiaryRepository @Inject constructor(
     private val diaryService: DiaryService
@@ -41,6 +44,25 @@ class DefaultDiaryRepository @Inject constructor(
         execute = {
             diaryService.getPlantCategories(keyword)
         },
+        transform = { it }
+    )
+
+    override suspend fun getMyPlants(): Result<List<GetMyPlant>> = handleResult(
+        execute = {
+            diaryService.getMyPlants()
+        },
+        transform = { it }
+    )
+
+    override suspend fun getPlantProfile(plantId: Long): Result<GetPlantProfile> = handleResult(
+        execute = {
+            diaryService.getPlantProfile(plantId)
+        },
+        transform = { it }
+    )
+
+    override suspend fun getPlantDiaries(plantId: Long): Result<GetPlantDiaries> = handleResult(
+        execute = { diaryService.getPlantDiaries(plantId) },
         transform = { it }
     )
 }

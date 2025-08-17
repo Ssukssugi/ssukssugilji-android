@@ -26,7 +26,14 @@ internal fun Project.configureComposeAndroid() {
             implementation(libs.findLibrary("androidx.material").get())
             implementation(libs.findLibrary("androidx.navigation.compose").get())
             implementation(libs.findLibrary("androidx.hilt.navigation.compose").get())
+
+            implementation(libs.findLibrary("orbit-core").get())
+            implementation(libs.findLibrary("orbit-compose").get())
+            implementation(libs.findLibrary("orbit-viewmodel").get())
+            testImplementation(libs.findLibrary("orbit-test").get())
+
             implementation(libs.findLibrary("coil").get())
+            implementation(libs.findLibrary("coil-network").get())
 
             debugImplementation(libs.findLibrary("androidx.ui.tooling").get())
             debugImplementation(libs.findLibrary("androidx.ui.test.manifest").get())

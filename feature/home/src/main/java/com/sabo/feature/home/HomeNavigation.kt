@@ -20,7 +20,7 @@ fun NavGraphBuilder.homeNavGraph(
     navigateToGallery: () -> Unit
 ) {
     composable<RouteModel.Home> {
-        HomeRoute(
+        HomeScreen(
             navigateToGallery = navigateToGallery
         )
     }

@@ -10,7 +10,7 @@ android {
 
 dependencies {
     api(projects.core.model)
-    implementation(projects.core.network)
+    api(projects.core.network)
     implementation(projects.core.datastore)
     implementation(libs.retrofit)
 }

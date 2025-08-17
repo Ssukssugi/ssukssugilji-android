@@ -10,5 +10,4 @@ android {
 
 dependencies {
     implementation(projects.core.data)
-    debugImplementation(libs.ui.tooling)
 }

@@ -175,7 +175,7 @@ private fun GalleryGridList(
             AsyncImage(
                 model = uri,
                 contentDescription = null,
-                contentScale = ContentScale.Fit,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .aspectRatio(1f)
                     .fillMaxWidth()
