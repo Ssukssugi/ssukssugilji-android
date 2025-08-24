@@ -3,6 +3,9 @@ package com.sabo.core.designsystem.theme.component
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,7 +36,8 @@ fun SsukssukTopAppBar(
     navigationType: NavigationType = NavigationType.NONE,
     onNavigationClick: () -> Unit = {},
     containerColor: Color = MaterialTheme.colorScheme.surfaceDim,
-    contentColor: Color = MaterialTheme.colorScheme.onSurface
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    content: @Composable RowScope.(Modifier) -> Unit = {}
 ) {
     CompositionLocalProvider(LocalContentColor provides contentColor) {
         val icon: @Composable (Modifier, imageVector: ImageVector) -> Unit = { modifier, imageVector ->
@@ -54,15 +58,20 @@ fun SsukssukTopAppBar(
                 .fillMaxWidth()
                 .height(42.dp)
                 .background(color = containerColor),
-            contentAlignment = Alignment.CenterStart
         ) {
-            navigationType.iconResId?.let {
-                icon(
-                    modifier
-                        .padding(start = 14.dp)
-                        .align(Alignment.CenterStart),
-                    ImageVector.vectorResource(id = it)
-                )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                navigationType.iconResId?.let {
+                    icon(
+                        modifier.padding(start = 14.dp),
+                        ImageVector.vectorResource(id = it)
+                    )
+                }
+                content(Modifier.weight(1f, fill = true))
             }
         }
     }
