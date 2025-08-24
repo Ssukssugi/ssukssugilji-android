@@ -12,8 +12,8 @@ import androidx.navigation.compose.NavHost
 import com.sabo.feature.diary.gallery.galleryScreen
 import com.sabo.feature.diary.plantadd.categorySearch.categorySearchScreen
 import com.sabo.feature.diary.plantadd.categorySearch.popBackStackWithResult
-import com.sabo.feature.diary.plantadd.plantAddNavGraph
-import com.sabo.feature.home.homeNavGraph
+import com.sabo.feature.diary.plantadd.navigation.plantAddNavGraph
+import com.sabo.feature.home.navigation.homeNavGraph
 import com.sabo.feature.login.loginNavGraph
 import com.sabo.feature.signup.signUpNavGraph
 
@@ -41,7 +41,8 @@ internal fun MainNavHost(
                 onCompletedSignUp = navigator::navigateToHome
             )
             homeNavGraph(
-                navigateToGallery = navigator::navigateToGallery
+                navigateToGallery = navigator::navigateToGallery,
+                navigateToPlantAdd = navigator::navigateToPlantAdd
             )
             plantAddNavGraph(
                 onClickCategory = navigator::navigateToCategorySearch,

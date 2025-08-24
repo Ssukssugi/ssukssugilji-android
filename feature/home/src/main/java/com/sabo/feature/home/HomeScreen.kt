@@ -57,7 +57,8 @@ import java.time.LocalDate
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
-    navigateToGallery: () -> Unit
+    navigateToGallery: () -> Unit,
+    navigateToPlantAdd: () -> Unit
 ) {
 
     val state = viewModel.collectAsState().value
@@ -66,7 +67,8 @@ internal fun HomeScreen(
         modifier = modifier,
         plantList = state.plantList,
         plantContent = state.plantContent,
-        navigateToGallery = navigateToGallery
+        navigateToGallery = navigateToGallery,
+        navigateToPlantAdd = navigateToPlantAdd
     )
 }
 
@@ -75,7 +77,8 @@ private fun HomeContent(
     modifier: Modifier = Modifier,
     plantList: List<PlantListItem>,
     plantContent: PlantContent,
-    navigateToGallery: () -> Unit = {}
+    navigateToGallery: () -> Unit = {},
+    navigateToPlantAdd: () -> Unit = {}
 ) {
     val storyRowState = rememberLazyListState()
     val contentColumnState = rememberLazyListState()
@@ -113,6 +116,7 @@ private fun HomeContent(
             PlantStory(
                 plantList = plantList,
                 scrollState = storyRowState,
+                onClickAddPlant = navigateToPlantAdd
             )
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),
