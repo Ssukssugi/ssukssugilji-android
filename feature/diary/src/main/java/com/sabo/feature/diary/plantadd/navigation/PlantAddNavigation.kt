@@ -19,6 +19,7 @@ fun NavGraphBuilder.plantAddNavGraph(
     onClickCategory: (String) -> Unit,
     onClickHome: () -> Unit,
     onClickDiary: () -> Unit,
+    onClickBack: () -> Unit
 ) {
     composable<RouteModel.PlantAdd> { entry ->
         val viewModel = hiltViewModel<PlantAddViewModel>()
@@ -36,6 +37,7 @@ fun NavGraphBuilder.plantAddNavGraph(
 
         PlantAddRoute(
             viewModel = viewModel,
+            onClickBack = onClickBack,
             onClickCategory = onClickCategory,
             onClickHome = onClickHome,
             onClickDiary = onClickDiary

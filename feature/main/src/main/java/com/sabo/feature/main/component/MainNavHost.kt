@@ -47,7 +47,8 @@ internal fun MainNavHost(
             plantAddNavGraph(
                 onClickCategory = navigator::navigateToCategorySearch,
                 onClickHome = navigator::navigateToHome,
-                onClickDiary = { /* TODO: 일지 작성 하러 가기 추가*/}
+                onClickDiary = { /* TODO: 일지 작성 하러 가기 추가*/},
+                onClickBack = navigator::popBackStack
             )
             categorySearchScreen(
                 onClickBack = navigator::popBackStack,

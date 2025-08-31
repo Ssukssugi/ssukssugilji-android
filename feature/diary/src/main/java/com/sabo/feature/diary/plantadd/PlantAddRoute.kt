@@ -64,6 +64,7 @@ import com.sabo.core.designsystem.theme.component.SsukssukTopAppBar
 internal fun PlantAddRoute(
     modifier: Modifier = Modifier,
     viewModel: PlantAddViewModel = hiltViewModel(),
+    onClickBack: () -> Unit = {},
     onClickCategory: (String) -> Unit = {},
     onClickHome: () -> Unit = {},
     onClickDiary: () -> Unit = {}
@@ -82,7 +83,8 @@ internal fun PlantAddRoute(
                 SsukssukTopAppBar(
                     modifier = modifier,
                     navigationType = NavigationType.BACK,
-                    containerColor = Color(0xFFFFFFFF)
+                    containerColor = Color(0xFFFFFFFF),
+                    onNavigationClick = onClickBack
                 )
 
                 PlantInfoInputScreen(
