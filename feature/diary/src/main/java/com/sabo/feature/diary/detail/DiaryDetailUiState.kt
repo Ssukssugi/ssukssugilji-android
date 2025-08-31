@@ -1,6 +1,6 @@
 package com.sabo.feature.diary.detail
 
-import com.sabo.core.designsystem.theme.component.CareTypeIcon
+import com.sabo.core.designsystem.component.CareTypeIcon
 
 data class DiaryDetailUiState(
     val isLoading: Boolean,

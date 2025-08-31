@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class GetPlantProfile(
     val name: String,
     val plantCategory: String,
-    val plantImage: String,
+    val plantImage: String? = null,
     val shine: Int?,
     val place: PlantEnvironmentPlace
 )

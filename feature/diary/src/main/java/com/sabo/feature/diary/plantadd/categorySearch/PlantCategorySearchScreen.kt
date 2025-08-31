@@ -36,8 +36,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
-import com.sabo.core.designsystem.theme.component.NavigationType
-import com.sabo.core.designsystem.theme.component.SsukssukTopAppBar
+import com.sabo.core.designsystem.component.NavigationType
+import com.sabo.core.designsystem.component.SsukssukTopAppBar
 
 @Composable
 internal fun PlantCategorySearchScreen(

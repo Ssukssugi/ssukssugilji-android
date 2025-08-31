@@ -1,4 +1,4 @@
-package com.sabo.core.designsystem.theme.component
+package com.sabo.core.designsystem.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background

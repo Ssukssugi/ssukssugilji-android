@@ -49,6 +49,7 @@ import com.sabo.core.designsystem.R
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
+import com.sabo.core.designsystem.toolkit.noRippleClickable
 import com.sabo.core.mapper.DateMapper.toDisplayDayOfWeek
 import org.orbitmvi.orbit.compose.collectAsState
 import java.time.LocalDate
@@ -430,7 +431,7 @@ private fun AddPlantItem(
     Column(
         modifier = Modifier
             .size(68.dp)
-            .clickable { onClickItem() },
+            .noRippleClickable { onClickItem() },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
