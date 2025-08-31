@@ -6,18 +6,13 @@ import com.sabo.feature.diary.plantadd.LightAmount.Companion.NOT_SET
 sealed interface PlantAddState {
     data class Input(
         val textFieldState: TextFieldState = TextFieldState(),
-        val plantCategory: PlantCategory? = null,
+        val plantCategory: String? = null,
         val lightAmount: LightAmount = NOT_SET,
         val place: PlantPlace? = null,
     ) : PlantAddState
 
     data object SaveSuccess : PlantAddState
 }
-
-data class PlantCategory(
-    val id: Long,
-    val name: String,
-)
 
 data class LightAmount(
     val value: Int,
@@ -44,6 +39,16 @@ data class LightAmount(
             3,
             "햇빝이 아주 쨍쨍하게 들어요"
         )
+
+        fun fromValue(value: Int): LightAmount {
+            return when (value) {
+                0 -> NONE
+                1 -> LOW
+                2 -> MEDIUM
+                3 -> HIGH
+                else -> NOT_SET
+            }
+        }
     }
 }
 

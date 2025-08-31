@@ -20,7 +20,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val diaryRepository: DiaryRepository
-): ContainerHost<HomeUiState, HomeEvent>,ViewModel() {
+) : ContainerHost<HomeUiState, HomeEvent>, ViewModel() {
 
     override val container: Container<HomeUiState, HomeEvent> = container(
         initialState = HomeUiState(
@@ -58,6 +58,7 @@ class HomeViewModel @Inject constructor(
                     ) as PlantListItem
                 }
             }
+
             is Result.Error -> {
                 emptyList()
             }

@@ -34,13 +34,18 @@ class PlantAddViewModel @Inject constructor(
         initialValue = false
     )
 
+    fun onSelectedPlantCategory(category: String) {
+        val state = state.value as? PlantAddState.Input ?: return
+        _state.value = state.copy(plantCategory = category)
+    }
+
     fun savePlant() {
         viewModelScope.launch {
             val inputState = state.value as? PlantAddState.Input ?: return@launch
             if (inputState.place == null) return@launch
             diaryRepository.saveNewPlant(
                 name = inputState.textFieldState.text.toString(),
-                category = inputState.plantCategory?.name ?: "",
+                category = inputState.plantCategory ?: "",
                 shine = inputState.lightAmount.value + 1,
                 place = when(inputState.place) {
                     PlantPlace.VERANDA -> PlantEnvironmentPlace.VERANDAH
@@ -59,5 +64,15 @@ class PlantAddViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    fun onClickLightStep(step: Int) {
+        val state = state.value as? PlantAddState.Input ?: return
+        _state.value = state.copy(lightAmount = LightAmount.fromValue(step))
+    }
+
+    fun onClickPlace(place: PlantPlace) {
+        val state = state.value as? PlantAddState.Input ?: return
+        _state.value = state.copy(place = place)
     }
 }

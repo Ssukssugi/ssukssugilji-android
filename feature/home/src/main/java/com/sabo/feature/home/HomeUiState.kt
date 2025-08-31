@@ -15,7 +15,7 @@ sealed interface PlantListItem {
     data class Plant(
         val id: Long,
         val name: String,
-        val image: String,
+        val image: String?,
         val isSelected: Boolean
     ) : PlantListItem
 }
@@ -28,7 +28,7 @@ sealed interface PlantContent {
         val title: String,
         val name: String,
         val category: String,
-        val image: String,
+        val image: String?,
         val shine: Int?,
         val historyList: List<PlantHistory>
     ) : PlantContent
@@ -43,7 +43,7 @@ data class PlantHistory(
 data class Diary(
     val id: Long,
     val date: LocalDate,
-    val image: String,
+    val image: String?,
     val content: String,
     val cares: List<CareType>
 )

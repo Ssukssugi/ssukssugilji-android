@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -70,7 +71,7 @@ private fun PlantCategorySearchContent(
     state: PlantSearchState,
     onClickCategory: (String) -> Unit = {}
 ) {
-    var isFocused by remember { mutableStateOf(false) }
+    var isFocused by remember { mutableStateOf(true) }
 
     Column(
         modifier = Modifier
@@ -105,6 +106,9 @@ private fun PlantCategorySearchContent(
                 .wrapContentHeight()
                 .onFocusChanged { isFocused = it.isFocused },
             lineLimits = TextFieldLineLimits.SingleLine,
+            onKeyboardAction = KeyboardActionHandler {
+                onClickCategory(state.textFieldState.text.toString())
+            },
             decorator = { innerTextField ->
                 Column(
                     modifier = Modifier
@@ -182,8 +186,9 @@ private fun ColumnScope.SearchResultListContent(
                 style = DiaryTypography.bodySmallSemiBold,
                 color = DiaryColorsPalette.current.gray800,
                 modifier = Modifier
-                    .padding(vertical = 12.dp, horizontal = 8.dp)
-                    .clickable { onClickCategory(result) },
+                    .fillParentMaxWidth()
+                    .clickable { onClickCategory(result) }
+                    .padding(vertical = 12.dp, horizontal = 8.dp),
                 maxLines = 1,
             )
         }

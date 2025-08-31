@@ -5,5 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SocialLoginResponse(
     val isRegistered: Boolean,
-    val existInfo: Boolean
+    val existInfo: Boolean,
+    val socialId: String = "",
+    val emailAddress: String = ""
 )

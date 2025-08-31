@@ -1,6 +1,8 @@
 package com.sabo.feature.diary.plantadd.categorySearch
 
+import android.util.Log
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,9 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
@@ -27,41 +26,38 @@ class PlantCategorySearchViewModel @AssistedInject constructor(
     @Assisted val searchKeyword: String
 ) : ViewModel() {
 
+    private val searchState = TextFieldState(
+        initialText = searchKeyword,
+        initialSelection = TextRange(searchKeyword.length)
+    )
+
     private val _state = MutableStateFlow(
         PlantSearchState(
-            textFieldState = TextFieldState(
-                initialText = searchKeyword,
-                initialSelection = TextRange(searchKeyword.length)
-            )
+            textFieldState = searchState
         )
     )
     val state = _state.asStateFlow()
 
-
-    private val keywordFlow = state
-        .map { it.textFieldState.text }
-        .debounce(500L)
-        .distinctUntilChanged()
-
     init {
-        keywordFlow.onEach {
-            onSearchedCategory(it.toString())
-        }.launchIn(viewModelScope)
+        viewModelScope.launch {
+            snapshotFlow { searchState.text }
+                .distinctUntilChanged()
+                .debounce(500L)
+                .collect { onSearchedCategory(it.toString()) }
+        }
     }
 
-    private fun onSearchedCategory(keyword: String) {
-        viewModelScope.launch {
-            diaryRepository.getPlantCategories(keyword).handle(
-                onSuccess = { response ->
-                    _state.value = _state.value.copy(
-                        searchResult = response
-                    )
-                },
-                onError = {
-                    _state.value = _state.value.copy(searchResult = emptyList())
-                }
-            )
-        }
+    private suspend fun onSearchedCategory(keyword: String) {
+        diaryRepository.getPlantCategories(keyword).handle(
+            onSuccess = { response ->
+                _state.value = _state.value.copy(
+                    searchResult = response
+                )
+            },
+            onError = {
+                _state.value = _state.value.copy(searchResult = emptyList())
+            }
+        )
     }
 
     @AssistedFactory

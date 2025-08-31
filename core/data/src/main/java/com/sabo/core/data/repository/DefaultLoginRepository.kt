@@ -4,10 +4,8 @@ import com.sabo.core.data.Result
 import com.sabo.core.data.handleResult
 import com.sabo.core.model.LoginType
 import com.sabo.core.model.SocialLogin
-import com.sabo.core.data.provider.AuthTokenProvider
-import com.sabo.core.network.model.request.SocialLoginRequest
 import com.sabo.core.network.model.request.ApplyTermsAgreementRequest
-import com.sabo.core.network.model.response.SocialLoginResponse
+import com.sabo.core.network.model.request.SocialLoginRequest
 import com.sabo.core.network.service.LoginService
 import javax.inject.Inject
 
@@ -26,7 +24,9 @@ class DefaultLoginRepository @Inject constructor(
         transform = { response ->
             SocialLogin(
                 isRegistered = response.isRegistered,
-                existInfo = response.existInfo
+                existInfo = response.existInfo,
+                socialId = response.socialId,
+                emailAddress = response.emailAddress
             )
         }
     )
@@ -43,7 +43,9 @@ class DefaultLoginRepository @Inject constructor(
         transform = { response ->
             SocialLogin(
                 isRegistered = response.isRegistered,
-                existInfo = response.existInfo
+                existInfo = response.existInfo,
+                socialId = response.socialId,
+                emailAddress = response.emailAddress
             )
         }
     )
@@ -60,7 +62,9 @@ class DefaultLoginRepository @Inject constructor(
         transform = { response ->
             SocialLogin(
                 isRegistered = response.isRegistered,
-                existInfo = response.existInfo
+                existInfo = response.existInfo,
+                socialId = response.socialId,
+                emailAddress = response.emailAddress
             )
         }
     )

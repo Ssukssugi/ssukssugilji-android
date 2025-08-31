@@ -2,6 +2,7 @@ package com.sabo.core.network.service
 
 import com.sabo.core.network.model.request.SaveNewPlantRequest
 import com.sabo.core.network.model.response.GetMyPlant
+import com.sabo.core.network.model.response.GetPlantCategories
 import com.sabo.core.network.model.response.GetPlantDiaries
 import com.sabo.core.network.model.response.GetPlantProfile
 import retrofit2.Response
@@ -20,10 +21,10 @@ interface DiaryService {
     @GET("/api/v1/plant-categories/search")
     suspend fun getPlantCategories(
         @Query("keyword") keyword: String
-    ): Response<List<String>>
+    ): Response<List<GetPlantCategories>>
 
     @GET("/api/v1/plants")
-    suspend fun getMyPlants(): Response<List<GetMyPlant>>
+    suspend fun getMyPlants(): Response<GetMyPlant>
 
     @GET("api/v1/plants/profile")
     suspend fun getPlantProfile(

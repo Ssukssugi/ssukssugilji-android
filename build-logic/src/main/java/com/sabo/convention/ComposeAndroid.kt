@@ -26,6 +26,7 @@ internal fun Project.configureComposeAndroid() {
             implementation(libs.findLibrary("androidx.material").get())
             implementation(libs.findLibrary("androidx.navigation.compose").get())
             implementation(libs.findLibrary("androidx.hilt.navigation.compose").get())
+            implementation(libs.findLibrary("compose-foundation").get())
 
             implementation(libs.findLibrary("orbit-core").get())
             implementation(libs.findLibrary("orbit-compose").get())

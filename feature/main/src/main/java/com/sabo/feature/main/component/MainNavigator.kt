@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.sabo.core.navigator.RouteModel
 import com.sabo.feature.diary.gallery.navigateToGallery
-import com.sabo.feature.diary.plantadd.categorySearch.navigateToCategorySearch
+import com.sabo.feature.diary.plantadd.categorySearch.navigation.navigateToCategorySearch
 import com.sabo.feature.diary.plantadd.navigation.navigateToPlantAdd
 import com.sabo.feature.home.navigation.navigateToHome
 import com.sabo.feature.login.navigateToLogin

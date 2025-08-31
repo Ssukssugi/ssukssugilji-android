@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.FlowRow
@@ -45,13 +46,10 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -91,6 +89,8 @@ internal fun PlantAddRoute(
                     state = state,
                     isAddButtonEnabled = isAddButtonEnabled,
                     onClickCategory = onClickCategory,
+                    onClickLightStep = viewModel::onClickLightStep,
+                    onClickPlace = viewModel::onClickPlace,
                     onClickAddButton = viewModel::savePlant
                 )
             }
@@ -111,6 +111,8 @@ private fun ColumnScope.PlantInfoInputScreen(
     state: PlantAddState.Input = PlantAddState.Input(),
     isAddButtonEnabled: Boolean,
     onClickCategory: (String) -> Unit = {},
+    onClickLightStep: (Int) -> Unit = {},
+    onClickPlace: (PlantPlace) -> Unit = {},
     onClickAddButton: () -> Unit = {}
 ) {
     Box(
@@ -163,16 +165,19 @@ private fun ColumnScope.PlantInfoInputScreen(
             NicknameSection(textFieldState = state.textFieldState)
 
             PlantCategorySection(
-                plantCategoryName = state.plantCategory?.name,
+                plantCategoryName = state.plantCategory,
                 onClickCategory = onClickCategory
             )
 
             LightAmountBar(
                 currentStep = state.lightAmount,
-                onClickStep = {}
+                onClickStep = onClickLightStep
             )
 
-            PlantPlaceSection(selectedItem = state.place)
+            PlantPlaceSection(
+                selectedItem = state.place,
+                onClickPlace = onClickPlace
+            )
         }
 
         if (isAddButtonEnabled) {
@@ -319,9 +324,6 @@ private fun LightAmountBar(
     onClickStep: (Int) -> Unit = {},
 ) {
 
-    val windowInfo = LocalWindowInfo.current
-    val screenWidth = remember { windowInfo.containerSize.width.dp }
-
     val animatedProgress by animateFloatAsState(
         targetValue = currentStep.value.toFloat() / (stepCount - 1),
         animationSpec = tween(durationMillis = 300, easing = EaseInOutCubic)
@@ -356,71 +358,84 @@ private fun LightAmountBar(
         }
         Spacer(modifier = modifier.height(6.dp))
 
-        Box(
+        BoxWithConstraints(
             modifier = modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
         ) {
+            val circleSize = 20.dp
+            val innerDotSize = 12.dp
+            val availableWidth = maxWidth - circleSize
+
             Box(
                 modifier = modifier
                     .fillMaxWidth()
-                    .height(4.dp)
-                    .background(
-                        color = DiaryColorsPalette.current.gray200,
-                        shape = CircleShape
-                    )
-                    .align(Alignment.Center)
-            )
+                    .wrapContentHeight()
+            ) {
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(4.dp)
+                        .background(
+                            color = DiaryColorsPalette.current.gray200,
+                            shape = CircleShape
+                        )
+                        .align(Alignment.Center)
+                )
 
-            Box(
-                modifier = modifier
-                    .fillMaxWidth(animatedProgress.coerceAtLeast(0f))
-                    .height(4.dp)
-                    .background(
-                        color = DiaryColorsPalette.current.green300,
-                        shape = CircleShape
-                    )
-                    .align(Alignment.CenterStart)
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth(animatedProgress.coerceAtLeast(0f))
+                        .height(4.dp)
+                        .background(
+                            color = DiaryColorsPalette.current.green300,
+                            shape = CircleShape
+                        )
+                        .align(Alignment.CenterStart)
 
-            )
-            repeat(stepCount) { index ->
-                val isActive = index <= currentStep.value
-                val fraction = index.toFloat() / (stepCount - 1)
-                if (isActive) {
-                    Box(
-                        modifier = modifier
-                            .size(20.dp)
-                            .offset(x = (fraction * (screenWidth - 74.dp) / (stepCount - 1)))
-                            .background(
-                                color = DiaryColorsPalette.current.green300,
-                                shape = CircleShape
-                            )
-                            .clickable { onClickStep(index) }
-                    ) {
+                )
+                repeat(stepCount) { index ->
+                    val isActive = index <= currentStep.value
+                    val fraction = index.toFloat() / (stepCount - 1)
+                    val x = availableWidth * fraction
+
+                    if (isActive) {
                         Box(
                             modifier = modifier
-                                .size(12.dp)
+                                .size(circleSize)
+                                .offset(x = x)
                                 .background(
-                                    color = DiaryColorsPalette.current.green50,
+                                    color = DiaryColorsPalette.current.green300,
                                     shape = CircleShape
                                 )
-                                .align(Alignment.Center)
+                                .clickable { onClickStep(index) }
+                        ) {
+                            Box(
+                                modifier = modifier
+                                    .size(innerDotSize)
+                                    .background(
+                                        color = DiaryColorsPalette.current.green50,
+                                        shape = CircleShape
+                                    )
+                                    .align(Alignment.Center)
+                            )
+                        }
+                    } else {
+                        Box(
+                            modifier = modifier
+                                .size(circleSize)
+                                .offset(x = x)
+                                .background(
+                                    color = DiaryColorsPalette.current.gray200,
+                                    shape = CircleShape
+                                )
+                                .clickable { onClickStep(index) }
                         )
                     }
-                } else {
-                    Box(
-                        modifier = modifier
-                            .size(20.dp)
-                            .offset(x = (fraction * (screenWidth - 74.dp) / (stepCount - 1)))
-                            .background(
-                                color = DiaryColorsPalette.current.gray200,
-                                shape = CircleShape
-                            )
-                            .clickable { onClickStep(index) }
-                    )
                 }
             }
         }
+
         Spacer(modifier = modifier.height(8.dp))
         Row(
             modifier = modifier
@@ -464,6 +479,7 @@ private fun LightAmountBar(
 private fun PlantPlaceSection(
     modifier: Modifier = Modifier,
     selectedItem: PlantPlace? = null,
+    onClickPlace: (PlantPlace) -> Unit = {}
 ) {
     val placeList = remember { PlantPlace.entries }
 
@@ -490,7 +506,7 @@ private fun PlantPlaceSection(
                     modifier = modifier,
                     item = it,
                     selectedItem = selectedItem,
-                    onClick = {}
+                    onClick = { onClickPlace(it) }
                 )
             }
         }
@@ -588,7 +604,7 @@ private fun SaveSuccessContent(
                     color = Color(0xFF03D379),
                     shape = RoundedCornerShape(16.dp)
                 )
-                .clickable { onClickHome }
+                .clickable { onClickHome() }
                 .clip(RoundedCornerShape(16.dp))
                 .padding(vertical = 16.dp)
         ) {
@@ -612,7 +628,7 @@ private fun SaveSuccessContent(
                     color = DiaryColorsPalette.current.green50,
                     shape = RoundedCornerShape(16.dp)
                 )
-                .clickable { onClickDiary }
+                .clickable { onClickDiary() }
                 .clip(RoundedCornerShape(16.dp))
                 .padding(vertical = 16.dp)
         ) {
@@ -637,7 +653,7 @@ private fun PlantInfoInputScreenPreview() {
         ) {
             PlantInfoInputScreen(
                 state = PlantAddState.Input(
-                    lightAmount = LightAmount.LOW,
+                    lightAmount = LightAmount.HIGH,
                     place = PlantPlace.LIVINGROOM
                 ),
                 isAddButtonEnabled = true,

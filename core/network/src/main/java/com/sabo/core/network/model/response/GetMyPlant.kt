@@ -4,8 +4,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GetMyPlant(
-    val plantId: Long,
-    val name: String,
-    val plantCategory: String,
-    val image: String
-)
+    val plants: List<Plant>
+) {
+    @Serializable
+    data class Plant(
+        val plantId: Long,
+        val name: String,
+        val plantCategory: String,
+        val image: String? = null
+    )
+}

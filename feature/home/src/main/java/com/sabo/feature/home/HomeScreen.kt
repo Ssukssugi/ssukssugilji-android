@@ -225,7 +225,7 @@ private fun SelectedPlantContent(
 @Composable
 private fun PlantInfoMain(
     id: Long,
-    image: String,
+    image: String?,
     title: String,
     name: String,
     category: String,

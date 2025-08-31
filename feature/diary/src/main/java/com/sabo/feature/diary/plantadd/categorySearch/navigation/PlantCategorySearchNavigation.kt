@@ -1,4 +1,4 @@
-package com.sabo.feature.diary.plantadd.categorySearch
+package com.sabo.feature.diary.plantadd.categorySearch.navigation
 
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -6,6 +6,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.sabo.core.navigator.RouteModel
+import com.sabo.feature.diary.plantadd.categorySearch.PlantCategorySearchScreen
+import com.sabo.feature.diary.plantadd.categorySearch.PlantCategorySearchViewModel
 
 fun NavController.navigateToCategorySearch(keyword: String) {
     navigate(route = RouteModel.CategorySearch(keyword))
@@ -15,7 +17,7 @@ fun NavController.popBackStackWithResult(category: String) {
     previousBackStackEntry
         ?.savedStateHandle
         ?.set(RouteModel.CategorySearch.EXTRA_KEY, category)
-    popBackStack<RouteModel.CategorySearch>(inclusive = false)
+    popBackStack<RouteModel.PlantAdd>(inclusive = false)
 }
 
 fun NavGraphBuilder.categorySearchScreen(
