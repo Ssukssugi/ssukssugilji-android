@@ -33,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -55,8 +56,10 @@ import com.sabo.feature.signup.component.SignUpTitle
 import com.sabo.feature.signup.model.AgeChip
 import com.sabo.feature.signup.model.HowKnownChip
 import com.sabo.feature.signup.model.PlantReasonChip
+import com.sabo.feature.signup.model.SignUpEvent
 import com.sabo.feature.signup.model.SignUpStep
 import com.sabo.feature.signup.model.SignUpUiState
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
@@ -69,8 +72,10 @@ internal fun SignUpRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        if (uiState.step == SignUpStep.COMPLETED) {
-            onCompletedSignUp()
+        viewModel.event.collectLatest {
+            when (it) {
+                SignUpEvent.OnCompletedSignUp -> onCompletedSignUp()
+            }
         }
     }
 

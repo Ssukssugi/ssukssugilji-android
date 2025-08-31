@@ -41,8 +41,6 @@ class DefaultSignUpRepository @Inject constructor(
             )
             signUpService.applyUserDetail(request)
         },
-        transform = {
-
-        }
+        transform = {}
     )
 }

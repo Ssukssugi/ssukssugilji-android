@@ -5,10 +5,10 @@ sealed interface Result<out T> {
     data class Error(val code: String?, val message: String?) : Result<Nothing>
 }
 
-fun <T : Any> Result<T>.handle(
-    onSuccess: ((T) -> Unit)? = null,
-    onError: ((Throwable) -> Unit)? = null,
-    onFinish: (() -> Unit)? = null
+suspend fun <T : Any> Result<T>.handle(
+    onSuccess: (suspend (T) -> Unit)? = null,
+    onError: (suspend (Throwable) -> Unit)? = null,
+    onFinish: (suspend () -> Unit)? = null
 ) {
     try {
         when (this) {

@@ -165,6 +165,15 @@ private fun LoginScreen(
             horizontalArrangement = Arrangement.Center
         ) {
             LoginIcon(
+                resId = R.drawable.img_login_google,
+                onClick = {
+                    scope.launch {
+                        onClickGoogleLogin()
+                    }
+                }
+            )
+            Spacer(modifier = modifier.width(16.dp))
+            LoginIcon(
                 resId = R.drawable.img_login_kakao,
                 onClick = {
                     onClickKakaoLogin()
@@ -189,15 +198,6 @@ private fun LoginScreen(
                             //TODO("Not yet implemented")
                         }
                     })
-                }
-            )
-            Spacer(modifier = modifier.width(16.dp))
-            LoginIcon(
-                resId = R.drawable.icon_login_google,
-                onClick = {
-                    scope.launch {
-                        onClickGoogleLogin()
-                    }
                 }
             )
         }

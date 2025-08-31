@@ -128,6 +128,7 @@ class SignUpViewModel @Inject constructor(
                     _uiState.value = uiState.value.copy(
                         step = SignUpStep.COMPLETED
                     )
+                    _event.send(SignUpEvent.OnCompletedSignUp)
                 },
                 onError = {
 
