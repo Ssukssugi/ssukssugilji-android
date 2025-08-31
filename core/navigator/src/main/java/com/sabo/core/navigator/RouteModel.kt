@@ -25,4 +25,7 @@ sealed interface RouteModel {
 
     @Serializable
     data object Gallery : RouteModel
+
+    @Serializable
+    data object Profile : RouteModel
 }

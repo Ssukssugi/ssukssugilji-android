@@ -10,6 +10,7 @@ import com.sabo.feature.diary.plantadd.categorySearch.navigation.navigateToCateg
 import com.sabo.feature.diary.plantadd.navigation.navigateToPlantAdd
 import com.sabo.feature.home.navigation.navigateToHome
 import com.sabo.feature.login.navigateToLogin
+import com.sabo.feature.profile.navigation.navigateToProfile
 import com.sabo.feature.signup.navigateToSignUp
 
 class MainNavigator(
@@ -39,6 +40,10 @@ class MainNavigator(
 
     fun navigateToGallery() {
         navController.navigateToGallery()
+    }
+
+    fun navigateToProfile() {
+        navController.navigateToProfile()
     }
 
     fun popBackStack() {

@@ -13,4 +13,5 @@ dependencies {
     implementation(projects.feature.signup)
     implementation(projects.feature.home)
     implementation(projects.feature.diary)
+    implementation(projects.feature.profile)
 }

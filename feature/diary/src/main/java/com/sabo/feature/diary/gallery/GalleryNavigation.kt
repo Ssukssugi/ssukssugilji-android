@@ -10,8 +10,12 @@ fun NavController.navigateToGallery(navOptions: NavOptions? = null) {
     navigate(RouteModel.Gallery, navOptions)
 }
 
-fun NavGraphBuilder.galleryScreen() {
+fun NavGraphBuilder.galleryScreen(
+    onClickBack: () -> Unit
+) {
     composable<RouteModel.Gallery> {
-        GalleryScreen()
+        GalleryScreen(
+            onClickBack = onClickBack
+        )
     }
 }

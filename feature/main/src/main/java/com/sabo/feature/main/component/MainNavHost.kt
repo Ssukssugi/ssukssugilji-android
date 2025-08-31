@@ -15,6 +15,7 @@ import com.sabo.feature.diary.plantadd.categorySearch.navigation.popBackStackWit
 import com.sabo.feature.diary.plantadd.navigation.plantAddNavGraph
 import com.sabo.feature.home.navigation.homeNavGraph
 import com.sabo.feature.login.loginNavGraph
+import com.sabo.feature.profile.navigation.profileNavGraph
 import com.sabo.feature.signup.signUpNavGraph
 
 @Composable
@@ -42,7 +43,8 @@ internal fun MainNavHost(
             )
             homeNavGraph(
                 navigateToGallery = navigator::navigateToGallery,
-                navigateToPlantAdd = navigator::navigateToPlantAdd
+                navigateToPlantAdd = navigator::navigateToPlantAdd,
+                navigateToProfile = navigator::navigateToProfile
             )
             plantAddNavGraph(
                 onClickCategory = navigator::navigateToCategorySearch,
@@ -54,7 +56,13 @@ internal fun MainNavHost(
                 onClickBack = navigator::popBackStack,
                 onClickCategory = navigator.navController::popBackStackWithResult
             )
-            galleryScreen()
+            galleryScreen(
+                onClickBack = navigator::popBackStack
+            )
+            profileNavGraph(
+                onClickBack = navigator::popBackStack,
+                onClickSetting = { /*TODO*/ }
+            )
         }
     }
 }

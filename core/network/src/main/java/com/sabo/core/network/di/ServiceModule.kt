@@ -2,6 +2,7 @@ package com.sabo.core.network.di
 
 import com.sabo.core.network.service.DiaryService
 import com.sabo.core.network.service.LoginService
+import com.sabo.core.network.service.ProfileService
 import com.sabo.core.network.service.SignUpService
 import dagger.Module
 import dagger.Provides
@@ -31,5 +32,11 @@ object ServiceModule {
     @Provides
     fun provideDiaryService(retrofit: Retrofit): DiaryService {
         return retrofit.create<DiaryService>()
+    }
+
+    @Singleton
+    @Provides
+    fun provideProfileService(retrofit: Retrofit): ProfileService {
+        return retrofit.create<ProfileService>()
     }
 }

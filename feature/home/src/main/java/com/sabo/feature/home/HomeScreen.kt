@@ -59,7 +59,8 @@ internal fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
     navigateToGallery: () -> Unit,
-    navigateToPlantAdd: () -> Unit
+    navigateToPlantAdd: () -> Unit,
+    navigateToProfile: () -> Unit
 ) {
 
     val state = viewModel.collectAsState().value
@@ -69,7 +70,8 @@ internal fun HomeScreen(
         plantList = state.plantList,
         plantContent = state.plantContent,
         navigateToGallery = navigateToGallery,
-        navigateToPlantAdd = navigateToPlantAdd
+        navigateToPlantAdd = navigateToPlantAdd,
+        navigateToProfile = navigateToProfile
     )
 }
 
@@ -79,7 +81,8 @@ private fun HomeContent(
     plantList: List<PlantListItem>,
     plantContent: PlantContent,
     navigateToGallery: () -> Unit = {},
-    navigateToPlantAdd: () -> Unit = {}
+    navigateToPlantAdd: () -> Unit = {},
+    navigateToProfile: () -> Unit = {}
 ) {
     val storyRowState = rememberLazyListState()
     val contentColumnState = rememberLazyListState()
@@ -109,7 +112,10 @@ private fun HomeContent(
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.icon_account),
                     contentDescription = null,
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .clickable { navigateToProfile() },
                     tint = DiaryColorsPalette.current.gray900
                 )
             }
@@ -468,7 +474,7 @@ private fun PlantStoryItem(
     Column(
         modifier = Modifier
             .size(68.dp)
-            .clickable { onClickItem(data.id) },
+            .noRippleClickable { onClickItem(data.id) },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AsyncImage(
