@@ -26,7 +26,8 @@ class LoginViewModel @Inject constructor(
     private val _loginEvent = Channel<LoginEvent>(Channel.RENDEZVOUS)
     val loginEvent = _loginEvent.receiveAsFlow()
 
-    private var socialAccessToken: String? = null
+    private var socialId: String? = null
+    private var emailAddress: String? = null
     private var loginType: LoginType? = null
 
     fun onSuccessKakaoLogin(token: String) {
@@ -34,7 +35,8 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             loginRepository.requestKakaoLogin(token).handle(
                 onSuccess = {
-                    socialAccessToken = token
+                    socialId = it.socialId
+                    emailAddress = it.emailAddress
                     loginType = LoginType.KAKAO
                     if (it.isRegistered) {
                         navigateAfterLogin(
@@ -59,7 +61,8 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             loginRepository.requestNaverLogin(token).handle(
                 onSuccess = {
-                    socialAccessToken = token
+                    socialId = it.socialId
+                    emailAddress = it.emailAddress
                     loginType = LoginType.NAVER
                     if (it.isRegistered) {
                         navigateAfterLogin(
@@ -83,7 +86,8 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             loginRepository.requestGoogleLogin(token).handle(
                 onSuccess = {
-                    socialAccessToken = token
+                    socialId = it.socialId
+                    emailAddress = it.emailAddress
                     loginType = LoginType.GOOGLE
                     if (it.isRegistered) {
                         navigateAfterLogin(
@@ -101,15 +105,17 @@ class LoginViewModel @Inject constructor(
     fun applyTermsAgreement() {
         val state = uiState.value as? LoginUiState.BeforeLogin ?: return
         if (state.termsState.isRequiredAgree().not()) return
-        val accessToken = socialAccessToken ?: return
+        val socialId = this.socialId ?: return
+        val emailAddress = this.emailAddress ?: return
         val loginType = this.loginType ?: return
         viewModelScope.launch {
             _uiState.value = state.copy(isShownTermsAgree = false)
             _uiState.value = LoginUiState.SignUpLoading
             loginRepository.applyTermsAgreement(
-                accessToken,
-                loginType,
-                state.termsState.marketingTerms
+                socialId = socialId,
+                emailAddress = emailAddress,
+                type = loginType,
+                isMarketingAgree = state.termsState.marketingTerms
             ).handle(
                 onSuccess = {
                     _uiState.value = LoginUiState.SuccessLogin(type = loginType)

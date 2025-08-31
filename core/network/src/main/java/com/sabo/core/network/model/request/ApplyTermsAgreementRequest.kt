@@ -5,7 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ApplyTermsAgreementRequest(
-    val accessToken: String,
+    val socialId: String,
+    val emailAddress: String,
     val loginType: LoginType,
     val termsAgreement: TermsAgreement
 ) {

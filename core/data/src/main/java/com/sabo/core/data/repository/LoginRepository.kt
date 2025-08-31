@@ -9,8 +9,9 @@ interface LoginRepository {
     suspend fun requestKakaoLogin(token: String): Result<SocialLogin>
     suspend fun requestGoogleLogin(token: String): Result<SocialLogin>
     suspend fun applyTermsAgreement(
-        token: String,
         type: LoginType,
-        isMarketingAgree: Boolean
+        isMarketingAgree: Boolean,
+        socialId: String,
+        emailAddress: String,
     ): Result<Unit>
 }

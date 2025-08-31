@@ -43,8 +43,4 @@ internal fun Project.configureComposeAndroid() {
             androidTestImplementation(libs.findLibrary("androidx.ui.test.junit4").get())
         }
     }
-
-    extensions.getByType<ComposeCompilerGradlePluginExtension>().apply {
-        enableStrongSkippingMode.set(true)
-    }
 }

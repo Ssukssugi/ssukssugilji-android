@@ -70,14 +70,16 @@ class DefaultLoginRepository @Inject constructor(
     )
 
     override suspend fun applyTermsAgreement(
-        token: String,
         type: LoginType,
-        isMarketingAgree: Boolean
+        isMarketingAgree: Boolean,
+        socialId: String,
+        emailAddress: String,
     ): Result<Unit> = handleResult(
         execute = {
             loginService.requestTermsAgreeApply(
                 ApplyTermsAgreementRequest(
-                    accessToken = token,
+                    socialId = socialId,
+                    emailAddress = emailAddress,
                     loginType = type,
                     termsAgreement = ApplyTermsAgreementRequest.TermsAgreement(
                         marketing = isMarketingAgree
