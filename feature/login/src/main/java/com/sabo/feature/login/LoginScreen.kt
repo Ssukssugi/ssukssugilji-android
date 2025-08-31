@@ -54,6 +54,7 @@ import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
 import com.sabo.core.model.LoginType
 import kotlinx.coroutines.launch
+import com.sabo.core.designsystem.R as dsR
 
 @Composable
 internal fun LoginRoute(
@@ -140,14 +141,29 @@ private fun LoginScreen(
         modifier = modifier
             .fillMaxSize()
             .padding(top = 80.dp, bottom = 188.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Image(
+            painter = painterResource(id = dsR.drawable.img_home_logo),
+            contentDescription = null,
+            modifier = Modifier
+                .width(156.dp)
+                .height(40.dp)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = stringResource(R.string.login_title),
-            style = DiaryTypography.headlineMediumBold,
-            textAlign = TextAlign.Center
+            style = DiaryTypography.subtitleLargeBold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = modifier.weight(1f))
+        Spacer(modifier = Modifier.weight(1f))
+        Image(
+            painter = painterResource(id = dsR.drawable.img_logo_cat),
+            contentDescription = null,
+            modifier = Modifier.size(224.dp)
+        )
+        Spacer(modifier = Modifier.weight(1f))
         Text(
             modifier = modifier
                 .padding(vertical = 16.dp)

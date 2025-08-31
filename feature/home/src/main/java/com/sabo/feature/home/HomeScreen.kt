@@ -507,7 +507,7 @@ private fun BoxScope.WriteDiaryFAB(
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
-            model = R.drawable.img_logo_home_fab,
+            model = R.drawable.img_logo_cat,
             contentDescription = null,
             modifier = modifier.size(40.dp)
         )
