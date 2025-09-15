@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
@@ -41,6 +42,7 @@ class PlantCategorySearchViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch {
             snapshotFlow { searchState.text }
+                .filter { it.isNotEmpty() }
                 .distinctUntilChanged()
                 .debounce(500L)
                 .collect { onSearchedCategory(it.toString()) }

@@ -306,6 +306,7 @@ private fun PlantInfoMain(
             modifier = Modifier
                 .size(24.dp)
                 .align(Alignment.TopEnd)
+                .clip(CircleShape)
                 .clickable { onClickMore(id) }
         )
     }

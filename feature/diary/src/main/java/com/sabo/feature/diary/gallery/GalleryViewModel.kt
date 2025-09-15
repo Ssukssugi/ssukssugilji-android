@@ -45,11 +45,7 @@ class GalleryViewModel @Inject constructor(
     }
 
     fun onImageSelected(uri: Uri) {
-        _state.value = state.value.copy(selectedImageUri = uri)
-    }
-
-    fun onImageDeselected() {
-        _state.value = state.value.copy(selectedImageUri = null)
+        _state.value = state.value.copy(selectedImageUri = if (state.value.selectedImageUri == uri) null else uri)
     }
 
     fun onImageCaptured(uri: Uri) {
