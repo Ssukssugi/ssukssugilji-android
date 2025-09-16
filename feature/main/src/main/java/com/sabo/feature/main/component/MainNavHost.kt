@@ -9,10 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
-import com.sabo.feature.diary.gallery.galleryScreen
+import com.sabo.feature.diary.gallery.navigation.galleryScreen
 import com.sabo.feature.diary.plantadd.categorySearch.navigation.categorySearchScreen
 import com.sabo.feature.diary.plantadd.categorySearch.navigation.popBackStackWithResult
 import com.sabo.feature.diary.plantadd.navigation.plantAddNavGraph
+import com.sabo.feature.diary.write.navigation.diaryWriteScreen
 import com.sabo.feature.home.navigation.homeNavGraph
 import com.sabo.feature.login.loginNavGraph
 import com.sabo.feature.profile.navigation.profileNavGraph
@@ -57,6 +58,10 @@ internal fun MainNavHost(
                 onClickCategory = navigator.navController::popBackStackWithResult
             )
             galleryScreen(
+                onClickBack = navigator::popBackStack,
+                onClickNext = navigator::navigateToDiaryWrite
+            )
+            diaryWriteScreen(
                 onClickBack = navigator::popBackStack
             )
             profileNavGraph(

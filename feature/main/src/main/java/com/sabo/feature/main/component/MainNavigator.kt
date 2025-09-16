@@ -1,13 +1,15 @@
 package com.sabo.feature.main.component
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.sabo.core.navigator.RouteModel
-import com.sabo.feature.diary.gallery.navigateToGallery
+import com.sabo.feature.diary.gallery.navigation.navigateToGallery
 import com.sabo.feature.diary.plantadd.categorySearch.navigation.navigateToCategorySearch
 import com.sabo.feature.diary.plantadd.navigation.navigateToPlantAdd
+import com.sabo.feature.diary.write.navigation.navigateToDiaryWrite
 import com.sabo.feature.home.navigation.navigateToHome
 import com.sabo.feature.login.navigateToLogin
 import com.sabo.feature.profile.navigation.navigateToProfile
@@ -40,6 +42,10 @@ class MainNavigator(
 
     fun navigateToGallery() {
         navController.navigateToGallery()
+    }
+
+    fun navigateToDiaryWrite(imageUri: Uri) {
+        navController.navigateToDiaryWrite(imageUri = imageUri)
     }
 
     fun navigateToProfile() {
