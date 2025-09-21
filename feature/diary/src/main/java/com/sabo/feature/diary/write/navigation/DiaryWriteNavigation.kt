@@ -14,12 +14,13 @@ fun NavController.navigateToDiaryWrite(imageUri: Uri) {
 
 fun NavGraphBuilder.diaryWriteScreen(
     onClickBack: () -> Unit,
+    navigateToDiaryDetail: (Long) -> Unit,
     navigateToHome: () -> Unit
 ) {
     composable<RouteModel.DiaryWrite> {
         DiaryWriteScreen(
             onClickBack = onClickBack,
-            navigateToDiaryDetail = { /* TODO: Implement navigation to DiaryDetail */ },
+            navigateToDiaryDetail = navigateToDiaryDetail,
             navigateToHome = navigateToHome
         )
     }

@@ -116,4 +116,9 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+    fun onClickDiaryDetail() = intent {
+        val plantId = selectedPlantId.value ?: return@intent
+        postSideEffect(HomeEvent.NavigateToDiaryDetail(plantId))
+    }
 }

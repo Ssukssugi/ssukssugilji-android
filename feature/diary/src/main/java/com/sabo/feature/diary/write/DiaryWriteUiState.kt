@@ -29,5 +29,5 @@ data class CareTypeItem(
 )
 
 sealed interface DiaryWriteSideEffect {
-
+    data class NavigateToDetail(val plantId: Long) : DiaryWriteSideEffect
 }

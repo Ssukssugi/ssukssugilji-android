@@ -20,13 +20,15 @@ fun NavController.navigateToHome(
 fun NavGraphBuilder.homeNavGraph(
     navigateToGallery: () -> Unit,
     navigateToPlantAdd: () -> Unit,
-    navigateToProfile: () -> Unit
+    navigateToProfile: () -> Unit,
+    navigateToDiaryDetail: (Long) -> Unit
 ) {
     composable<RouteModel.Home> {
         HomeScreen(
             navigateToGallery = navigateToGallery,
             navigateToPlantAdd = navigateToPlantAdd,
-            navigateToProfile = navigateToProfile
+            navigateToProfile = navigateToProfile,
+            navigateToDiaryDetail = navigateToDiaryDetail
         )
     }
 }

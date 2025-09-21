@@ -30,5 +30,8 @@ sealed interface RouteModel {
     data class DiaryWrite(val imageUri: String) : RouteModel
 
     @Serializable
+    data class DiaryDetail(val plantId: Long) : RouteModel
+
+    @Serializable
     data object Profile : RouteModel
 }

@@ -2,6 +2,7 @@ package com.sabo.feature.diary.detail
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,13 +41,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.sabo.core.designsystem.R
+import com.sabo.core.designsystem.component.NavigationType
+import com.sabo.core.designsystem.component.SsukssukTopAppBar
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
-import com.sabo.core.designsystem.component.NavigationType
-import com.sabo.core.designsystem.component.SsukssukTopAppBar
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 @Composable
 internal fun DiaryDetailScreen(
@@ -81,26 +85,25 @@ internal fun DiaryDetailScreen(
             )
         }
 
-        LazyRow(
-            state = lazyRowState,
-            modifier = Modifier
-                .height(80.dp)
-                .background(color = Color.Transparent),
-            contentPadding = PaddingValues(vertical = 12.dp, horizontal = 24.dp)
-        ) {
-            items(
-                items = state.historyImages,
-                key = { it }
+        if (state.diaries.isNotEmpty()) {
+            LazyRow(
+                state = lazyRowState,
+                modifier = Modifier
+                    .height(80.dp)
+                    .background(color = Color.Transparent),
+                contentPadding = PaddingValues(vertical = 12.dp, horizontal = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                AsyncImage(
-                    model = it,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .width(40.dp)
-                        .aspectRatio(3f/5f)
-                        .background(color = DiaryColorsPalette.current.gray500, shape = RoundedCornerShape(2.5.dp)),
-                    contentScale = ContentScale.Crop
-                )
+                itemsIndexed(
+                    items = state.diaries,
+                    key = { _, diary -> diary.diaryId }
+                ) { index, diary ->
+                    DiaryHistoryImage(
+                        imageUrl = diary.image,
+                        isSelected = index == state.selectedDiaryIndex,
+                        onClick = { viewModel.onSelectDiary(index) }
+                    )
+                }
             }
         }
     }
@@ -145,6 +148,27 @@ private fun DiaryDetailTopAppBar(
                 Spacer(modifier = Modifier.width(20.dp))
             }
         }
+    )
+}
+
+@Composable
+private fun DiaryHistoryImage(
+    imageUrl: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    AsyncImage(
+        model = imageUrl,
+        contentDescription = null,
+        modifier = Modifier
+            .width(40.dp)
+            .aspectRatio(3f / 5f)
+            .background(
+                color = if (isSelected) DiaryColorsPalette.current.gray900 else DiaryColorsPalette.current.gray500,
+                shape = RoundedCornerShape(2.5.dp)
+            )
+            .clickable { onClick() },
+        contentScale = ContentScale.Crop
     )
 }
 
@@ -213,12 +237,13 @@ private fun DiaryInfoBottomSheet(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                (content as? Content.Success)?.careTypes?.map { care ->
+                (content as? Content.Success)?.careTypes?.forEach { care ->
                     Image(
                         painter = painterResource(care.iconRes),
                         contentDescription = null,
@@ -228,12 +253,27 @@ private fun DiaryInfoBottomSheet(
                     )
                 }
             }
+
+            val updatedAt = (content as? Content.Success)?.updatedAt
+            val timeText = if (updatedAt != null) {
+                val days = ChronoUnit.DAYS.between(LocalDate.parse(updatedAt, DateTimeFormatter.ISO_DATE), LocalDate.now())
+                when {
+                    days == 0L -> "오늘"
+                    days == 1L -> "어제"
+                    days < 7 -> "${days}일 전"
+                    else -> updatedAt
+                }
+            } else {
+                ""
+            }
             Text(
-                text = (content as? Content.Success)?.updatedAt ?: "",
+                text = timeText,
                 style = DiaryTypography.bodySmallRegular,
                 color = DiaryColorsPalette.current.gray600
             )
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = (content as? Content.Success)?.diary ?: "",

@@ -53,5 +53,5 @@ enum class CareType(@DrawableRes val resId: Int) {
 }
 
 sealed interface HomeEvent {
-
+    data class NavigateToDiaryDetail(val plantId: Long) : HomeEvent
 }

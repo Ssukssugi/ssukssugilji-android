@@ -100,4 +100,9 @@ class DiaryWriteViewModel @Inject constructor(
             }
         )
     }
+    
+    fun onClickGoToDiaryDetail() = intent {
+        val plantId = state.plants.first { it.isSelected }.id
+        postSideEffect(DiaryWriteSideEffect.NavigateToDetail(plantId = plantId))
+    }
 }

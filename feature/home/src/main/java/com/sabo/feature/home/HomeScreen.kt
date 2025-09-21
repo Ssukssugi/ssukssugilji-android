@@ -52,6 +52,7 @@ import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
 import com.sabo.core.designsystem.toolkit.noRippleClickable
 import com.sabo.core.mapper.DateMapper.toDisplayDayOfWeek
 import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 import java.time.LocalDate
 
 @Composable
@@ -60,10 +61,17 @@ internal fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     navigateToGallery: () -> Unit,
     navigateToPlantAdd: () -> Unit,
-    navigateToProfile: () -> Unit
+    navigateToProfile: () -> Unit,
+    navigateToDiaryDetail: (Long) -> Unit
 ) {
 
     val state = viewModel.collectAsState().value
+
+    viewModel.collectSideEffect {
+        when (it) {
+            is HomeEvent.NavigateToDiaryDetail -> navigateToDiaryDetail(it.plantId)
+        }
+    }
 
     HomeContent(
         modifier = modifier,
@@ -71,7 +79,8 @@ internal fun HomeScreen(
         plantContent = state.plantContent,
         navigateToGallery = navigateToGallery,
         navigateToPlantAdd = navigateToPlantAdd,
-        navigateToProfile = navigateToProfile
+        navigateToProfile = navigateToProfile,
+        onClickDiaryDetail = viewModel::onClickDiaryDetail
     )
 }
 
@@ -82,7 +91,8 @@ private fun HomeContent(
     plantContent: PlantContent,
     navigateToGallery: () -> Unit = {},
     navigateToPlantAdd: () -> Unit = {},
-    navigateToProfile: () -> Unit = {}
+    navigateToProfile: () -> Unit = {},
+    onClickDiaryDetail: () -> Unit = {}
 ) {
     val storyRowState = rememberLazyListState()
     val contentColumnState = rememberLazyListState()
@@ -135,7 +145,8 @@ private fun HomeContent(
                     .fillMaxWidth()
                     .weight(1f, fill = true),
                 scrollState = contentColumnState,
-                data = plantContent
+                data = plantContent,
+                onClickDiaryDetail = onClickDiaryDetail
             )
         }
         WriteDiaryFAB(
@@ -181,7 +192,8 @@ private fun SelectedPlantContent(
     modifier: Modifier = Modifier,
     scrollState: LazyListState = rememberLazyListState(),
     data: PlantContent,
-    onClickMore: (Long) -> Unit = {}
+    onClickMore: (Long) -> Unit = {},
+    onClickDiaryDetail: () -> Unit = {}
 ) {
     when (data) {
         PlantContent.Loading -> {
@@ -217,7 +229,8 @@ private fun SelectedPlantContent(
                         title = data.title,
                         name = data.name,
                         category = data.category,
-                        onClickMore = onClickMore
+                        onClickMore = onClickMore,
+                        onClickDetail = onClickDiaryDetail
                     )
                 }
 
@@ -236,12 +249,14 @@ private fun PlantInfoMain(
     title: String,
     name: String,
     category: String,
-    onClickMore: (Long) -> Unit = {}
+    onClickMore: (Long) -> Unit = {},
+    onClickDetail: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = DiaryColorsPalette.current.gray50)
+            .clickable { onClickDetail() }
             .padding(20.dp)
     ) {
         Row(

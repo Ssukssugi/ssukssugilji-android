@@ -4,8 +4,10 @@ import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import com.sabo.core.navigator.RouteModel
+import com.sabo.feature.diary.detail.navigation.navigateToDiaryDetail
 import com.sabo.feature.diary.gallery.navigation.navigateToGallery
 import com.sabo.feature.diary.plantadd.categorySearch.navigation.navigateToCategorySearch
 import com.sabo.feature.diary.plantadd.navigation.navigateToPlantAdd
@@ -46,6 +48,10 @@ class MainNavigator(
 
     fun navigateToDiaryWrite(imageUri: Uri) {
         navController.navigateToDiaryWrite(imageUri = imageUri)
+    }
+
+    fun navigateToDiaryDetail(plantId: Long, navOption: NavOptions? = null) {
+        navController.navigateToDiaryDetail(plantId = plantId, navOptions = navOption)
     }
 
     fun navigateToProfile() {

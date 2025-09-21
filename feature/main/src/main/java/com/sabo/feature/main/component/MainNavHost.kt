@@ -9,6 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
+import androidx.navigation.navOptions
+import com.sabo.core.navigator.RouteModel
+import com.sabo.feature.diary.detail.navigation.diaryDetailScreen
 import com.sabo.feature.diary.gallery.navigation.galleryScreen
 import com.sabo.feature.diary.plantadd.categorySearch.navigation.categorySearchScreen
 import com.sabo.feature.diary.plantadd.categorySearch.navigation.popBackStackWithResult
@@ -45,12 +48,13 @@ internal fun MainNavHost(
             homeNavGraph(
                 navigateToGallery = navigator::navigateToGallery,
                 navigateToPlantAdd = navigator::navigateToPlantAdd,
-                navigateToProfile = navigator::navigateToProfile
+                navigateToProfile = navigator::navigateToProfile,
+                navigateToDiaryDetail = navigator::navigateToDiaryDetail
             )
             plantAddNavGraph(
                 onClickCategory = navigator::navigateToCategorySearch,
                 onClickHome = navigator::navigateToHome,
-                onClickDiary = { /* TODO: 일지 작성 하러 가기 추가*/},
+                onClickDiary = { /* TODO: 일지 작성 하러 가기 추가*/ },
                 onClickBack = navigator::popBackStack
             )
             categorySearchScreen(
@@ -63,7 +67,20 @@ internal fun MainNavHost(
             )
             diaryWriteScreen(
                 onClickBack = navigator::popBackStack,
-                navigateToHome = navigator::navigateToHome
+                navigateToHome = navigator::navigateToHome,
+                navigateToDiaryDetail = {
+                    navigator.navigateToDiaryDetail(
+                        plantId = it,
+                        navOption = navOptions {
+                            popUpTo<RouteModel.Home> {
+                                inclusive = false
+                            }
+                        }
+                    )
+                }
+            )
+            diaryDetailScreen(
+
             )
             profileNavGraph(
                 onClickBack = navigator::popBackStack,

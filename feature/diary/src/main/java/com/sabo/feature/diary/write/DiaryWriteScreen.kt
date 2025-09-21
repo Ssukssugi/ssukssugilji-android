@@ -66,14 +66,16 @@ import java.time.format.DateTimeFormatter
 internal fun DiaryWriteScreen(
     viewModel: DiaryWriteViewModel = hiltViewModel(),
     onClickBack: () -> Unit,
-    navigateToDiaryDetail: () -> Unit,
+    navigateToDiaryDetail: (Long) -> Unit,
     navigateToHome: () -> Unit
 ) {
     val uiState = viewModel.collectAsState().value
     val isSaveEnabled by viewModel.isSaveEnabled.collectAsStateWithLifecycle()
 
     viewModel.collectSideEffect {
-
+        when (it) {
+            is DiaryWriteSideEffect.NavigateToDetail -> navigateToDiaryDetail(it.plantId)
+        }
     }
 
     val scrollState = rememberScrollState()
@@ -84,7 +86,7 @@ internal fun DiaryWriteScreen(
         }
         uiState.isSaveSuccess -> {
             DiarySaveSuccessContent(
-                navigateToDiaryDetail = navigateToDiaryDetail,
+                onClickGoToDetail = viewModel::onClickGoToDiaryDetail,
                 navigateToHome = navigateToHome
             )
         }
@@ -468,7 +470,7 @@ private fun DiarySaveLoadingContent() {
 
 @Composable
 private fun DiarySaveSuccessContent(
-    navigateToDiaryDetail: () -> Unit = {},
+    onClickGoToDetail: () -> Unit = {},
     navigateToHome: () -> Unit = {}
 ) {
     Column(
@@ -497,7 +499,7 @@ private fun DiarySaveSuccessContent(
                     color = DiaryColorsPalette.current.green500,
                     shape = RoundedCornerShape(16.dp)
                 )
-                .clickable { navigateToDiaryDetail() }
+                .clickable { onClickGoToDetail() }
                 .padding(vertical = 16.dp)
         ) {
             Text(
