@@ -19,8 +19,10 @@ import com.sabo.feature.diary.plantadd.navigation.plantAddNavGraph
 import com.sabo.feature.diary.write.navigation.diaryWriteScreen
 import com.sabo.feature.home.navigation.homeNavGraph
 import com.sabo.feature.login.loginNavGraph
+import com.sabo.feature.profile.navigation.policyNavGraph
 import com.sabo.feature.profile.navigation.profileNavGraph
 import com.sabo.feature.signup.signUpNavGraph
+import com.sabo.feature.web.navigation.webLinkScreen
 
 @Composable
 internal fun MainNavHost(
@@ -84,7 +86,16 @@ internal fun MainNavHost(
             )
             profileNavGraph(
                 onClickBack = navigator::popBackStack,
-                onClickSetting = { /*TODO*/ }
+                onClickSetting = { /*TODO*/ },
+                onClickFAQ = { navigator.navigateToWebLink(RouteModel.WebLink.Link.QNA) },
+                onClickPolicy = navigator::navigateToPolicy
+            )
+            policyNavGraph(
+                onClickBack = navigator::popBackStack,
+                navigateToWebLink = navigator::navigateToWebLink
+            )
+            webLinkScreen(
+                onClickClose = navigator::popBackStack
             )
         }
     }

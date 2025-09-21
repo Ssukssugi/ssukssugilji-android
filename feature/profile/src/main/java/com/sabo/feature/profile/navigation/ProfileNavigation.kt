@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.sabo.core.navigator.RouteModel
+import com.sabo.feature.profile.PolicyScreen
 import com.sabo.feature.profile.ProfileScreen
 
 fun NavController.navigateToProfile() {
@@ -12,12 +13,32 @@ fun NavController.navigateToProfile() {
 
 fun NavGraphBuilder.profileNavGraph(
     onClickBack: () -> Unit,
-    onClickSetting: () -> Unit
+    onClickSetting: () -> Unit,
+    onClickFAQ: () -> Unit,
+    onClickPolicy: () -> Unit
 ) {
     composable<RouteModel.Profile> {
         ProfileScreen(
             onClickBack = onClickBack,
-            onClickSetting = onClickSetting
+            onClickSetting = onClickSetting,
+            onClickFAQ = onClickFAQ,
+            onClickPolicy = onClickPolicy
+        )
+    }
+}
+
+fun NavController.navigateToPolicy() {
+    navigate(RouteModel.Policy)
+}
+
+fun NavGraphBuilder.policyNavGraph(
+    onClickBack: () -> Unit,
+    navigateToWebLink: (RouteModel.WebLink.Link) -> Unit
+) {
+    composable<RouteModel.Policy> {
+        PolicyScreen(
+            onClickBack = onClickBack,
+            navigateToWebLink = navigateToWebLink
         )
     }
 }

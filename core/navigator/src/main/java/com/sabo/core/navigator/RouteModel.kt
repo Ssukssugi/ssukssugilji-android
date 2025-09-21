@@ -34,4 +34,16 @@ sealed interface RouteModel {
 
     @Serializable
     data object Profile : RouteModel
+
+    @Serializable
+    data object Policy : RouteModel
+
+    @Serializable
+    data class WebLink(val link: Link) : RouteModel {
+        enum class Link(val url: String, val title: String) {
+            QNA("https://forms.gle/PhhnS6dLPQREXvrGA", "의견 보내기"),
+            POLICY("https://brazen-objective-f15.notion.site/244f509f94c9816bbbd6dd98ab92fb96?source=copy_link", "서비스 이용약관"),
+            PRIVACY("https://brazen-objective-f15.notion.site/244f509f94c981fa97d9edec16d75c2e?source=copy_link", "개인정보 수집 / 이용 동의서")
+        }
+    }
 }

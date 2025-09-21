@@ -14,8 +14,10 @@ import com.sabo.feature.diary.plantadd.navigation.navigateToPlantAdd
 import com.sabo.feature.diary.write.navigation.navigateToDiaryWrite
 import com.sabo.feature.home.navigation.navigateToHome
 import com.sabo.feature.login.navigateToLogin
+import com.sabo.feature.profile.navigation.navigateToPolicy
 import com.sabo.feature.profile.navigation.navigateToProfile
 import com.sabo.feature.signup.navigateToSignUp
+import com.sabo.feature.web.navigation.navigateToWebLink
 
 class MainNavigator(
     val navController: NavHostController
@@ -56,6 +58,14 @@ class MainNavigator(
 
     fun navigateToProfile() {
         navController.navigateToProfile()
+    }
+
+    fun navigateToPolicy() {
+        navController.navigateToPolicy()
+    }
+
+    fun navigateToWebLink(link: RouteModel.WebLink.Link) {
+        navController.navigateToWebLink(link)
     }
 
     fun popBackStack() {
