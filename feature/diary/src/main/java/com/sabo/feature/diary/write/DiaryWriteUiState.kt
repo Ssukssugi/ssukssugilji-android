@@ -10,14 +10,22 @@ data class DiaryWriteUiState(
     val imageUri: Uri = Uri.EMPTY,
     val plants: List<PlantListItem> = emptyList(),
     val date: LocalDate = LocalDate.now(),
-    val careType: CareType? = null,
-    val content: TextFieldState = TextFieldState()
+    val careTypes: List<CareTypeItem> = CareType.entries.map { CareTypeItem(it) },
+    val content: TextFieldState = TextFieldState(),
+    val isSaveLoading: Boolean = false,
+    val isSaveSuccess: Boolean = false
 )
 
 data class PlantListItem(
     val id: Long,
     val name: String,
-    val imageUrl: String
+    val imageUrl: String?,
+    val isSelected: Boolean = false
+)
+
+data class CareTypeItem(
+    val type: CareType,
+    val isSelected: Boolean = false
 )
 
 sealed interface DiaryWriteSideEffect {

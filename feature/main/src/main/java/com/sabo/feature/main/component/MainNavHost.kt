@@ -62,7 +62,8 @@ internal fun MainNavHost(
                 onClickNext = navigator::navigateToDiaryWrite
             )
             diaryWriteScreen(
-                onClickBack = navigator::popBackStack
+                onClickBack = navigator::popBackStack,
+                navigateToHome = navigator::navigateToHome
             )
             profileNavGraph(
                 onClickBack = navigator::popBackStack,

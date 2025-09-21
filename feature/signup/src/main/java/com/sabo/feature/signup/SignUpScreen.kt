@@ -235,9 +235,7 @@ private fun NickNameInput(
                         .fillMaxWidth()
                         .height(1.dp)
                         .background(color = DiaryColorsPalette.current.green400)
-                ) {}
-
-
+                )
             }
         }
     )

@@ -1,17 +1,24 @@
 package com.sabo.core.data.repository
 
+import androidx.core.net.toUri
 import com.sabo.core.data.Result
 import com.sabo.core.data.handleResult
+import com.sabo.core.model.CareType
 import com.sabo.core.model.PlantEnvironmentPlace
+import com.sabo.core.network.model.request.SaveNewDiaryRequest
 import com.sabo.core.network.model.request.SaveNewPlantRequest
 import com.sabo.core.network.model.response.GetMyPlant
 import com.sabo.core.network.model.response.GetPlantDiaries
 import com.sabo.core.network.model.response.GetPlantProfile
 import com.sabo.core.network.service.DiaryService
+import com.sabo.core.network.util.MultipartUtil
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class DefaultDiaryRepository @Inject constructor(
-    private val diaryService: DiaryService
+    private val diaryService: DiaryService,
+    private val multipartUtil: MultipartUtil
 ): DiaryRepository {
     override suspend fun saveNewPlant(
         name: String,
@@ -64,5 +71,24 @@ class DefaultDiaryRepository @Inject constructor(
     override suspend fun getPlantDiaries(plantId: Long): Result<GetPlantDiaries> = handleResult(
         execute = { diaryService.getPlantDiaries(plantId) },
         transform = { it }
+    )
+
+    override suspend fun savePlantDiary(plantId: Long, date: LocalDate, careTypes: List<CareType>, diary: String, imageUrl: String) = handleResult(
+        execute = {
+            val request = SaveNewDiaryRequest(
+                plantId = plantId,
+                date = date.format(DateTimeFormatter.ISO_DATE),
+                careTypes = careTypes.map { it.name },
+                diary = diary
+            )
+
+            val requestBody = multipartUtil.createDiaryRequestBody(request)
+            val imagePart = multipartUtil.createImageMultipartBody(imageUri = imageUrl.toUri())
+                ?: throw IllegalArgumentException("Image part cannot be null")
+            diaryService.saveNewDiary(requestBody, imagePart)
+        },
+        transform = {
+            it
+        }
     )
 }
