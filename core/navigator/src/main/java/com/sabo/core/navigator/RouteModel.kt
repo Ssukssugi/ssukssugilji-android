@@ -37,6 +37,9 @@ sealed interface RouteModel {
     data object Profile : RouteModel
 
     @Serializable
+    data object Settings : RouteModel
+
+    @Serializable
     data object Policy : RouteModel
 
     @Serializable

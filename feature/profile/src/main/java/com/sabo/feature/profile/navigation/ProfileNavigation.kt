@@ -6,9 +6,14 @@ import androidx.navigation.compose.composable
 import com.sabo.core.navigator.RouteModel
 import com.sabo.feature.profile.PolicyScreen
 import com.sabo.feature.profile.ProfileScreen
+import com.sabo.feature.profile.SettingsScreen
 
 fun NavController.navigateToProfile() {
     this.navigate(RouteModel.Profile)
+}
+
+fun NavController.navigateToSettings() {
+    this.navigate(RouteModel.Settings)
 }
 
 fun NavGraphBuilder.profileNavGraph(
@@ -23,6 +28,20 @@ fun NavGraphBuilder.profileNavGraph(
             onClickSetting = onClickSetting,
             onClickFAQ = onClickFAQ,
             onClickPolicy = onClickPolicy
+        )
+    }
+}
+
+fun NavGraphBuilder.settingsNavGraph(
+    onClickBack: () -> Unit,
+    onClickLogout: () -> Unit,
+    onClickDeleteAccount: () -> Unit
+) {
+    composable<RouteModel.Settings> {
+        SettingsScreen(
+            onClickBack = onClickBack,
+            onClickLogout = onClickLogout,
+            onClickDeleteAccount = onClickDeleteAccount
         )
     }
 }

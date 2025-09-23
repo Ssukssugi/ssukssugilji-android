@@ -21,6 +21,7 @@ import com.sabo.feature.home.navigation.homeNavGraph
 import com.sabo.feature.login.loginNavGraph
 import com.sabo.feature.profile.navigation.policyNavGraph
 import com.sabo.feature.profile.navigation.profileNavGraph
+import com.sabo.feature.profile.navigation.settingsNavGraph
 import com.sabo.feature.signup.signUpNavGraph
 import com.sabo.feature.web.navigation.webLinkScreen
 
@@ -86,9 +87,14 @@ internal fun MainNavHost(
             )
             profileNavGraph(
                 onClickBack = navigator::popBackStack,
-                onClickSetting = { /*TODO*/ },
+                onClickSetting = navigator::navigateToSettings,
                 onClickFAQ = { navigator.navigateToWebLink(RouteModel.WebLink.Link.QNA) },
                 onClickPolicy = navigator::navigateToPolicy
+            )
+            settingsNavGraph(
+                onClickBack = navigator::popBackStack,
+                onClickLogout = { /*TODO: 로그아웃 기능 구현*/ },
+                onClickDeleteAccount = { /*TODO: 회원 탈퇴 기능 구현*/ }
             )
             policyNavGraph(
                 onClickBack = navigator::popBackStack,

@@ -16,6 +16,7 @@ import com.sabo.feature.home.navigation.navigateToHome
 import com.sabo.feature.login.navigateToLogin
 import com.sabo.feature.profile.navigation.navigateToPolicy
 import com.sabo.feature.profile.navigation.navigateToProfile
+import com.sabo.feature.profile.navigation.navigateToSettings
 import com.sabo.feature.signup.navigateToSignUp
 import com.sabo.feature.web.navigation.navigateToWebLink
 
@@ -62,6 +63,10 @@ class MainNavigator(
 
     fun navigateToPolicy() {
         navController.navigateToPolicy()
+    }
+
+    fun navigateToSettings() {
+        navController.navigateToSettings()
     }
 
     fun navigateToWebLink(link: RouteModel.WebLink.Link) {

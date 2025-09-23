@@ -6,9 +6,14 @@ import javax.inject.Inject
 
 class DefaultProfileRepository @Inject constructor(
     private val profileService: ProfileService
-): ProfileRepository {
+) : ProfileRepository {
     override suspend fun getUserProfile() = handleResult(
         execute = { profileService.getUserProfile() },
+        transform = { it }
+    )
+
+    override suspend fun getUserSettings() = handleResult(
+        execute = { profileService.getUserSettings() },
         transform = { it }
     )
 }

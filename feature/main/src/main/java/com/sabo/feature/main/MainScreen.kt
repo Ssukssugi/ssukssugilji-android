@@ -27,8 +27,7 @@ private fun MainScreenContent(
     Scaffold(
         modifier = modifier
             .imePadding()
-            .navigationBarsPadding()
-            .statusBarsPadding(),
+            .navigationBarsPadding(),
         content = { padding ->
             MainNavHost(
                 navigator = navigator,
