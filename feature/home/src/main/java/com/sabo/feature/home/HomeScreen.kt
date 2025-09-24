@@ -529,7 +529,7 @@ private fun BoxScope.WriteDiaryFAB(
             .align(Alignment.BottomCenter)
             .padding(bottom = 16.dp)
             .height(56.dp)
-            .background(DiaryColorsPalette.current.green400, CircleShape)
+            .background(Color(0xFF00BA55).copy(alpha = 0.88f), CircleShape)
             .clip(CircleShape)
             .clickable { navigateToGallery() }
             .padding(horizontal = 20.dp),
@@ -543,8 +543,8 @@ private fun BoxScope.WriteDiaryFAB(
         Spacer(modifier = modifier.width(4.dp))
         Text(
             text = "쑥쑥일지 작성하기",
-            color = DiaryColorsPalette.current.gray50,
-            style = DiaryTypography.bodySmallBold
+            color = Color(0xFFFFFFFF),
+            style = DiaryTypography.bodyLargeBold
         )
     }
 }
