@@ -53,6 +53,38 @@ internal fun SettingsScreen(
         }
     }
 
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        SettingsContent(
+            state = state,
+            onClickBack = onClickBack,
+            onClickLogout = viewModel::onLogoutClick,
+            onClickDeleteAccount = viewModel::onDeleteAccountClick,
+            onClickMarketingToggle = viewModel::updateMarketingNotification,
+            onClickServiceToggle = viewModel::updateServiceNotification
+        )
+
+        if (state.isLoading) {
+            CircularProgressIndicator(
+                color = DiaryColorsPalette.current.green400,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+    }
+}
+
+@Composable
+private fun SettingsContent(
+    state: SettingsUiState,
+    onClickBack: () -> Unit = {},
+    onClickLogout: () -> Unit = {},
+    onClickDeleteAccount: () -> Unit = {},
+    onClickMarketingToggle: (Boolean) -> Unit = {},
+    onClickServiceToggle: (Boolean) -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -60,47 +92,36 @@ internal fun SettingsScreen(
     ) {
         TopAppBar(onClickBack = onClickBack)
 
-        if (state.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(32.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    color = DiaryColorsPalette.current.green400
-                )
-            }
-        } else {
-            Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-            NotificationSection()
+        NotificationSection()
 
-            Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-            NotificationItem(
-                title = "서비스 알림 수신 동의",
-                subtitle = "물 주기 알림 등 필수 기능 알림을 드려요",
-                isEnabled = state.serviceNotificationEnabled,
-            )
+        NotificationItem(
+            title = "서비스 알림 수신 동의",
+            subtitle = "물 주기 알림 등 필수 기능 알림을 드려요",
+            isEnabled = state.serviceNotificationEnabled,
+            onToggle = onClickServiceToggle
+        )
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            NotificationItem(
-                title = "마케팅 알림 수신 동의",
-                subtitle = "혜택, 이벤트 등 알림을 드려요",
-                isEnabled = state.marketingNotificationEnabled,
-            )
+        NotificationItem(
+            title = "마케팅 알림 수신 동의",
+            subtitle = "혜택, 이벤트 등 알림을 드려요",
+            isEnabled = state.marketingNotificationEnabled,
+            onToggle = onClickMarketingToggle
+        )
 
-            Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.weight(1f))
 
-            BottomButtons(
-                onClickLogout = viewModel::onLogoutClick,
-                onClickDeleteAccount = viewModel::onDeleteAccountClick
-            )
+        BottomButtons(
+            onClickLogout = onClickLogout,
+            onClickDeleteAccount = onClickDeleteAccount
+        )
 
-            Spacer(modifier = Modifier.height(34.dp))
-        }
+        Spacer(modifier = Modifier.height(34.dp))
     }
 }
 
@@ -170,7 +191,8 @@ private fun NotificationItem(
                 checkedThumbColor = Color.White,
                 checkedTrackColor = DiaryColorsPalette.current.green400,
                 uncheckedThumbColor = Color.White,
-                uncheckedTrackColor = DiaryColorsPalette.current.gray300
+                uncheckedTrackColor = DiaryColorsPalette.current.gray300,
+                uncheckedBorderColor = DiaryColorsPalette.current.gray300
             )
         )
     }
@@ -220,57 +242,12 @@ private fun BottomButtons(
 
 @Preview
 @Composable
-private fun SettingsScreenPreview() {
-    SsukssukDiaryTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
-        ) {
-            TopAppBar(onClickBack = {})
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            NotificationSection()
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            NotificationItem(
-                title = "서비스 알림 수신 동의",
-                subtitle = "물 주기 알림 등 필수 기능 알림을 드려요",
-                isEnabled = true,
-                onToggle = {}
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            NotificationItem(
-                title = "마케팅 알림 수신 동의",
-                subtitle = "혜택, 이벤트 등 알림을 드려요",
-                isEnabled = true,
-                onToggle = {}
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            BottomButtons(
-                onClickLogout = {},
-                onClickDeleteAccount = {}
-            )
-
-            Spacer(modifier = Modifier.height(34.dp))
-        }
-    }
-}
-
-@Preview
-@Composable
 private fun NotificationItemPreview() {
     SsukssukDiaryTheme {
         NotificationItem(
             title = "서비스 알림 수신 동의",
             subtitle = "물 주기 알림 등 필수 기능 알림을 드려요",
-            isEnabled = true,
+            isEnabled = false,
             onToggle = {}
         )
     }

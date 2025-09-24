@@ -49,6 +49,40 @@ class SettingsViewModel @Inject constructor(
         )
     }
 
+    fun updateMarketingNotification(enabled: Boolean) = intent {
+        if (state.isLoading) return@intent
+        reduce { state.copy(isLoading = true) }
+        profileRepository.updateMarketingSettings(enabled).handle(
+            onSuccess = {
+                reduce {
+                    state.copy(marketingNotificationEnabled = enabled)
+                }
+            },
+            onFinish = {
+                reduce {
+                    state.copy(isLoading = false)
+                }
+            }
+        )
+    }
+
+    fun updateServiceNotification(enabled: Boolean) = intent {
+        if (state.isLoading) return@intent
+        reduce { state.copy(isLoading = true) }
+        profileRepository.updateServiceNotificationSettings(enabled).handle(
+            onSuccess = {
+                reduce {
+                    state.copy(serviceNotificationEnabled = enabled)
+                }
+            },
+            onFinish = {
+                reduce {
+                    state.copy(isLoading = false)
+                }
+            }
+        )
+    }
+
     fun onLogoutClick() = intent {
         postSideEffect(SettingsEvent.ShowLogoutDialog)
     }
