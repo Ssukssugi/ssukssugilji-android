@@ -301,6 +301,7 @@ private fun PlantInfoMain(
                     style = DiaryTypography.bodySmallRegular,
                     color = DiaryColorsPalette.current.gray600
                 )
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = name,
                     style = DiaryTypography.subtitleLargeBold,
@@ -348,6 +349,7 @@ private fun LazyListScope.plantMonthlyHistory(
         key = { it.id }
     ) {
         DiaryItem(it)
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
@@ -377,6 +379,8 @@ private fun DiaryItem(
                 )
             }
 
+            Spacer(modifier = Modifier.height(6.dp))
+
             Text(
                 text = diary.date.toDisplayDayOfWeek(),
                 color = DiaryColorsPalette.current.gray600,
@@ -402,6 +406,8 @@ private fun DiaryItem(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(64.dp)
+                        .background(shape = RoundedCornerShape(6.dp), color = DiaryColorsPalette.current.gray50)
+                        .clip(RoundedCornerShape(6.dp))
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(
