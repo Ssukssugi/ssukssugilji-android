@@ -8,6 +8,7 @@ import com.sabo.core.model.LoginType
 sealed interface LoginUiState {
     @Immutable
     data class BeforeLogin(
+        val isInitializing: Boolean = true,
         val isShownTermsAgree: Boolean = false,
         val termsState: TermsAgreeState = TermsAgreeState()
     ) : LoginUiState

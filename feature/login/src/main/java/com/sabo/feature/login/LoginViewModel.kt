@@ -30,6 +30,18 @@ class LoginViewModel @Inject constructor(
     private var emailAddress: String? = null
     private var loginType: LoginType? = null
 
+    init {
+        checkInitialAuthentication()
+    }
+
+    private fun checkInitialAuthentication() {
+        viewModelScope.launch {
+            if (loginRepository.checkUserAuthentication()) {
+                _loginEvent.send(LoginEvent.GoToMain)
+            }
+        }
+    }
+
     fun onSuccessKakaoLogin(token: String) {
         val state = uiState.value as? LoginUiState.BeforeLogin ?: return
         viewModelScope.launch {

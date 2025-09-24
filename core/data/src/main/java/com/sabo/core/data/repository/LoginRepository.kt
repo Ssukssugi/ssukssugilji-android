@@ -14,4 +14,6 @@ interface LoginRepository {
         socialId: String,
         emailAddress: String,
     ): Result<Unit>
+
+    suspend fun checkUserAuthentication(): Boolean
 }

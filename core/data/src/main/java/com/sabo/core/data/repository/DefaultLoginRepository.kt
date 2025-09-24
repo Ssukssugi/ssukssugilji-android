@@ -4,13 +4,15 @@ import com.sabo.core.data.Result
 import com.sabo.core.data.handleResult
 import com.sabo.core.model.LoginType
 import com.sabo.core.model.SocialLogin
+import com.sabo.core.model.TokenProvider
 import com.sabo.core.network.model.request.ApplyTermsAgreementRequest
 import com.sabo.core.network.model.request.SocialLoginRequest
 import com.sabo.core.network.service.LoginService
 import javax.inject.Inject
 
 class DefaultLoginRepository @Inject constructor(
-    private val loginService: LoginService
+    private val loginService: LoginService,
+    private val tokenProvider: TokenProvider
 ) : LoginRepository {
     override suspend fun requestNaverLogin(token: String): Result<SocialLogin> = handleResult(
         execute = {
@@ -89,4 +91,8 @@ class DefaultLoginRepository @Inject constructor(
         },
         transform = { }
     )
+
+    override suspend fun checkUserAuthentication(): Boolean {
+        return tokenProvider.getAccessToken() != null
+    }
 }

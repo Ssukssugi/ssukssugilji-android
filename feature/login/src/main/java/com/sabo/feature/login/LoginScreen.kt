@@ -109,6 +109,7 @@ private fun LoginContent(
     when (uiState) {
         is LoginUiState.BeforeLogin -> LoginScreen(
             modifier = modifier,
+            needToLogin = uiState.isInitializing.not(),
             onClickKakaoLogin = onClickKakaoLogin,
             onClickGoogleLogin = onClickGoogleLogin,
             onSuccessNaverLogin = onSuccessNaverLogin,
@@ -126,6 +127,7 @@ private fun LoginContent(
 @Composable
 private fun LoginScreen(
     modifier: Modifier = Modifier,
+    needToLogin: Boolean = true,
     onClickKakaoLogin: () -> Unit,
     onClickGoogleLogin: suspend () -> Unit,
     onSuccessNaverLogin: (String) -> Unit,
@@ -137,85 +139,98 @@ private fun LoginScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(top = 80.dp, bottom = 188.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Box(
+        modifier = modifier.fillMaxSize(),
     ) {
-        Image(
-            painter = painterResource(id = dsR.drawable.img_home_logo),
-            contentDescription = null,
-            modifier = Modifier
-                .width(156.dp)
-                .height(40.dp)
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            text = stringResource(R.string.login_title),
-            style = DiaryTypography.subtitleLargeBold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.weight(1f))
         Image(
             painter = painterResource(id = dsR.drawable.img_logo_cat),
             contentDescription = null,
-            modifier = Modifier.size(224.dp)
+            modifier = Modifier
+                .padding(bottom = 188.dp)
+                .size(224.dp)
+                .align(Alignment.Center)
         )
-        Spacer(modifier = Modifier.weight(1f))
-        Text(
-            modifier = modifier
-                .padding(vertical = 16.dp)
-                .fillMaxWidth(),
-            text = stringResource(R.string.login_sns_help),
-            style = DiaryTypography.bodyLargeBold,
-            textAlign = TextAlign.Center
-        )
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            LoginIcon(
-                resId = R.drawable.img_login_google,
-                onClick = {
-                    scope.launch {
-                        onClickGoogleLogin()
-                    }
-                }
-            )
-            Spacer(modifier = modifier.width(16.dp))
-            LoginIcon(
-                resId = R.drawable.img_login_kakao,
-                onClick = {
-                    onClickKakaoLogin()
-                }
-            )
-            Spacer(modifier = modifier.width(16.dp))
-            LoginIcon(
-                resId = R.drawable.img_login_naver,
-                onClick = {
-                    NaverIdLoginSDK.authenticate(context, object : OAuthLoginCallback {
-                        override fun onSuccess() {
-                            NaverIdLoginSDK.getAccessToken()?.let { token ->
-                                onSuccessNaverLogin(token)
+
+        if (needToLogin) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 80.dp, bottom = 188.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Image(
+                    painter = painterResource(id = dsR.drawable.img_home_logo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(156.dp)
+                        .height(40.dp)
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = stringResource(R.string.login_title),
+                    style = DiaryTypography.subtitleLargeBold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.weight(1f))
+
+                Spacer(modifier = Modifier.size(224.dp))
+
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    modifier = Modifier
+                        .padding(vertical = 16.dp)
+                        .fillMaxWidth(),
+                    text = stringResource(R.string.login_sns_help),
+                    style = DiaryTypography.bodyLargeBold,
+                    textAlign = TextAlign.Center
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    LoginIcon(
+                        resId = R.drawable.img_login_google,
+                        onClick = {
+                            scope.launch {
+                                onClickGoogleLogin()
                             }
                         }
-
-                        override fun onError(errorCode: Int, message: String) {
-                            //TODO("Not yet implemented")
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    LoginIcon(
+                        resId = R.drawable.img_login_kakao,
+                        onClick = {
+                            onClickKakaoLogin()
                         }
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    LoginIcon(
+                        resId = R.drawable.img_login_naver,
+                        onClick = {
+                            NaverIdLoginSDK.authenticate(context, object : OAuthLoginCallback {
+                                override fun onSuccess() {
+                                    NaverIdLoginSDK.getAccessToken()?.let { token ->
+                                        onSuccessNaverLogin(token)
+                                    }
+                                }
 
-                        override fun onFailure(httpStatus: Int, message: String) {
-                            //TODO("Not yet implemented")
+                                override fun onError(errorCode: Int, message: String) {
+                                    //TODO("Not yet implemented")
+                                }
+
+                                override fun onFailure(httpStatus: Int, message: String) {
+                                    //TODO("Not yet implemented")
+                                }
+                            })
                         }
-                    })
+                    )
                 }
-            )
+            }
         }
     }
 

@@ -23,8 +23,6 @@ import com.sabo.feature.web.navigation.navigateToWebLink
 class MainNavigator(
     val navController: NavHostController
 ) {
-    val startDestination = RouteModel.Login
-
     fun navigateToLogin() {
         navController.navigateToLogin()
     }

@@ -39,7 +39,7 @@ internal fun MainNavHost(
     ) {
         NavHost(
             navController = navigator.navController,
-            startDestination = navigator.startDestination
+            startDestination = RouteModel.Login
         ) {
             loginNavGraph(
                 navigateToSignUp = navigator::navigateToSignUp,
