@@ -121,4 +121,19 @@ class HomeViewModel @Inject constructor(
         val plantId = selectedPlantId.value ?: return@intent
         postSideEffect(HomeEvent.NavigateToDiaryDetail(plantId))
     }
+
+    fun onClickMore(plantId: Long) = intent {
+        val plant = state.plantList.filterIsInstance<PlantListItem.Plant>()
+            .find { it.id == plantId } ?: return@intent
+
+        postSideEffect(HomeEvent.ShowPlantOptions(plant))
+    }
+
+    fun onEditPlant() = intent {
+        // TODO: Navigate to edit plant screen
+    }
+
+    fun onDeletePlant() = intent {
+        // TODO: Implement delete plant logic
+    }
 }

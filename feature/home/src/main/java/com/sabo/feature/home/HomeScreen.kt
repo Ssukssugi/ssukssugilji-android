@@ -27,10 +27,16 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +61,7 @@ import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 import java.time.LocalDate
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -67,9 +74,16 @@ internal fun HomeScreen(
 
     val state = viewModel.collectAsState().value
 
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var selectedPlant by remember { mutableStateOf<PlantListItem.Plant?>(null) }
+
     viewModel.collectSideEffect {
         when (it) {
             is HomeEvent.NavigateToDiaryDetail -> navigateToDiaryDetail(it.plantId)
+            is HomeEvent.ShowPlantOptions -> {
+                selectedPlant = it.plant
+                showBottomSheet = true
+            }
         }
     }
 
@@ -80,8 +94,21 @@ internal fun HomeScreen(
         navigateToGallery = navigateToGallery,
         navigateToPlantAdd = navigateToPlantAdd,
         navigateToProfile = navigateToProfile,
-        onClickDiaryDetail = viewModel::onClickDiaryDetail
+        onClickDiaryDetail = viewModel::onClickDiaryDetail,
+        onClickMore = { id -> viewModel.onClickMore(id) }
     )
+
+    if (showBottomSheet) {
+        PlantOptionsModalBottomSheet(
+            plant = selectedPlant,
+            onEditClick = viewModel::onEditPlant,
+            onDeleteClick = viewModel::onDeletePlant,
+            onDismissRequest = {
+                showBottomSheet = false
+                selectedPlant = null
+            }
+        )
+    }
 }
 
 @Composable
@@ -92,7 +119,8 @@ private fun HomeContent(
     navigateToGallery: () -> Unit = {},
     navigateToPlantAdd: () -> Unit = {},
     navigateToProfile: () -> Unit = {},
-    onClickDiaryDetail: () -> Unit = {}
+    onClickDiaryDetail: () -> Unit = {},
+    onClickMore: (Long) -> Unit = {}
 ) {
     val storyRowState = rememberLazyListState()
     val contentColumnState = rememberLazyListState()
@@ -128,6 +156,7 @@ private fun HomeContent(
                         .clickable { navigateToProfile() },
                     tint = DiaryColorsPalette.current.gray900
                 )
+                // Removed top right more icon since 'onClickMore' is handled in PlantInfoMain for each plant
             }
 
             PlantStory(
@@ -146,7 +175,8 @@ private fun HomeContent(
                     .weight(1f, fill = true),
                 scrollState = contentColumnState,
                 data = plantContent,
-                onClickDiaryDetail = onClickDiaryDetail
+                onClickDiaryDetail = onClickDiaryDetail,
+                onClickMore = onClickMore
             )
         }
         WriteDiaryFAB(
@@ -549,6 +579,119 @@ private fun BoxScope.WriteDiaryFAB(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PlantOptionsModalBottomSheet(
+    plant: PlantListItem.Plant?,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        dragHandle = {
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .size(width = 56.dp, height = 4.dp)
+                    .background(
+                        color = Color(0xFFDDDDDD),
+                        shape = RoundedCornerShape(2.dp)
+                    )
+            )
+        },
+        containerColor = Color(0xFFFFFFFF)
+    ) {
+        plant?.let {
+            PlantOptionsBottomSheet(
+                plant = it,
+                onEditClick = onEditClick,
+                onDeleteClick = onDeleteClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun PlantOptionsBottomSheet(
+    plant: PlantListItem.Plant,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 24.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 20.dp, horizontal = 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AsyncImage(
+                model = plant.image,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(24.dp)
+                    .background(color = Color(0xFFFFFFFF), shape = CircleShape)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = plant.name,
+                style = DiaryTypography.subtitleMediumBold,
+                color = DiaryColorsPalette.current.gray900
+            )
+        }
+
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            PlantBottomSheetEditItem(
+                iconRes = R.drawable.icon_edit_diary,
+                text = "수정하기",
+                tint = DiaryColorsPalette.current.gray600,
+                onClick = onEditClick
+            )
+            PlantBottomSheetEditItem(
+                iconRes = R.drawable.icon_trash,
+                text = "삭제하기",
+                tint = DiaryColorsPalette.current.red400,
+                onClick = onDeleteClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun PlantBottomSheetEditItem(
+    iconRes: Int,
+    text: String,
+    tint: Color,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = ImageVector.vectorResource(iconRes),
+            contentDescription = null,
+            tint = tint,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = text,
+            style = DiaryTypography.bodyLargeSemiBold,
+            color = tint
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun HomeContentPreview() {
@@ -579,7 +722,8 @@ private fun HomeContentPreview() {
                         )
                     )
                 )
-            )
+            ),
+            onClickMore = { }
         )
     }
 }
