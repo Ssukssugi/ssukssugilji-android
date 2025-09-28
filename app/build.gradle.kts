@@ -47,6 +47,7 @@ android {
             signingConfig = signingConfigs.getByName("release")
             manifestPlaceholders["KAKAO_APP_KEY"] = String.valueOf(getKakaoSdkAppKey())
             isMinifyEnabled = true
+            isShrinkResources = true
         }
     }
 }

@@ -23,7 +23,7 @@ class LoginViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.BeforeLogin())
     val uiState = _uiState.asStateFlow()
 
-    private val _loginEvent = Channel<LoginEvent>(Channel.RENDEZVOUS)
+    private val _loginEvent = Channel<LoginEvent>(capacity = 1)
     val loginEvent = _loginEvent.receiveAsFlow()
 
     private var socialId: String? = null
@@ -38,6 +38,9 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             if (loginRepository.checkUserAuthentication()) {
                 _loginEvent.send(LoginEvent.GoToMain)
+            } else {
+                val state = uiState.value as? LoginUiState.BeforeLogin ?: return@launch
+                _uiState.value = state.copy(isInitializing = false)
             }
         }
     }
