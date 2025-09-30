@@ -22,6 +22,7 @@ import com.sabo.feature.login.loginNavGraph
 import com.sabo.feature.profile.navigation.policyNavGraph
 import com.sabo.feature.profile.navigation.profileNavGraph
 import com.sabo.feature.profile.navigation.settingsNavGraph
+import com.sabo.feature.profile.navigation.userDeleteNavGraph
 import com.sabo.feature.signup.signUpNavGraph
 import com.sabo.feature.web.navigation.webLinkScreen
 
@@ -94,7 +95,11 @@ internal fun MainNavHost(
             settingsNavGraph(
                 onClickBack = navigator::popBackStack,
                 navigateToLogin = navigator::navigateToLoginAndClearBackStack,
-                onClickDeleteAccount = { /*TODO: 회원 탈퇴 기능 구현*/ }
+                onClickDeleteAccount = navigator::navigateToUserDelete
+            )
+            userDeleteNavGraph(
+                onClickBack = navigator::popBackStack,
+                navigateToLogin = navigator::navigateToLoginAndClearBackStack
             )
             policyNavGraph(
                 onClickBack = navigator::popBackStack,

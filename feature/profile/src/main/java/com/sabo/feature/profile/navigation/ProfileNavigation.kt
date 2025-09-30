@@ -7,6 +7,7 @@ import com.sabo.core.navigator.RouteModel
 import com.sabo.feature.profile.PolicyScreen
 import com.sabo.feature.profile.ProfileScreen
 import com.sabo.feature.profile.SettingsScreen
+import com.sabo.feature.profile.UserDeleteScreen
 
 fun NavController.navigateToProfile() {
     this.navigate(RouteModel.Profile)
@@ -14,6 +15,10 @@ fun NavController.navigateToProfile() {
 
 fun NavController.navigateToSettings() {
     this.navigate(RouteModel.Settings)
+}
+
+fun NavController.navigateToUserDelete() {
+    this.navigate(RouteModel.UserDelete)
 }
 
 fun NavGraphBuilder.profileNavGraph(
@@ -41,7 +46,19 @@ fun NavGraphBuilder.settingsNavGraph(
         SettingsScreen(
             onClickBack = onClickBack,
             navigateToLogin = navigateToLogin,
-            onClickDeleteAccount = onClickDeleteAccount
+            navigateToUserDelete = onClickDeleteAccount
+        )
+    }
+}
+
+fun NavGraphBuilder.userDeleteNavGraph(
+    onClickBack: () -> Unit,
+    navigateToLogin: () -> Unit,
+) {
+    composable<RouteModel.UserDelete> {
+        UserDeleteScreen(
+            onClickBack = onClickBack,
+            navigateToLogin = navigateToLogin
         )
     }
 }

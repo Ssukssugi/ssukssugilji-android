@@ -15,4 +15,6 @@ interface ProfileRepository {
     suspend fun updateServiceNotificationSettings(value: Boolean): Result<Unit>
 
     suspend fun logout(): Result<Unit>
+
+    suspend fun deleteUser(): Result<Unit>
 }

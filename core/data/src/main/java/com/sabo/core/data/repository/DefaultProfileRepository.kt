@@ -85,4 +85,30 @@ class DefaultProfileRepository @Inject constructor(
     } catch (e: Exception) {
         Result.Error(null, e.message)
     }
+
+    override suspend fun deleteUser(): Result<Unit> {
+        return try {
+            val result = handleResult(
+                execute = { profileService.deleteUser() },
+                transform = {}
+            )
+
+            val finalResult = if (result is Result.Success) {
+                authDataStore.clear()
+                localDataStore.clear()
+
+                val token = authDataStore.getAccessToken()
+                if (token != null) {
+                    Result.Error(null, "Failed to clear authentication data")
+                } else {
+                    result
+                }
+            } else {
+                result
+            }
+            finalResult
+        } catch (e: Exception) {
+            Result.Error(null, e.message)
+        }
+    }
 }

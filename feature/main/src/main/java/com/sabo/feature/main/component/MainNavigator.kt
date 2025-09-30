@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import com.sabo.core.navigator.RouteModel
 import com.sabo.feature.diary.detail.navigation.navigateToDiaryDetail
 import com.sabo.feature.diary.gallery.navigation.navigateToGallery
@@ -17,6 +18,7 @@ import com.sabo.feature.login.navigateToLogin
 import com.sabo.feature.profile.navigation.navigateToPolicy
 import com.sabo.feature.profile.navigation.navigateToProfile
 import com.sabo.feature.profile.navigation.navigateToSettings
+import com.sabo.feature.profile.navigation.navigateToUserDelete
 import com.sabo.feature.signup.navigateToSignUp
 import com.sabo.feature.web.navigation.navigateToWebLink
 
@@ -28,12 +30,15 @@ class MainNavigator(
     }
 
     fun navigateToLoginAndClearBackStack() {
-        navController.navigate(RouteModel.Login) {
-            popUpTo(0) {
-                inclusive = true
+        navController.navigate(
+            route = RouteModel.Login,
+            navOptions = navOptions {
+                popUpTo<RouteModel.Login> {
+                    inclusive = true
+                }
+                launchSingleTop = true
             }
-            launchSingleTop = true
-        }
+        )
     }
 
     fun navigateToSignUp() {
@@ -74,6 +79,10 @@ class MainNavigator(
 
     fun navigateToSettings() {
         navController.navigateToSettings()
+    }
+
+    fun navigateToUserDelete() {
+        navController.navigateToUserDelete()
     }
 
     fun navigateToWebLink(link: RouteModel.WebLink.Link) {

@@ -52,7 +52,7 @@ internal fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
     onClickBack: () -> Unit = {},
     navigateToLogin: () -> Unit = {},
-    onClickDeleteAccount: () -> Unit = {},
+    navigateToUserDelete: () -> Unit = {},
     onShowError: (String) -> Unit = {}
 ) {
     val state = viewModel.collectAsState().value
@@ -63,7 +63,7 @@ internal fun SettingsScreen(
             SettingsEvent.NavigateBack -> onClickBack()
             SettingsEvent.ShowLogoutDialog -> showLogoutDialog = true
             SettingsEvent.NavigateToLogin -> navigateToLogin()
-            SettingsEvent.ShowDeleteAccountDialog -> onClickDeleteAccount()
+            SettingsEvent.NavigateToDeleteScreen -> navigateToUserDelete()
             is SettingsEvent.ShowError -> onShowError(event.message)
         }
     }

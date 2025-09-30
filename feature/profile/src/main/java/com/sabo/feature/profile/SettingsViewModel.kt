@@ -12,7 +12,7 @@ import javax.inject.Inject
 sealed interface SettingsEvent {
     data object NavigateBack : SettingsEvent
     data object ShowLogoutDialog : SettingsEvent
-    data object ShowDeleteAccountDialog : SettingsEvent
+    data object NavigateToDeleteScreen : SettingsEvent
     data object NavigateToLogin : SettingsEvent
     data class ShowError(val message: String) : SettingsEvent
 }
@@ -101,6 +101,6 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onDeleteAccountClick() = intent {
-        postSideEffect(SettingsEvent.ShowDeleteAccountDialog)
+        postSideEffect(SettingsEvent.NavigateToDeleteScreen)
     }
 }

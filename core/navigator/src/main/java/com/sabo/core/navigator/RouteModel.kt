@@ -40,6 +40,9 @@ sealed interface RouteModel {
     data object Settings : RouteModel
 
     @Serializable
+    data object UserDelete : RouteModel
+
+    @Serializable
     data object Policy : RouteModel
 
     @Serializable
