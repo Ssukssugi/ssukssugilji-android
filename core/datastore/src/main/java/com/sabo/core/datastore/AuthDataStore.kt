@@ -40,4 +40,10 @@ class AuthDataStore @Inject constructor(
             preferences[PreferencesKey.REFRESH_TOKEN] = token
         }
     }
+
+    suspend fun clear() {
+        dataStore.edit { preferences ->
+            preferences.clear()
+        }
+    }
 }

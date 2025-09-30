@@ -13,4 +13,6 @@ interface ProfileRepository {
     suspend fun updateMarketingSettings(value: Boolean): Result<Unit>
 
     suspend fun updateServiceNotificationSettings(value: Boolean): Result<Unit>
+
+    suspend fun logout(): Result<Unit>
 }

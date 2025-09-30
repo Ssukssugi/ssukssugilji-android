@@ -47,4 +47,10 @@ class LocalDataStore @Inject constructor(
             preferences[PreferencesKey.MARKETING_NOTIFICATION_ENABLED] = marketingNotificationEnabled
         }
     }
+
+    suspend fun clear() {
+        dataStore.edit { preferences ->
+            preferences.clear()
+        }
+    }
 }

@@ -13,6 +13,7 @@ sealed interface SettingsEvent {
     data object NavigateBack : SettingsEvent
     data object ShowLogoutDialog : SettingsEvent
     data object ShowDeleteAccountDialog : SettingsEvent
+    data object NavigateToLogin : SettingsEvent
     data class ShowError(val message: String) : SettingsEvent
 }
 
@@ -85,6 +86,18 @@ class SettingsViewModel @Inject constructor(
 
     fun onLogoutClick() = intent {
         postSideEffect(SettingsEvent.ShowLogoutDialog)
+    }
+
+    fun onConfirmLogout() = intent {
+        reduce { state.copy(isLoading = true) }
+        profileRepository.logout().handle(
+            onSuccess = {
+                postSideEffect(SettingsEvent.NavigateToLogin)
+            },
+            onFinish = {
+                reduce { state.copy(isLoading = false) }
+            }
+        )
     }
 
     fun onDeleteAccountClick() = intent {

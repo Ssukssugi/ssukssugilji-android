@@ -2,6 +2,7 @@ package com.sabo.core.data.repository
 
 import com.sabo.core.data.Result
 import com.sabo.core.data.handleResult
+import com.sabo.core.datastore.AuthDataStore
 import com.sabo.core.datastore.LocalDataStore
 import com.sabo.core.network.model.request.UpdateUserSettingsRequest
 import com.sabo.core.network.model.request.UserSettingsKey
@@ -12,7 +13,8 @@ import javax.inject.Inject
 
 class DefaultProfileRepository @Inject constructor(
     private val profileService: ProfileService,
-    private val localDataStore: LocalDataStore
+    private val localDataStore: LocalDataStore,
+    private val authDataStore: AuthDataStore
 ) : ProfileRepository {
     override suspend fun getUserProfile() = handleResult(
         execute = { profileService.getUserProfile() },
@@ -75,4 +77,12 @@ class DefaultProfileRepository @Inject constructor(
         },
         transform = {}
     )
+
+    override suspend fun logout(): Result<Unit> = try {
+        authDataStore.clear()
+        localDataStore.clear()
+        Result.Success(Unit)
+    } catch (e: Exception) {
+        Result.Error(null, e.message)
+    }
 }

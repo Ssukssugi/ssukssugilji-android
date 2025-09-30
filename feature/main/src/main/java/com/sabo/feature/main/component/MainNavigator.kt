@@ -27,6 +27,15 @@ class MainNavigator(
         navController.navigateToLogin()
     }
 
+    fun navigateToLoginAndClearBackStack() {
+        navController.navigate(RouteModel.Login) {
+            popUpTo(0) {
+                inclusive = true
+            }
+            launchSingleTop = true
+        }
+    }
+
     fun navigateToSignUp() {
         navController.navigateToSignUp()
     }

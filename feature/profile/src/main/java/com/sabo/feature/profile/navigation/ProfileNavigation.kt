@@ -34,13 +34,13 @@ fun NavGraphBuilder.profileNavGraph(
 
 fun NavGraphBuilder.settingsNavGraph(
     onClickBack: () -> Unit,
-    onClickLogout: () -> Unit,
+    navigateToLogin: () -> Unit,
     onClickDeleteAccount: () -> Unit
 ) {
     composable<RouteModel.Settings> {
         SettingsScreen(
             onClickBack = onClickBack,
-            onClickLogout = onClickLogout,
+            navigateToLogin = navigateToLogin,
             onClickDeleteAccount = onClickDeleteAccount
         )
     }

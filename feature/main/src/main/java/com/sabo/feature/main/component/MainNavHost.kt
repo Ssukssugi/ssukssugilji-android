@@ -93,7 +93,7 @@ internal fun MainNavHost(
             )
             settingsNavGraph(
                 onClickBack = navigator::popBackStack,
-                onClickLogout = { /*TODO: 로그아웃 기능 구현*/ },
+                navigateToLogin = navigator::navigateToLoginAndClearBackStack,
                 onClickDeleteAccount = { /*TODO: 회원 탈퇴 기능 구현*/ }
             )
             policyNavGraph(
