@@ -61,7 +61,6 @@ import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 import java.time.LocalDate
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -95,7 +94,8 @@ internal fun HomeScreen(
         navigateToPlantAdd = navigateToPlantAdd,
         navigateToProfile = navigateToProfile,
         onClickDiaryDetail = viewModel::onClickDiaryDetail,
-        onClickMore = { id -> viewModel.onClickMore(id) }
+        onClickMore = viewModel::onClickMore,
+        onClickOtherPlant = viewModel::onSelectPlant
     )
 
     if (showBottomSheet) {
@@ -120,7 +120,8 @@ private fun HomeContent(
     navigateToPlantAdd: () -> Unit = {},
     navigateToProfile: () -> Unit = {},
     onClickDiaryDetail: () -> Unit = {},
-    onClickMore: (Long) -> Unit = {}
+    onClickMore: (Long) -> Unit = {},
+    onClickOtherPlant: (Long) -> Unit = {}
 ) {
     val storyRowState = rememberLazyListState()
     val contentColumnState = rememberLazyListState()
@@ -162,7 +163,8 @@ private fun HomeContent(
             PlantStory(
                 plantList = plantList,
                 scrollState = storyRowState,
-                onClickAddPlant = navigateToPlantAdd
+                onClickAddPlant = navigateToPlantAdd,
+                onClickPlant = onClickOtherPlant
             )
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),

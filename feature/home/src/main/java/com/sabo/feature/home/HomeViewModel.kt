@@ -1,6 +1,5 @@
 package com.sabo.feature.home
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sabo.core.data.Result
@@ -18,7 +17,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val diaryRepository: DiaryRepository
 ) : ContainerHost<HomeUiState, HomeEvent>, ViewModel() {
 
@@ -72,6 +70,21 @@ class HomeViewModel @Inject constructor(
                 plantList = plants,
                 plantContent = if (plants.size == 1) PlantContent.Empty else PlantContent.Loading
             )
+        }
+    }
+
+    fun onSelectPlant(plantId: Long) = intent {
+        selectedPlantId.update { plantId }
+
+        val updatedPlantList = state.plantList.map {
+            when (it) {
+                is PlantListItem.Plant -> it.copy(isSelected = it.id == plantId)
+                is PlantListItem.AddPlant -> it
+            }
+        }
+
+        reduce {
+            state.copy(plantList = updatedPlantList)
         }
     }
 
