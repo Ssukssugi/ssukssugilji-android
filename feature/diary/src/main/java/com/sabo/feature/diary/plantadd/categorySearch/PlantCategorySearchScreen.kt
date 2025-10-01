@@ -19,13 +19,17 @@ import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -71,7 +75,14 @@ private fun PlantCategorySearchContent(
     state: PlantSearchState,
     onClickCategory: (String) -> Unit = {}
 ) {
-    var isFocused by remember { mutableStateOf(true) }
+    var isFocused by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+        keyboardController?.show()
+    }
 
     Column(
         modifier = Modifier
@@ -104,7 +115,8 @@ private fun PlantCategorySearchContent(
                 .padding(horizontal = 20.dp)
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .onFocusChanged { isFocused = it.isFocused },
+                .onFocusChanged { isFocused = it.isFocused }
+                .focusRequester(focusRequester),
             lineLimits = TextFieldLineLimits.SingleLine,
             onKeyboardAction = KeyboardActionHandler {
                 onClickCategory(state.textFieldState.text.toString())

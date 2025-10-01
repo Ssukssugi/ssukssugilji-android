@@ -1,6 +1,5 @@
 package com.sabo.feature.diary.plantadd.categorySearch
 
-import android.util.Log
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.text.TextRange

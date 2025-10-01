@@ -1,6 +1,5 @@
 package com.sabo.feature.diary.plantadd
 
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sabo.core.data.handle
@@ -10,7 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,10 +22,10 @@ class PlantAddViewModel @Inject constructor(
     private val _state = MutableStateFlow<PlantAddState>(PlantAddState.Input())
     val state = _state.asStateFlow()
 
-    val isAddable = combine(
-        snapshotFlow { (state.value as? PlantAddState.Input)?.textFieldState?.text?.isNotEmpty() ?: false },
-        snapshotFlow { (state.value as? PlantAddState.Input)?.plantCategory != null }
-    ) { isTextNotEmpty, isCategorySelected ->
+    val isAddable = _state.map { state ->
+        val inputState = state as? PlantAddState.Input
+        val isTextNotEmpty = inputState?.textFieldState?.text?.isNotEmpty() ?: false
+        val isCategorySelected = inputState?.plantCategory != null
         isTextNotEmpty && isCategorySelected
     }.stateIn(
         scope = viewModelScope,

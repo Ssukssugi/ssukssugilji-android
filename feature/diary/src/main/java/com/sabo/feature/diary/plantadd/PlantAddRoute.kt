@@ -606,8 +606,8 @@ private fun SaveSuccessContent(
                     color = Color(0xFF03D379),
                     shape = RoundedCornerShape(16.dp)
                 )
-                .clickable { onClickHome() }
                 .clip(RoundedCornerShape(16.dp))
+                .clickable { onClickHome() }
                 .padding(vertical = 16.dp)
         ) {
             Text(
@@ -630,8 +630,8 @@ private fun SaveSuccessContent(
                     color = DiaryColorsPalette.current.green50,
                     shape = RoundedCornerShape(16.dp)
                 )
-                .clickable { onClickDiary() }
                 .clip(RoundedCornerShape(16.dp))
+                .clickable { onClickDiary() }
                 .padding(vertical = 16.dp)
         ) {
             Text(
