@@ -7,13 +7,7 @@ import androidx.navigation.compose.composable
 import com.sabo.core.navigator.RouteModel
 import com.sabo.feature.home.HomeScreen
 
-fun NavController.navigateToHome(
-    navOptions: NavOptions = androidx.navigation.navOptions {
-        popUpTo(this@navigateToHome.graph.startDestinationId) {
-            inclusive = true
-        }
-    }
-) {
+fun NavController.navigateToHome(navOptions: NavOptions) {
     this.navigate(RouteModel.Home, navOptions)
 }
 

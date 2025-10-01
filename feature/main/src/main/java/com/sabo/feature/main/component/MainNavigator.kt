@@ -45,8 +45,15 @@ class MainNavigator(
         navController.navigateToSignUp()
     }
 
-    fun navigateToHome() {
-        navController.navigateToHome()
+    fun navigateToHome(
+        navOptions: NavOptions = navOptions {
+            popUpTo<RouteModel.Home> {
+                inclusive = true
+            }
+            launchSingleTop = true
+        }
+    ) {
+        navController.navigateToHome(navOptions = navOptions)
     }
 
     fun navigateToPlantAdd() {
@@ -57,8 +64,8 @@ class MainNavigator(
         navController.navigateToCategorySearch(keyword)
     }
 
-    fun navigateToGallery() {
-        navController.navigateToGallery()
+    fun navigateToGallery(navOption: NavOptions? = null) {
+        navController.navigateToGallery(navOptions = navOption)
     }
 
     fun navigateToDiaryWrite(imageUri: Uri) {

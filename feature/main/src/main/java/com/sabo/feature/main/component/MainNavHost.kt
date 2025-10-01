@@ -44,10 +44,28 @@ internal fun MainNavHost(
         ) {
             loginNavGraph(
                 navigateToSignUp = navigator::navigateToSignUp,
-                navigateToHome = navigator::navigateToHome
+                navigateToHome = {
+                    navigator.navigateToHome(
+                        navOptions = navOptions {
+                            popUpTo<RouteModel.Login> {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    )
+                }
             )
             signUpNavGraph(
-                onCompletedSignUp = navigator::navigateToHome
+                onCompletedSignUp = {
+                    navigator.navigateToHome(
+                        navOptions = navOptions {
+                            popUpTo<RouteModel.Login> {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    )
+                }
             )
             homeNavGraph(
                 navigateToGallery = navigator::navigateToGallery,
@@ -58,7 +76,15 @@ internal fun MainNavHost(
             plantAddNavGraph(
                 onClickCategory = navigator::navigateToCategorySearch,
                 onClickHome = navigator::navigateToHome,
-                onClickDiary = { /* TODO: 일지 작성 하러 가기 추가*/ },
+                onClickDiary = {
+                    navigator.navigateToGallery(
+                        navOption = navOptions {
+                            popUpTo<RouteModel.Home> {
+                                inclusive = false
+                            }
+                        }
+                    )
+                },
                 onClickBack = navigator::popBackStack
             )
             categorySearchScreen(
