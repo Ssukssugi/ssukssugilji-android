@@ -181,7 +181,9 @@ private fun HomeContent(
         }
         WriteDiaryFAB(
             modifier = modifier,
-            navigateToGallery = navigateToGallery
+            anyPlants = plantList.filterIsInstance<PlantListItem.Plant>().isNotEmpty(),
+            navigateToGallery = navigateToGallery,
+            navigateToAddPlant = navigateToPlantAdd
         )
     }
 }
@@ -552,7 +554,9 @@ private fun PlantStoryItem(
 @Composable
 private fun BoxScope.WriteDiaryFAB(
     modifier: Modifier = Modifier,
-    navigateToGallery: () -> Unit = {}
+    anyPlants: Boolean,
+    navigateToGallery: () -> Unit = {},
+    navigateToAddPlant: () -> Unit = {}
 ) {
     Row(
         modifier = modifier
@@ -561,7 +565,13 @@ private fun BoxScope.WriteDiaryFAB(
             .height(56.dp)
             .background(Color(0xFF00BA55).copy(alpha = 0.88f), CircleShape)
             .clip(CircleShape)
-            .clickable { navigateToGallery() }
+            .clickable {
+                if (anyPlants) {
+                    navigateToGallery()
+                } else {
+                    navigateToAddPlant()
+                }
+            }
             .padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -572,7 +582,7 @@ private fun BoxScope.WriteDiaryFAB(
         )
         Spacer(modifier = modifier.width(4.dp))
         Text(
-            text = "쑥쑥일지 작성하기",
+            text = if (anyPlants) "쑥쑥일지 작성하기" else "식물 추가하기",
             color = Color(0xFFFFFFFF),
             style = DiaryTypography.bodyLargeBold
         )
