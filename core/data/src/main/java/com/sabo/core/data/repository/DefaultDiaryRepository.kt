@@ -83,8 +83,7 @@ class DefaultDiaryRepository @Inject constructor(
             )
 
             val requestBody = multipartUtil.createDiaryRequestBody(request)
-            val imagePart = multipartUtil.createImageMultipartBody(imageUri = imageUrl.toUri())
-                ?: throw IllegalArgumentException("Image part cannot be null")
+            val imagePart = multipartUtil.createImageMultipartBody(imageUri = imageUrl.toUri()) ?: throw IllegalArgumentException("Image part cannot be null")
             diaryService.saveNewDiary(requestBody, imagePart)
         },
         transform = {

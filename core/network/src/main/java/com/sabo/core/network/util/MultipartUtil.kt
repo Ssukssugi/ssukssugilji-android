@@ -22,13 +22,13 @@ class MultipartUtil @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     fun createDiaryRequestBody(request: SaveNewDiaryRequest): okhttp3.RequestBody {
-        val json = Json.encodeToString(request)
-        return json.toRequestBody("text/plain".toMediaTypeOrNull())
+        val json = Json.encodeToString(SaveNewDiaryRequest.serializer(), request)
+        return json.toRequestBody("application/json".toMediaTypeOrNull())
     }
 
     fun createImageMultipartBody(
         imageUri: Uri,
-        partName: String = "plantImage_${System.currentTimeMillis()}"
+        partName: String = "plantImage"
     ): MultipartBody.Part? {
         return try {
             val compressedFile = getCompressedImage(context, imageUri)
