@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.stateIn
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.viewmodel.container
+import java.time.Instant
+import java.time.ZoneId
 import javax.inject.Inject
 
 @HiltViewModel
@@ -58,6 +60,16 @@ class DiaryWriteViewModel @Inject constructor(
                 plants = state.plants.map { plant ->
                     plant.copy(isSelected = plant.id == plantId)
                 }
+            )
+        }
+    }
+
+    fun onChangeDate(millis: Long) = intent {
+        reduce {
+            state.copy(
+                date = Instant.ofEpochMilli(millis)
+                    .atZone(ZoneId.of("UTC"))
+                    .toLocalDate()
             )
         }
     }

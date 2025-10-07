@@ -36,12 +36,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -51,6 +54,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.sabo.core.designsystem.R
+import com.sabo.core.designsystem.component.DatePickerDialog
 import com.sabo.core.designsystem.component.NavigationType
 import com.sabo.core.designsystem.component.SsukssukTopAppBar
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
@@ -71,6 +75,8 @@ internal fun DiaryWriteScreen(
 ) {
     val uiState = viewModel.collectAsState().value
     val isSaveEnabled by viewModel.isSaveEnabled.collectAsStateWithLifecycle()
+
+    var isShownDatePicker by remember { mutableStateOf(false) }
 
     viewModel.collectSideEffect {
         when (it) {
@@ -97,10 +103,19 @@ internal fun DiaryWriteScreen(
                 isSaveEnabled = isSaveEnabled,
                 onClickBack = onClickBack,
                 onClickPlant = viewModel::onClickPlant,
+                onClickCalendar = { isShownDatePicker = true },
                 onSelectCareType = viewModel::onClickCareType,
                 onClickSave = viewModel::onClickSave
             )
         }
+    }
+
+    if (isShownDatePicker) {
+        DatePickerDialog(
+            selectedDate = uiState.date,
+            onDismiss = { isShownDatePicker = false },
+            onSuccess = viewModel::onChangeDate
+        )
     }
 }
 
@@ -111,6 +126,7 @@ private fun DiaryWriteContent(
     isSaveEnabled: Boolean,
     onClickBack: () -> Unit = {},
     onClickPlant: (Long) -> Unit = {},
+    onClickCalendar: () -> Unit = {},
     onSelectCareType: (CareType) -> Unit = {},
     onClickSave: () -> Unit = {}
 ) {
@@ -223,8 +239,8 @@ private fun DiaryWriteContent(
                                 AsyncImage(
                                     model = plant.imageUrl,
                                     contentDescription = null,
-                                    modifier = Modifier
-                                        .fillMaxSize()
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
                                 )
                                 if (plant.isSelected) {
                                     Box(
@@ -283,6 +299,7 @@ private fun DiaryWriteContent(
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
                             .size(24.dp)
+                            .clickable { onClickCalendar() }
                     )
                 }
 
