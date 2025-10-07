@@ -177,12 +177,6 @@ private fun DiaryWriteContent(
                         style = DiaryTypography.captionLargeRegular,
                         color = Color(0xFF777777),
                     )
-
-                    Text(
-                        text = "전체 보기",
-                        style = DiaryTypography.captionLargeRegular,
-                        color = DiaryColorsPalette.current.gray600
-                    )
                 }
 
                 LazyRow(
