@@ -157,7 +157,6 @@ private fun HomeContent(
                         .clickable { navigateToProfile() },
                     tint = DiaryColorsPalette.current.gray900
                 )
-                // Removed top right more icon since 'onClickMore' is handled in PlantInfoMain for each plant
             }
 
             PlantStory(
@@ -305,6 +304,7 @@ private fun PlantInfoMain(
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
+                        .clip(CircleShape)
                         .background(color = DiaryColorsPalette.current.gray500, shape = CircleShape)
                         .size(80.dp)
                 )
