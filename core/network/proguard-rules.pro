@@ -19,3 +19,36 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Kotlinx Serialization
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.AnnotationsKt
+
+-keepclassmembers class kotlinx.serialization.json.** {
+    *** Companion;
+}
+-keepclasseswithmembers class kotlinx.serialization.json.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+# Keep Serializers
+-keep,includedescriptorclasses class com.sabo.core.network.**$$serializer { *; }
+-keepclassmembers class com.sabo.core.network.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.sabo.core.network.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+# Keep all @Serializable classes
+-keep @kotlinx.serialization.Serializable class com.sabo.core.network.** { *; }
+
+# Keep all fields in serializable classes
+-keepclassmembers @kotlinx.serialization.Serializable class com.sabo.core.network.** {
+    <fields>;
+}
+
+# OkHttp
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
