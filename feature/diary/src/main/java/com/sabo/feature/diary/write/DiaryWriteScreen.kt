@@ -30,6 +30,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -57,6 +58,8 @@ import com.sabo.core.designsystem.R
 import com.sabo.core.designsystem.component.DatePickerDialog
 import com.sabo.core.designsystem.component.NavigationType
 import com.sabo.core.designsystem.component.SsukssukTopAppBar
+import com.sabo.core.designsystem.component.TopSnackBar
+import com.sabo.core.designsystem.component.rememberSnackBarState
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
@@ -66,6 +69,7 @@ import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DiaryWriteScreen(
     viewModel: DiaryWriteViewModel = hiltViewModel(),
@@ -77,10 +81,24 @@ internal fun DiaryWriteScreen(
     val isSaveEnabled by viewModel.isSaveEnabled.collectAsStateWithLifecycle()
 
     var isShownDatePicker by remember { mutableStateOf(false) }
+    var snackBarState by rememberSnackBarState()
 
     viewModel.collectSideEffect {
         when (it) {
             is DiaryWriteSideEffect.NavigateToDetail -> navigateToDiaryDetail(it.plantId)
+            is DiaryWriteSideEffect.ShowSnackBar -> {
+                when (it.type) {
+                    DiaryWriteSideEffect.ShowSnackBar.SnackBarType.PLANT_REQUIRED -> {
+                        snackBarState = snackBarState.copy(isVisible =  false)
+                        snackBarState = snackBarState.copy(
+                            message = "식물 목록을 선택해주세요.",
+                            iconRes = R.drawable.icon_notice_triangle,
+                            iconTint = Color(0xFFFFDC16),
+                            isVisible = true
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -115,6 +133,15 @@ internal fun DiaryWriteScreen(
             selectedDate = uiState.date,
             onDismiss = { isShownDatePicker = false },
             onSuccess = viewModel::onChangeDate
+        )
+    }
+
+    if (snackBarState.isVisible) {
+        TopSnackBar(
+            message = snackBarState.message,
+            iconRes = snackBarState.iconRes,
+            iconTint = snackBarState.iconTint,
+            onDismiss = { snackBarState = snackBarState.copy(isVisible = false) }
         )
     }
 }

@@ -30,4 +30,9 @@ data class CareTypeItem(
 
 sealed interface DiaryWriteSideEffect {
     data class NavigateToDetail(val plantId: Long) : DiaryWriteSideEffect
+    data class ShowSnackBar(val type: SnackBarType) : DiaryWriteSideEffect {
+        enum class SnackBarType {
+            PLANT_REQUIRED
+        }
+    }
 }

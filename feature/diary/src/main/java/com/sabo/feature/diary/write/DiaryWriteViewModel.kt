@@ -89,6 +89,10 @@ class DiaryWriteViewModel @Inject constructor(
     }
 
     fun onClickSave() = intent {
+        if (isSaveEnabled.value.not()) {
+            postSideEffect(DiaryWriteSideEffect.ShowSnackBar(DiaryWriteSideEffect.ShowSnackBar.SnackBarType.PLANT_REQUIRED))
+            return@intent
+        }
         reduce { state.copy(isSaveLoading = true) }
         diaryRepository.savePlantDiary(
             plantId = state.plants.first { it.isSelected }.id,
