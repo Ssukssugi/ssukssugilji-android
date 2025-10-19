@@ -7,14 +7,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import com.sabo.core.navigator.RouteModel
+import com.sabo.core.navigator.Home
+import com.sabo.core.navigator.Login
+import com.sabo.core.navigator.PlantAddEdit
+import com.sabo.core.navigator.WebLink
 import com.sabo.feature.diary.detail.navigation.navigateToDiaryDetail
 import com.sabo.feature.diary.gallery.navigation.navigateToGallery
 import com.sabo.feature.diary.plantadd.categorySearch.navigation.navigateToCategorySearch
 import com.sabo.feature.diary.plantadd.navigation.navigateToPlantAdd
+import com.sabo.feature.diary.plantadd.navigation.navigateToPlantEdit
 import com.sabo.feature.diary.write.navigation.navigateToDiaryWrite
 import com.sabo.feature.home.navigation.navigateToHome
-import com.sabo.feature.login.navigateToLogin
 import com.sabo.feature.profile.navigation.navigateToPolicy
 import com.sabo.feature.profile.navigation.navigateToProfile
 import com.sabo.feature.profile.navigation.navigateToSettings
@@ -25,15 +28,12 @@ import com.sabo.feature.web.navigation.navigateToWebLink
 class MainNavigator(
     val navController: NavHostController
 ) {
-    fun navigateToLogin() {
-        navController.navigateToLogin()
-    }
 
     fun navigateToLoginAndClearBackStack() {
         navController.navigate(
-            route = RouteModel.Login,
+            route = Login,
             navOptions = navOptions {
-                popUpTo<RouteModel.Login> {
+                popUpTo<Login> {
                     inclusive = true
                 }
                 launchSingleTop = true
@@ -47,7 +47,7 @@ class MainNavigator(
 
     fun navigateToHome(
         navOptions: NavOptions = navOptions {
-            popUpTo<RouteModel.Home> {
+            popUpTo<Home> {
                 inclusive = true
             }
             launchSingleTop = true
@@ -58,6 +58,10 @@ class MainNavigator(
 
     fun navigateToPlantAdd() {
         navController.navigateToPlantAdd()
+    }
+
+    fun navigateToPlantEdit(route: PlantAddEdit.PlantEdit) {
+        navController.navigateToPlantEdit(route)
     }
 
     fun navigateToCategorySearch(keyword: String) {
@@ -92,7 +96,7 @@ class MainNavigator(
         navController.navigateToUserDelete()
     }
 
-    fun navigateToWebLink(link: RouteModel.WebLink.Link) {
+    fun navigateToWebLink(link: WebLink.Link) {
         navController.navigateToWebLink(link)
     }
 

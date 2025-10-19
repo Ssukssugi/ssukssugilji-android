@@ -4,7 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.sabo.core.navigator.RouteModel
+import com.sabo.core.navigator.SignUp
 
 fun NavController.navigateToSignUp(
     navOptions: NavOptions = androidx.navigation.navOptions {
@@ -13,13 +13,13 @@ fun NavController.navigateToSignUp(
         }
     }
 ) {
-    this.navigate(RouteModel.SignUp, navOptions)
+    this.navigate(SignUp, navOptions)
 }
 
 fun NavGraphBuilder.signUpNavGraph(
     onCompletedSignUp: () -> Unit
 ) {
-    composable<RouteModel.SignUp> {
+    composable<SignUp> {
         SignUpRoute(
             onCompletedSignUp = onCompletedSignUp
         )

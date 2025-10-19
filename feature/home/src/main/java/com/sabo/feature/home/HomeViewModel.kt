@@ -3,8 +3,10 @@ package com.sabo.feature.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sabo.core.data.Result
+import com.sabo.core.data.handle
 import com.sabo.core.data.repository.DiaryRepository
 import com.sabo.core.mapper.DateMapper.toLocalDate
+import com.sabo.core.navigator.PlantAddEdit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -101,7 +103,7 @@ class HomeViewModel @Inject constructor(
                     state.copy(
                         plantContent = PlantContent.PlantInfo(
                             id = plantId,
-                            title = "${profile.place.display}에서 무럭무럭 자라는 중!",
+                            place = profile.place,
                             name = profile.name,
                             image = profile.plantImage,
                             category = profile.plantCategory,
@@ -143,10 +145,31 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onEditPlant() = intent {
-        // TODO: Navigate to edit plant screen
+        val plant = state.plantContent as? PlantContent.PlantInfo ?: return@intent
+        postSideEffect(
+            HomeEvent.NavigateToPlantEdit(
+                PlantAddEdit.PlantEdit(
+                    plantId = plant.id,
+                    name = plant.name,
+                    category = plant.category,
+                    shine = plant.shine,
+                    place = plant.place
+                )
+            )
+        )
+    }
+
+    fun refreshPlantContent() {
+        fetchPlantContent(selectedPlantId.value ?: return)
     }
 
     fun onDeletePlant() = intent {
-        // TODO: Implement delete plant logic
+        val plant = state.plantContent as? PlantContent.PlantInfo ?: return@intent
+        diaryRepository.deletePlant(plantId = plant.id).handle(
+            onSuccess = {
+                fetchPlantStory()
+                postSideEffect(HomeEvent.ShowSnackBarDeletePlant)
+            }
+        )
     }
 }

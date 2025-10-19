@@ -3,22 +3,27 @@ package com.sabo.feature.profile.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.sabo.core.navigator.RouteModel
+import com.sabo.core.navigator.Policy
+import com.sabo.core.navigator.Profile
+import com.sabo.core.navigator.Settings
+import com.sabo.core.navigator.UserDelete
+import com.sabo.core.navigator.WebLink
+import com.sabo.core.navigator.model.RouteModel
 import com.sabo.feature.profile.PolicyScreen
 import com.sabo.feature.profile.ProfileScreen
 import com.sabo.feature.profile.SettingsScreen
 import com.sabo.feature.profile.UserDeleteScreen
 
 fun NavController.navigateToProfile() {
-    this.navigate(RouteModel.Profile)
+    this.navigate(Profile)
 }
 
 fun NavController.navigateToSettings() {
-    this.navigate(RouteModel.Settings)
+    this.navigate(Settings)
 }
 
 fun NavController.navigateToUserDelete() {
-    this.navigate(RouteModel.UserDelete)
+    this.navigate(UserDelete)
 }
 
 fun NavGraphBuilder.profileNavGraph(
@@ -27,7 +32,7 @@ fun NavGraphBuilder.profileNavGraph(
     onClickFAQ: () -> Unit,
     onClickPolicy: () -> Unit
 ) {
-    composable<RouteModel.Profile> {
+    composable<Profile> {
         ProfileScreen(
             onClickBack = onClickBack,
             onClickSetting = onClickSetting,
@@ -42,7 +47,7 @@ fun NavGraphBuilder.settingsNavGraph(
     navigateToLogin: () -> Unit,
     onClickDeleteAccount: () -> Unit
 ) {
-    composable<RouteModel.Settings> {
+    composable<Settings> {
         SettingsScreen(
             onClickBack = onClickBack,
             navigateToLogin = navigateToLogin,
@@ -55,7 +60,7 @@ fun NavGraphBuilder.userDeleteNavGraph(
     onClickBack: () -> Unit,
     navigateToLogin: () -> Unit,
 ) {
-    composable<RouteModel.UserDelete> {
+    composable<UserDelete> {
         UserDeleteScreen(
             onClickBack = onClickBack,
             navigateToLogin = navigateToLogin
@@ -64,14 +69,14 @@ fun NavGraphBuilder.userDeleteNavGraph(
 }
 
 fun NavController.navigateToPolicy() {
-    navigate(RouteModel.Policy)
+    navigate(Policy)
 }
 
 fun NavGraphBuilder.policyNavGraph(
     onClickBack: () -> Unit,
-    navigateToWebLink: (RouteModel.WebLink.Link) -> Unit
+    navigateToWebLink: (WebLink.Link) -> Unit
 ) {
-    composable<RouteModel.Policy> {
+    composable<Policy> {
         PolicyScreen(
             onClickBack = onClickBack,
             navigateToWebLink = navigateToWebLink

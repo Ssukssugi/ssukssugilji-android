@@ -5,13 +5,23 @@ import com.sabo.feature.diary.plantadd.LightAmount.Companion.NOT_SET
 
 sealed interface PlantAddState {
     data class Input(
+        val mode: Mode,
         val textFieldState: TextFieldState = TextFieldState(),
         val plantCategory: String? = null,
         val lightAmount: LightAmount = NOT_SET,
         val place: PlantPlace? = null,
-    ) : PlantAddState
+    ) : PlantAddState {
+        sealed interface Mode {
+            data object Add : Mode
+            data class Edit(val plantId: Long) : Mode
+        }
+    }
 
     data object SaveSuccess : PlantAddState
+}
+
+sealed interface PlantAddSideEffect {
+    data object UpdateSuccess : PlantAddSideEffect
 }
 
 data class LightAmount(

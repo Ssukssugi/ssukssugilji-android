@@ -10,7 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
-import com.sabo.core.navigator.RouteModel
+import com.sabo.core.navigator.Home
+import com.sabo.core.navigator.Login
+import com.sabo.core.navigator.WebLink
 import com.sabo.feature.diary.detail.navigation.diaryDetailScreen
 import com.sabo.feature.diary.gallery.navigation.galleryScreen
 import com.sabo.feature.diary.plantadd.categorySearch.navigation.categorySearchScreen
@@ -40,14 +42,14 @@ internal fun MainNavHost(
     ) {
         NavHost(
             navController = navigator.navController,
-            startDestination = RouteModel.Login
+            startDestination = Login
         ) {
             loginNavGraph(
                 navigateToSignUp = navigator::navigateToSignUp,
                 navigateToHome = {
                     navigator.navigateToHome(
                         navOptions = navOptions {
-                            popUpTo<RouteModel.Login> {
+                            popUpTo<Login> {
                                 inclusive = true
                             }
                             launchSingleTop = true
@@ -59,7 +61,7 @@ internal fun MainNavHost(
                 onCompletedSignUp = {
                     navigator.navigateToHome(
                         navOptions = navOptions {
-                            popUpTo<RouteModel.Login> {
+                            popUpTo<Login> {
                                 inclusive = true
                             }
                             launchSingleTop = true
@@ -71,7 +73,8 @@ internal fun MainNavHost(
                 navigateToGallery = navigator::navigateToGallery,
                 navigateToPlantAdd = navigator::navigateToPlantAdd,
                 navigateToProfile = navigator::navigateToProfile,
-                navigateToDiaryDetail = navigator::navigateToDiaryDetail
+                navigateToDiaryDetail = navigator::navigateToDiaryDetail,
+                navigateToPlantEdit = navigator::navigateToPlantEdit
             )
             plantAddNavGraph(
                 onClickCategory = navigator::navigateToCategorySearch,
@@ -79,13 +82,16 @@ internal fun MainNavHost(
                 onClickDiary = {
                     navigator.navigateToGallery(
                         navOption = navOptions {
-                            popUpTo<RouteModel.Home> {
+                            popUpTo<Home> {
                                 inclusive = false
                             }
                         }
                     )
                 },
-                onClickBack = navigator::popBackStack
+                onClickBack = navigator::popBackStack,
+                navigateToHome = {
+                    
+                }
             )
             categorySearchScreen(
                 onClickBack = navigator::popBackStack,
@@ -102,7 +108,7 @@ internal fun MainNavHost(
                     navigator.navigateToDiaryDetail(
                         plantId = it,
                         navOption = navOptions {
-                            popUpTo<RouteModel.Home> {
+                            popUpTo<Home> {
                                 inclusive = false
                             }
                         }
@@ -115,7 +121,7 @@ internal fun MainNavHost(
             profileNavGraph(
                 onClickBack = navigator::popBackStack,
                 onClickSetting = navigator::navigateToSettings,
-                onClickFAQ = { navigator.navigateToWebLink(RouteModel.WebLink.Link.QNA) },
+                onClickFAQ = { navigator.navigateToWebLink(WebLink.Link.QNA) },
                 onClickPolicy = navigator::navigateToPolicy
             )
             settingsNavGraph(

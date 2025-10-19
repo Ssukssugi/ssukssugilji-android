@@ -35,6 +35,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,14 +52,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import coil3.compose.AsyncImage
 import com.sabo.core.designsystem.R
+import com.sabo.core.designsystem.component.NavigationType
+import com.sabo.core.designsystem.component.SsukssukTopAppBar
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
-import com.sabo.core.designsystem.component.NavigationType
-import com.sabo.core.designsystem.component.SsukssukTopAppBar
 
 @Composable
 internal fun PlantAddRoute(
@@ -67,10 +71,22 @@ internal fun PlantAddRoute(
     onClickBack: () -> Unit = {},
     onClickCategory: (String) -> Unit = {},
     onClickHome: () -> Unit = {},
-    onClickDiary: () -> Unit = {}
+    onClickDiary: () -> Unit = {},
+    navigateToHomeAfterPlantUpdated: () -> Unit = {}
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val isAddButtonEnabled by viewModel.isAddable.collectAsStateWithLifecycle()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.event.collect {
+                when (it) {
+                    is PlantAddSideEffect.UpdateSuccess -> navigateToHomeAfterPlantUpdated()
+                }
+            }
+        }
+    }
 
     Column(
         modifier = modifier
@@ -93,7 +109,7 @@ internal fun PlantAddRoute(
                     onClickCategory = onClickCategory,
                     onClickLightStep = viewModel::onClickLightStep,
                     onClickPlace = viewModel::onClickPlace,
-                    onClickAddButton = viewModel::savePlant
+                    onClickAddButton = viewModel::onClickSave
                 )
             }
 
@@ -110,7 +126,7 @@ internal fun PlantAddRoute(
 @Composable
 private fun ColumnScope.PlantInfoInputScreen(
     modifier: Modifier = Modifier,
-    state: PlantAddState.Input = PlantAddState.Input(),
+    state: PlantAddState.Input,
     isAddButtonEnabled: Boolean,
     onClickCategory: (String) -> Unit = {},
     onClickLightStep: (Int) -> Unit = {},
@@ -143,7 +159,10 @@ private fun ColumnScope.PlantInfoInputScreen(
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = "키우는 식물을\n추가해주세요",
+                        text = when (state.mode) {
+                            PlantAddState.Input.Mode.Add -> "키우는 식물을\n추가해주세요"
+                            is PlantAddState.Input.Mode.Edit -> "식물 정보를\n수정해주세요"
+                        },
                         style = DiaryTypography.subtitleLargeSemiBold,
                         color = DiaryColorsPalette.current.gray900
                     )
@@ -182,12 +201,12 @@ private fun ColumnScope.PlantInfoInputScreen(
             )
         }
 
-        if (isAddButtonEnabled) {
-            AddButton(
-                modifier = Modifier.align(Alignment.BottomCenter),
-                onclick = onClickAddButton
-            )
-        }
+        AddButton(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            onclick = onClickAddButton,
+            mode = state.mode,
+            isEnabled = isAddButtonEnabled
+        )
     }
 }
 
@@ -406,6 +425,7 @@ private fun LightAmountBar(
                             modifier = modifier
                                 .size(circleSize)
                                 .offset(x = x)
+                                .clip(CircleShape)
                                 .background(
                                     color = DiaryColorsPalette.current.green300,
                                     shape = CircleShape
@@ -556,21 +576,28 @@ fun SelectChip(
 @Composable
 private fun AddButton(
     modifier: Modifier = Modifier,
-    onclick: () -> Unit = {}
+    onclick: () -> Unit = {},
+    mode: PlantAddState.Input.Mode,
+    isEnabled: Boolean
 ) {
     Box(
         modifier = modifier
             .padding(horizontal = 20.dp, vertical = 16.dp)
             .fillMaxWidth()
             .background(
-                color = DiaryColorsPalette.current.green500,
+                color = if (isEnabled) DiaryColorsPalette.current.green500 else DiaryColorsPalette.current.green100,
                 shape = RoundedCornerShape(16.dp)
             )
-            .clickable { onclick() }
+            .clickable(
+                enabled = isEnabled
+            ) { onclick() }
             .padding(vertical = 16.dp)
     ) {
         Text(
-            text = "추가하기",
+            text = when (mode) {
+                PlantAddState.Input.Mode.Add -> "추가하기"
+                is PlantAddState.Input.Mode.Edit -> "수정 완료"
+            },
             style = DiaryTypography.subtitleMediumBold,
             color = DiaryColorsPalette.current.gray50,
             modifier = modifier.align(Alignment.Center)
@@ -655,6 +682,7 @@ private fun PlantInfoInputScreenPreview() {
         ) {
             PlantInfoInputScreen(
                 state = PlantAddState.Input(
+                    mode = PlantAddState.Input.Mode.Add,
                     lightAmount = LightAmount.HIGH,
                     place = PlantPlace.LIVINGROOM
                 ),

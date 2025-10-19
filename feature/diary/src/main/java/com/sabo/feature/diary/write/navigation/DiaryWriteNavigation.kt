@@ -4,12 +4,12 @@ import android.net.Uri
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.sabo.core.navigator.RouteModel
+import com.sabo.core.navigator.DiaryWrite
 import com.sabo.feature.diary.write.DiaryWriteScreen
 
 
 fun NavController.navigateToDiaryWrite(imageUri: Uri) {
-    this.navigate(RouteModel.DiaryWrite(imageUri.toString()))
+    this.navigate(DiaryWrite(imageUri.toString()))
 }
 
 fun NavGraphBuilder.diaryWriteScreen(
@@ -17,7 +17,7 @@ fun NavGraphBuilder.diaryWriteScreen(
     navigateToDiaryDetail: (Long) -> Unit,
     navigateToHome: () -> Unit
 ) {
-    composable<RouteModel.DiaryWrite> {
+    composable<DiaryWrite> {
         DiaryWriteScreen(
             onClickBack = onClickBack,
             navigateToDiaryDetail = navigateToDiaryDetail,

@@ -26,12 +26,12 @@ import com.sabo.core.designsystem.component.SsukssukTopAppBar
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
-import com.sabo.core.navigator.RouteModel
+import com.sabo.core.navigator.WebLink
 
 @Composable
 internal fun PolicyScreen(
     onClickBack: () -> Unit,
-    navigateToWebLink: (RouteModel.WebLink.Link) -> Unit
+    navigateToWebLink: (WebLink.Link) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -58,13 +58,13 @@ internal fun PolicyScreen(
         Spacer(modifier = Modifier.height(8.dp))
         LinkContent(
             text = "서비스 이용약관",
-            link = RouteModel.WebLink.Link.POLICY,
+            link = WebLink.Link.POLICY,
             onClick = navigateToWebLink
         )
 
         LinkContent(
             text = "개인정보 수집 / 이용 동의서",
-            link = RouteModel.WebLink.Link.PRIVACY,
+            link = WebLink.Link.PRIVACY,
             onClick = navigateToWebLink
         )
 
@@ -74,8 +74,8 @@ internal fun PolicyScreen(
 @Composable
 private fun LinkContent(
     text: String,
-    link: RouteModel.WebLink.Link,
-    onClick: (RouteModel.WebLink.Link) -> Unit = {}
+    link: WebLink.Link,
+    onClick: (WebLink.Link) -> Unit = {}
 ) {
     Box(
         modifier = Modifier

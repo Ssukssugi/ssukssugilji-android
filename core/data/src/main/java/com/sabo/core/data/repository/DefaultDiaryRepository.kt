@@ -47,6 +47,35 @@ class DefaultDiaryRepository @Inject constructor(
         transform = {}
     )
 
+    override suspend fun updatePlant(plantId: Long, name: String, category: String, shine: Int, place: PlantEnvironmentPlace): Result<Unit> = handleResult(
+        execute = {
+            val request = SaveNewPlantRequest(
+                name = name,
+                plantCategory = category,
+                plantEnvironment = SaveNewPlantRequest.PlantEnvironment(
+                    shine = shine,
+                    place = when (place) {
+                        PlantEnvironmentPlace.VERANDAH -> SaveNewPlantRequest.PlantEnvironment.Place.VERANDAH
+                        PlantEnvironmentPlace.WINDOW -> SaveNewPlantRequest.PlantEnvironment.Place.WINDOW
+                        PlantEnvironmentPlace.ROOM -> SaveNewPlantRequest.PlantEnvironment.Place.ROOM
+                        PlantEnvironmentPlace.LIVINGROOM -> SaveNewPlantRequest.PlantEnvironment.Place.LIVINGROOM
+                        PlantEnvironmentPlace.HALLWAY -> SaveNewPlantRequest.PlantEnvironment.Place.HALLWAY
+                        PlantEnvironmentPlace.ETC -> SaveNewPlantRequest.PlantEnvironment.Place.ETC
+                    }
+                )
+            )
+            diaryService.updatePlant(plantId, request)
+        },
+        transform = {}
+    )
+
+    override suspend fun deletePlant(plantId: Long): Result<Unit> = handleResult(
+        execute = {
+            diaryService.deletePlant(plantId)
+        },
+        transform = {}
+    )
+
     override suspend fun getPlantCategories(keyword: String): Result<List<String>> = handleResult(
         execute = {
             diaryService.getPlantCategories(keyword)

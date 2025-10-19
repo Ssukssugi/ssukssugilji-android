@@ -2,6 +2,8 @@ package com.sabo.feature.home
 
 import androidx.annotation.DrawableRes
 import com.sabo.core.designsystem.R
+import com.sabo.core.model.PlantEnvironmentPlace
+import com.sabo.core.navigator.PlantAddEdit
 import java.time.LocalDate
 
 data class HomeUiState(
@@ -25,7 +27,7 @@ sealed interface PlantContent {
     data object Empty : PlantContent
     data class PlantInfo(
         val id: Long,
-        val title: String,
+        val place: PlantEnvironmentPlace,
         val name: String,
         val category: String,
         val image: String?,
@@ -55,4 +57,6 @@ enum class CareType(@DrawableRes val resId: Int) {
 sealed interface HomeEvent {
     data class NavigateToDiaryDetail(val plantId: Long) : HomeEvent
     data class ShowPlantOptions(val plant: PlantListItem.Plant) : HomeEvent
+    data class NavigateToPlantEdit(val route: PlantAddEdit.PlantEdit): HomeEvent
+    data object ShowSnackBarDeletePlant : HomeEvent
 }

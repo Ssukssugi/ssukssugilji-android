@@ -12,6 +12,10 @@ import java.time.LocalDate
 interface DiaryRepository {
     suspend fun saveNewPlant(name: String, category: String, shine: Int, place: PlantEnvironmentPlace): Result<Unit>
 
+    suspend fun updatePlant(plantId: Long, name: String, category: String, shine: Int, place: PlantEnvironmentPlace): Result<Unit>
+
+    suspend fun deletePlant(plantId: Long): Result<Unit>
+
     suspend fun getPlantCategories(keyword: String): Result<List<String>>
 
     suspend fun getMyPlants(): Result<List<GetMyPlant.Plant>>

@@ -8,7 +8,7 @@ import androidx.navigation.toRoute
 import com.sabo.core.data.handle
 import com.sabo.core.data.repository.DiaryRepository
 import com.sabo.core.model.CareType
-import com.sabo.core.navigator.RouteModel
+import com.sabo.core.navigator.DiaryWrite
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -27,7 +27,7 @@ class DiaryWriteViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) : ContainerHost<DiaryWriteUiState, DiaryWriteSideEffect>, ViewModel() {
 
-    private val route = savedStateHandle.toRoute<RouteModel.DiaryWrite>()
+    private val route = savedStateHandle.toRoute<DiaryWrite>()
     override val container: Container<DiaryWriteUiState, DiaryWriteSideEffect> = container(
         initialState = DiaryWriteUiState(isLoading = true, imageUri = route.imageUri.toUri(), date = imageDateLoader.getImageDateFromUri(route.imageUri.toUri())),
         onCreate = { loadPlants() }

@@ -7,7 +7,7 @@ import androidx.navigation.toRoute
 import com.sabo.core.data.Result
 import com.sabo.core.data.repository.DiaryRepository
 import com.sabo.core.designsystem.component.CareTypeIcon
-import com.sabo.core.navigator.RouteModel
+import com.sabo.core.navigator.DiaryDetail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -21,7 +21,7 @@ class DiaryDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val diaryRepository: DiaryRepository
 ): ContainerHost<DiaryDetailUiState, DiaryDetailUiEvent>, ViewModel() {
-    private val plantId = savedStateHandle.toRoute<RouteModel.DiaryDetail>().plantId
+    private val plantId = savedStateHandle.toRoute<DiaryDetail>().plantId
 
     override val container: Container<DiaryDetailUiState, DiaryDetailUiEvent> = container(
         initialState = DiaryDetailUiState(isLoading = true),

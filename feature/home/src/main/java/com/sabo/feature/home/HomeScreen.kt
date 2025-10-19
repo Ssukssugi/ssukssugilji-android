@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -49,14 +50,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.sabo.core.designsystem.R
+import com.sabo.core.designsystem.component.TopSnackBar
+import com.sabo.core.designsystem.component.rememberSnackBarState
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
 import com.sabo.core.designsystem.toolkit.noRippleClickable
 import com.sabo.core.mapper.DateMapper.toDisplayDayOfWeek
+import com.sabo.core.model.PlantEnvironmentPlace
+import com.sabo.core.navigator.PlantAddEdit
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 import java.time.LocalDate
@@ -68,13 +75,18 @@ internal fun HomeScreen(
     navigateToGallery: () -> Unit,
     navigateToPlantAdd: () -> Unit,
     navigateToProfile: () -> Unit,
-    navigateToDiaryDetail: (Long) -> Unit
+    navigateToDiaryDetail: (Long) -> Unit,
+    navigateToPlantEdit: (PlantAddEdit.PlantEdit) -> Unit
 ) {
 
     val state = viewModel.collectAsState().value
 
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedPlant by remember { mutableStateOf<PlantListItem.Plant?>(null) }
+    var showPlantDeleteDialog by remember { mutableStateOf(false) }
+    var snackBarState by rememberSnackBarState()
+
+    val plantDeleteIconColor = DiaryColorsPalette.current.green400
 
     viewModel.collectSideEffect {
         when (it) {
@@ -82,6 +94,19 @@ internal fun HomeScreen(
             is HomeEvent.ShowPlantOptions -> {
                 selectedPlant = it.plant
                 showBottomSheet = true
+            }
+            is HomeEvent.NavigateToPlantEdit -> {
+                showBottomSheet = false
+                navigateToPlantEdit(it.route)
+            }
+            HomeEvent.ShowSnackBarDeletePlant -> {
+                snackBarState = snackBarState.copy(isVisible = false)
+                snackBarState = snackBarState.copy(
+                    message = "삭제가 완료되었습니다!",
+                    iconRes = R.drawable.icon_circle_check,
+                    iconTint = plantDeleteIconColor,
+                    isVisible = true
+                )
             }
         }
     }
@@ -102,11 +127,27 @@ internal fun HomeScreen(
         PlantOptionsModalBottomSheet(
             plant = selectedPlant,
             onEditClick = viewModel::onEditPlant,
-            onDeleteClick = viewModel::onDeletePlant,
+            onDeleteClick = { showPlantDeleteDialog = true },
             onDismissRequest = {
                 showBottomSheet = false
                 selectedPlant = null
             }
+        )
+    }
+
+    if (showPlantDeleteDialog) {
+        PlantDeleteDialog(
+            onDismiss = { showPlantDeleteDialog = false },
+            onConfirm = viewModel::onDeletePlant
+        )
+    }
+
+    if (snackBarState.isVisible) {
+        TopSnackBar(
+            message = snackBarState.message,
+            iconRes = snackBarState.iconRes,
+            iconTint = snackBarState.iconTint,
+            onDismiss = { snackBarState = snackBarState.copy(isVisible = false) }
         )
     }
 }
@@ -259,7 +300,7 @@ private fun SelectedPlantContent(
                     PlantInfoMain(
                         id = data.id,
                         image = data.image,
-                        title = data.title,
+                        place = data.place,
                         name = data.name,
                         category = data.category,
                         onClickMore = onClickMore,
@@ -279,7 +320,7 @@ private fun SelectedPlantContent(
 private fun PlantInfoMain(
     id: Long,
     image: String?,
-    title: String,
+    place: PlantEnvironmentPlace,
     name: String,
     category: String,
     onClickMore: (Long) -> Unit = {},
@@ -331,7 +372,7 @@ private fun PlantInfoMain(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = title,
+                    text = "${place.display}에서 무럭무럭 자라는 중!",
                     style = DiaryTypography.bodySmallRegular,
                     color = DiaryColorsPalette.current.gray600
                 )
@@ -644,9 +685,11 @@ private fun PlantOptionsBottomSheet(
             AsyncImage(
                 model = plant.image,
                 contentDescription = null,
+                contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .size(24.dp)
                     .background(color = Color(0xFFFFFFFF), shape = CircleShape)
+                    .clip(CircleShape)
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
@@ -704,6 +747,90 @@ private fun PlantBottomSheetEditItem(
     }
 }
 
+@Composable
+private fun PlantDeleteDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(24.dp))
+                .background(Color.White)
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(40.dp))
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.icon_notice_triangle),
+                contentDescription = null,
+                tint = DiaryColorsPalette.current.red400,
+                modifier = Modifier.size(64.dp)
+            )
+            Text(
+                text = "이 식물을 정말 삭제할까요?",
+                style = DiaryTypography.subtitleLargeBold,
+                color = DiaryColorsPalette.current.gray900,
+                modifier = Modifier
+                    .padding(top = 24.dp, bottom = 8.dp)
+            )
+            Text(
+                text = "삭제시 등록한 식물정보와\n지금까지 작성한 일지가 모두 사라져요.",
+                style = DiaryTypography.bodyLargeMedium,
+                color = DiaryColorsPalette.current.gray600
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .wrapContentHeight()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(DiaryColorsPalette.current.green50)
+                        .clickable { onConfirm() }
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "삭제하기",
+                        color = DiaryColorsPalette.current.green600,
+                        style = DiaryTypography.subtitleMediumBold
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .wrapContentHeight()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(DiaryColorsPalette.current.green400)
+                        .clickable { onConfirm() }
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "돌아가기",
+                        color = DiaryColorsPalette.current.gray50,
+                        style = DiaryTypography.subtitleMediumBold
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun HomeContentPreview() {
@@ -714,7 +841,7 @@ private fun HomeContentPreview() {
             ),
             plantContent = PlantContent.PlantInfo(
                 id = -1,
-                title = "title",
+                place = PlantEnvironmentPlace.ROOM,
                 name = "name",
                 category = "category",
                 image = "image",
