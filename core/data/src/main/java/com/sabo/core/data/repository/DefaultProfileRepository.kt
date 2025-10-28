@@ -4,6 +4,7 @@ import com.sabo.core.data.Result
 import com.sabo.core.data.handleResult
 import com.sabo.core.datastore.AuthDataStore
 import com.sabo.core.datastore.LocalDataStore
+import com.sabo.core.network.model.request.UpdateUserProfileRequest
 import com.sabo.core.network.model.request.UpdateUserSettingsRequest
 import com.sabo.core.network.model.request.UserSettingsKey
 import com.sabo.core.network.model.response.GetUserSettings
@@ -111,4 +112,13 @@ class DefaultProfileRepository @Inject constructor(
             Result.Error(null, e.message)
         }
     }
+
+    override suspend fun changeUserProfile(nickname: String): Result<Unit> = handleResult(
+        execute = {
+            profileService.updateUserProfile(
+                UpdateUserProfileRequest(nickname = nickname)
+            )
+        },
+        transform = {}
+    )
 }

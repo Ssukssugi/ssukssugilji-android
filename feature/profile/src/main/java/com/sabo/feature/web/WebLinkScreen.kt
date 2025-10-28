@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.sabo.core.designsystem.R
 import com.sabo.core.designsystem.theme.DiaryTypography
-import com.sabo.core.navigator.WebLink
+import com.sabo.core.navigator.model.WebLink
 
 @Composable
 internal fun WebLinkScreen(

@@ -4,7 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.sabo.core.navigator.WebLink
+import com.sabo.core.navigator.model.WebLink
 import com.sabo.feature.web.WebLinkScreen
 
 fun NavController.navigateToWebLink(link: WebLink.Link) {

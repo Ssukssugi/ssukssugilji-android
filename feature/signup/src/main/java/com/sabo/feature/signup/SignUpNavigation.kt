@@ -4,7 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.sabo.core.navigator.SignUp
+import com.sabo.core.navigator.model.SignUp
 
 fun NavController.navigateToSignUp(
     navOptions: NavOptions = androidx.navigation.navOptions {

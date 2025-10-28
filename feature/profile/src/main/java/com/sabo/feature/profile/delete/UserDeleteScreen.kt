@@ -1,4 +1,4 @@
-package com.sabo.feature.profile
+package com.sabo.feature.profile.delete
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

@@ -1,4 +1,4 @@
-package com.sabo.feature.profile
+package com.sabo.feature.profile.settings
 
 import androidx.lifecycle.ViewModel
 import com.sabo.core.data.handle

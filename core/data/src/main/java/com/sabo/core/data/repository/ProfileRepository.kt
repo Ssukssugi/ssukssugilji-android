@@ -17,4 +17,6 @@ interface ProfileRepository {
     suspend fun logout(): Result<Unit>
 
     suspend fun deleteUser(): Result<Unit>
+
+    suspend fun changeUserProfile(nickname: String): Result<Unit>
 }

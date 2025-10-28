@@ -6,7 +6,7 @@ import com.sabo.core.data.Result
 import com.sabo.core.data.handle
 import com.sabo.core.data.repository.DiaryRepository
 import com.sabo.core.mapper.DateMapper.toLocalDate
-import com.sabo.core.navigator.PlantAddEdit
+import com.sabo.core.navigator.model.PlantAddEdit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow

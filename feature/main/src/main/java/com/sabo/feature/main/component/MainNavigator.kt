@@ -7,10 +7,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import com.sabo.core.navigator.Home
-import com.sabo.core.navigator.Login
-import com.sabo.core.navigator.PlantAddEdit
-import com.sabo.core.navigator.WebLink
+import com.sabo.core.navigator.model.Home
+import com.sabo.core.navigator.model.Login
+import com.sabo.core.navigator.model.PlantAddEdit
+import com.sabo.core.navigator.model.WebLink
 import com.sabo.feature.diary.detail.navigation.navigateToDiaryDetail
 import com.sabo.feature.diary.gallery.navigation.navigateToGallery
 import com.sabo.feature.diary.plantadd.categorySearch.navigation.navigateToCategorySearch
@@ -18,6 +18,7 @@ import com.sabo.feature.diary.plantadd.navigation.navigateToPlantAdd
 import com.sabo.feature.diary.plantadd.navigation.navigateToPlantEdit
 import com.sabo.feature.diary.write.navigation.navigateToDiaryWrite
 import com.sabo.feature.home.navigation.navigateToHome
+import com.sabo.feature.profile.navigation.navigateToChangeProfile
 import com.sabo.feature.profile.navigation.navigateToPolicy
 import com.sabo.feature.profile.navigation.navigateToProfile
 import com.sabo.feature.profile.navigation.navigateToSettings
@@ -98,6 +99,10 @@ class MainNavigator(
 
     fun navigateToWebLink(link: WebLink.Link) {
         navController.navigateToWebLink(link)
+    }
+
+    fun navigateToChangeProfile(name: String) {
+        navController.navigateToChangeProfile(name)
     }
 
     fun popBackStack() {

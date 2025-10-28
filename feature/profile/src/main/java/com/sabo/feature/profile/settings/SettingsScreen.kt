@@ -1,4 +1,4 @@
-package com.sabo.feature.profile
+package com.sabo.feature.profile.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

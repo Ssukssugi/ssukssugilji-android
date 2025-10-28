@@ -10,9 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
-import com.sabo.core.navigator.Home
-import com.sabo.core.navigator.Login
-import com.sabo.core.navigator.WebLink
+import com.sabo.core.navigator.model.Home
+import com.sabo.core.navigator.model.Login
+import com.sabo.core.navigator.model.WebLink
 import com.sabo.feature.diary.detail.navigation.diaryDetailScreen
 import com.sabo.feature.diary.gallery.navigation.galleryScreen
 import com.sabo.feature.diary.plantadd.categorySearch.navigation.categorySearchScreen
@@ -21,7 +21,9 @@ import com.sabo.feature.diary.plantadd.navigation.plantAddNavGraph
 import com.sabo.feature.diary.write.navigation.diaryWriteScreen
 import com.sabo.feature.home.navigation.homeNavGraph
 import com.sabo.feature.login.loginNavGraph
+import com.sabo.feature.profile.navigation.changeProfileNavGraph
 import com.sabo.feature.profile.navigation.policyNavGraph
+import com.sabo.feature.profile.navigation.popBackStackWithResultProfileUpdated
 import com.sabo.feature.profile.navigation.profileNavGraph
 import com.sabo.feature.profile.navigation.settingsNavGraph
 import com.sabo.feature.profile.navigation.userDeleteNavGraph
@@ -115,14 +117,13 @@ internal fun MainNavHost(
                     )
                 }
             )
-            diaryDetailScreen(
-
-            )
+            diaryDetailScreen()
             profileNavGraph(
                 onClickBack = navigator::popBackStack,
                 onClickSetting = navigator::navigateToSettings,
                 onClickFAQ = { navigator.navigateToWebLink(WebLink.Link.QNA) },
-                onClickPolicy = navigator::navigateToPolicy
+                onClickPolicy = navigator::navigateToPolicy,
+                onClickProfile = navigator::navigateToChangeProfile
             )
             settingsNavGraph(
                 onClickBack = navigator::popBackStack,
@@ -139,6 +140,10 @@ internal fun MainNavHost(
             )
             webLinkScreen(
                 onClickClose = navigator::popBackStack
+            )
+            changeProfileNavGraph(
+                onClickBack = navigator::popBackStack,
+                onSucceedSave = navigator.navController::popBackStackWithResultProfileUpdated
             )
         }
     }

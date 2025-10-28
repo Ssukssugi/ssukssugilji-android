@@ -1,7 +1,6 @@
-package com.sabo.core.navigator
+package com.sabo.core.navigator.model
 
 import com.sabo.core.model.PlantEnvironmentPlace
-import com.sabo.core.navigator.model.RouteModel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -75,5 +74,12 @@ data class WebLink(val link: Link) : RouteModel {
 
         @SerialName("PRIVACY")
         PRIVACY("https://brazen-objective-f15.notion.site/244f509f94c981fa97d9edec16d75c2e?source=copy_link", "개인정보 수집 / 이용 동의서")
+    }
+}
+
+@Serializable
+data class ChangeProfile(val name: String) : RouteModel {
+    companion object {
+        const val RESULT_PROFILE_UPDATED = "profile_updated"
     }
 }

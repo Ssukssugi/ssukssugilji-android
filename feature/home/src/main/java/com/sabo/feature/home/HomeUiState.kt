@@ -3,7 +3,7 @@ package com.sabo.feature.home
 import androidx.annotation.DrawableRes
 import com.sabo.core.designsystem.R
 import com.sabo.core.model.PlantEnvironmentPlace
-import com.sabo.core.navigator.PlantAddEdit
+import com.sabo.core.navigator.model.PlantAddEdit
 import java.time.LocalDate
 
 data class HomeUiState(

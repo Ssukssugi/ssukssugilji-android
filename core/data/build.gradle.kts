@@ -11,6 +11,7 @@ android {
 dependencies {
     api(projects.core.model)
     api(projects.core.network)
+    implementation(projects.core.navigator)
     implementation(projects.core.datastore)
     implementation(libs.retrofit)
 }

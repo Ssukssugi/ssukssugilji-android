@@ -5,8 +5,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.sabo.core.navigator.Gallery
-import com.sabo.core.navigator.model.RouteModel
+import com.sabo.core.navigator.model.Gallery
 import com.sabo.feature.diary.gallery.GalleryScreen
 
 fun NavController.navigateToGallery(navOptions: NavOptions? = null) {

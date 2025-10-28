@@ -8,7 +8,7 @@ import androidx.navigation.toRoute
 import com.sabo.core.data.handle
 import com.sabo.core.data.repository.DiaryRepository
 import com.sabo.core.model.CareType
-import com.sabo.core.navigator.DiaryWrite
+import com.sabo.core.navigator.model.DiaryWrite
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map

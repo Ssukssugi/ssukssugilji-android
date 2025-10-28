@@ -7,8 +7,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.sabo.core.navigator.CategorySearch
-import com.sabo.core.navigator.PlantAddEdit
+import com.sabo.core.navigator.model.CategorySearch
+import com.sabo.core.navigator.model.PlantAddEdit
 import com.sabo.core.navigator.toolkit.navTypeOf
 import com.sabo.feature.diary.plantadd.PlantAddRoute
 import com.sabo.feature.diary.plantadd.PlantAddViewModel

@@ -16,6 +16,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,10 +32,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.sabo.core.designsystem.R
 import com.sabo.core.designsystem.component.NavigationType
 import com.sabo.core.designsystem.component.SsukssukTopAppBar
+import com.sabo.core.designsystem.component.TopSnackBar
+import com.sabo.core.designsystem.component.rememberSnackBarState
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
 import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 internal fun ProfileScreen(
@@ -42,9 +47,24 @@ internal fun ProfileScreen(
     onClickSetting: () -> Unit = {},
     onClickFAQ: () -> Unit = {},
     onClickPolicy: () -> Unit = {},
+    onClickProfile: (String) -> Unit = {}
 ) {
 
     val state = viewModel.collectAsState().value
+    var snackBarState by rememberSnackBarState()
+
+    viewModel.collectSideEffect {
+        when (it) {
+            ProfileEvent.ProfileUpdated -> {
+                snackBarState = snackBarState.copy(isVisible =  false)
+                snackBarState = snackBarState.copy(
+                    message = "수정이 완료되었습니다!",
+                    iconRes = R.drawable.icon_circle_check,
+                    isVisible = true
+                )
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -56,7 +76,8 @@ internal fun ProfileScreen(
             onClickSetting = onClickSetting
         )
         ProfileContent(
-            name = state.name
+            name = state.name,
+            onClick = onClickProfile
         )
         Spacer(modifier = Modifier.height(8.dp))
         LinkItem(
@@ -68,6 +89,15 @@ internal fun ProfileScreen(
             iconRes = R.drawable.icon_policy_document,
             title = "약관 및 정책",
             onClick = onClickPolicy
+        )
+    }
+
+    if (snackBarState.isVisible) {
+        TopSnackBar(
+            message = snackBarState.message,
+            iconRes = snackBarState.iconRes,
+            iconTint = snackBarState.iconTint,
+            onDismiss = { snackBarState = snackBarState.copy(isVisible = false) }
         )
     }
 }
@@ -104,12 +134,12 @@ private fun TopAppBar(
 @Composable
 private fun ProfileContent(
     name: String,
-    onClick: () -> Unit = {}
+    onClick: (String) -> Unit = {}
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable { onClick(name) }
             .padding(horizontal = 20.dp, vertical = 24.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

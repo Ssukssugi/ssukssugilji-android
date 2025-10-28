@@ -8,8 +8,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.sabo.core.navigator.Home
-import com.sabo.core.navigator.PlantAddEdit
+import com.sabo.core.navigator.model.Home
+import com.sabo.core.navigator.model.PlantAddEdit
 import com.sabo.feature.home.HomeScreen
 import com.sabo.feature.home.HomeViewModel
 

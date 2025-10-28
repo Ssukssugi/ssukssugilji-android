@@ -28,4 +28,9 @@ class ProfileViewModel @Inject constructor(
             },
         )
     }
+
+    fun reloadProfile() = intent {
+        loadProfile()
+        postSideEffect(ProfileEvent.ProfileUpdated)
+    }
 }

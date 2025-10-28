@@ -32,8 +32,8 @@ internal object ApiModule {
         tokenInterceptor: TokenInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(httpLoggingInterceptor)
             .addInterceptor(tokenInterceptor)
+            .addInterceptor(httpLoggingInterceptor)
             .build()
     }
 

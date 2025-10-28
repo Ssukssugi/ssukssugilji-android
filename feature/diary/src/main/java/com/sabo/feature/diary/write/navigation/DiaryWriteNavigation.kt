@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.sabo.core.navigator.DiaryWrite
+import com.sabo.core.navigator.model.DiaryWrite
 import com.sabo.feature.diary.write.DiaryWriteScreen
 
 

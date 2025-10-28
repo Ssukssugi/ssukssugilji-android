@@ -1,18 +1,24 @@
 package com.sabo.feature.profile.navigation
 
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.sabo.core.navigator.Policy
-import com.sabo.core.navigator.Profile
-import com.sabo.core.navigator.Settings
-import com.sabo.core.navigator.UserDelete
-import com.sabo.core.navigator.WebLink
-import com.sabo.core.navigator.model.RouteModel
-import com.sabo.feature.profile.PolicyScreen
+import com.sabo.core.navigator.model.ChangeProfile
+import com.sabo.core.navigator.model.Policy
+import com.sabo.core.navigator.model.Profile
+import com.sabo.core.navigator.model.Settings
+import com.sabo.core.navigator.model.UserDelete
+import com.sabo.core.navigator.model.WebLink
 import com.sabo.feature.profile.ProfileScreen
-import com.sabo.feature.profile.SettingsScreen
-import com.sabo.feature.profile.UserDeleteScreen
+import com.sabo.feature.profile.ProfileViewModel
+import com.sabo.feature.profile.changeprofile.ChangeProfileScreen
+import com.sabo.feature.profile.delete.UserDeleteScreen
+import com.sabo.feature.profile.policy.PolicyScreen
+import com.sabo.feature.profile.settings.SettingsScreen
 
 fun NavController.navigateToProfile() {
     this.navigate(Profile)
@@ -30,14 +36,26 @@ fun NavGraphBuilder.profileNavGraph(
     onClickBack: () -> Unit,
     onClickSetting: () -> Unit,
     onClickFAQ: () -> Unit,
-    onClickPolicy: () -> Unit
+    onClickPolicy: () -> Unit,
+    onClickProfile: (String) -> Unit
 ) {
-    composable<Profile> {
+    composable<Profile> { backStackEntry ->
+        val viewModel: ProfileViewModel = hiltViewModel()
+
+        val isProfileUpdated by backStackEntry.savedStateHandle
+            .getStateFlow(ChangeProfile.RESULT_PROFILE_UPDATED, false)
+            .collectAsStateWithLifecycle()
+
+        LaunchedEffect(isProfileUpdated) {
+            if (isProfileUpdated) viewModel.reloadProfile()
+        }
+
         ProfileScreen(
             onClickBack = onClickBack,
             onClickSetting = onClickSetting,
             onClickFAQ = onClickFAQ,
-            onClickPolicy = onClickPolicy
+            onClickPolicy = onClickPolicy,
+            onClickProfile = onClickProfile
         )
     }
 }
@@ -80,6 +98,29 @@ fun NavGraphBuilder.policyNavGraph(
         PolicyScreen(
             onClickBack = onClickBack,
             navigateToWebLink = navigateToWebLink
+        )
+    }
+}
+
+fun NavController.navigateToChangeProfile(nickname: String) {
+    navigate(ChangeProfile(nickname))
+}
+
+fun NavController.popBackStackWithResultProfileUpdated() {
+    previousBackStackEntry
+        ?.savedStateHandle
+        ?.set(ChangeProfile.RESULT_PROFILE_UPDATED, true)
+    popBackStack()
+}
+
+fun NavGraphBuilder.changeProfileNavGraph(
+    onClickBack: () -> Unit,
+    onSucceedSave: () -> Unit
+) {
+    composable<ChangeProfile> {
+        ChangeProfileScreen(
+            onClickBack = onClickBack,
+            onSucceedSave = onSucceedSave
         )
     }
 }

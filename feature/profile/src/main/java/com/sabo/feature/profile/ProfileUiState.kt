@@ -5,5 +5,5 @@ data class ProfileUiState(
 )
 
 sealed interface ProfileEvent {
-
+    data object ProfileUpdated : ProfileEvent
 }

@@ -63,7 +63,7 @@ import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
 import com.sabo.core.designsystem.toolkit.noRippleClickable
 import com.sabo.core.mapper.DateMapper.toDisplayDayOfWeek
 import com.sabo.core.model.PlantEnvironmentPlace
-import com.sabo.core.navigator.PlantAddEdit
+import com.sabo.core.navigator.model.PlantAddEdit
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 import java.time.LocalDate
@@ -86,8 +86,6 @@ internal fun HomeScreen(
     var showPlantDeleteDialog by remember { mutableStateOf(false) }
     var snackBarState by rememberSnackBarState()
 
-    val plantDeleteIconColor = DiaryColorsPalette.current.green400
-
     viewModel.collectSideEffect {
         when (it) {
             is HomeEvent.NavigateToDiaryDetail -> navigateToDiaryDetail(it.plantId)
@@ -104,7 +102,6 @@ internal fun HomeScreen(
                 snackBarState = snackBarState.copy(
                     message = "삭제가 완료되었습니다!",
                     iconRes = R.drawable.icon_circle_check,
-                    iconTint = plantDeleteIconColor,
                     isVisible = true
                 )
             }
@@ -303,8 +300,7 @@ private fun SelectedPlantContent(
                         place = data.place,
                         name = data.name,
                         category = data.category,
-                        onClickMore = onClickMore,
-                        onClickDetail = onClickDiaryDetail
+                        onClickMore = onClickMore
                     )
                 }
 
@@ -323,14 +319,12 @@ private fun PlantInfoMain(
     place: PlantEnvironmentPlace,
     name: String,
     category: String,
-    onClickMore: (Long) -> Unit = {},
-    onClickDetail: () -> Unit = {}
+    onClickMore: (Long) -> Unit = {}
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = DiaryColorsPalette.current.gray50)
-            .clickable { onClickDetail() }
             .padding(20.dp)
     ) {
         Row(

@@ -7,7 +7,7 @@ import androidx.navigation.toRoute
 import com.sabo.core.data.Result
 import com.sabo.core.data.repository.DiaryRepository
 import com.sabo.core.designsystem.component.CareTypeIcon
-import com.sabo.core.navigator.DiaryDetail
+import com.sabo.core.navigator.model.DiaryDetail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch

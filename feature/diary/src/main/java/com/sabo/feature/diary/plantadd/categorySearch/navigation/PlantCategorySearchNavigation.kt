@@ -5,8 +5,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.sabo.core.navigator.CategorySearch
-import com.sabo.core.navigator.PlantAddEdit
+import com.sabo.core.navigator.model.CategorySearch
 import com.sabo.feature.diary.plantadd.categorySearch.PlantCategorySearchScreen
 import com.sabo.feature.diary.plantadd.categorySearch.PlantCategorySearchViewModel
 
