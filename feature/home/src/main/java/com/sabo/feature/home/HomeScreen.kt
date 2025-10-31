@@ -803,7 +803,10 @@ private fun PlantDeleteDialog(
                         .wrapContentHeight()
                         .clip(RoundedCornerShape(16.dp))
                         .background(DiaryColorsPalette.current.green50)
-                        .clickable { onConfirm() }
+                        .clickable {
+                            onConfirm()
+                            onDismiss()
+                        }
                         .padding(vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {

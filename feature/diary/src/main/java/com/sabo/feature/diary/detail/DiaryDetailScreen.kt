@@ -31,6 +31,7 @@ import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -130,6 +131,8 @@ private fun DiaryDetailTopAppBar(
                     modifier = Modifier
                         .size(20.dp)
                         .background(color = DiaryColorsPalette.current.gray500, shape = CircleShape)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.FillBounds
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(

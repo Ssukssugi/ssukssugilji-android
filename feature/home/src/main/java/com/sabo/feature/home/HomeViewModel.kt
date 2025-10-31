@@ -170,6 +170,11 @@ class HomeViewModel @Inject constructor(
 
     fun onDeletePlant() = intent {
         val plant = state.plantContent as? PlantContent.PlantInfo ?: return@intent
+        reduce {
+            state.copy(
+                plantContent = PlantContent.Loading
+            )
+        }
         diaryRepository.deletePlant(plantId = plant.id).handle(
             onSuccess = {
                 fetchPlantStory()

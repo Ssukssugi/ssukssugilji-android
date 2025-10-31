@@ -91,9 +91,7 @@ internal fun MainNavHost(
                     )
                 },
                 onClickBack = navigator::popBackStack,
-                navigateToHome = {
-                    
-                }
+                navigateToHome = navigator::navigateToHome
             )
             categorySearchScreen(
                 onClickBack = navigator::popBackStack,

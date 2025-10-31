@@ -82,7 +82,9 @@ internal fun PlantAddRoute(
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.event.collect {
                 when (it) {
-                    is PlantAddSideEffect.UpdateSuccess -> navigateToHomeAfterPlantUpdated()
+                    is PlantAddSideEffect.UpdateSuccess -> {
+                        navigateToHomeAfterPlantUpdated()
+                    }
                 }
             }
         }
