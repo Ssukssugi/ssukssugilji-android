@@ -21,43 +21,8 @@ class GalleryViewModel @Inject constructor(
     private val _event = Channel<GalleryEvent>(Channel.RENDEZVOUS)
     val event = _event.receiveAsFlow()
 
-    fun loadGalleryImages() {
-        viewModelScope.launch {
-            _state.value = state.value.copy(isLoading = true)
-            try {
-                val images = galleryImageManager.loadGalleyImages()
-                _state.value = state.value.copy(images = images)
-            } catch (e: Exception) {
-
-            } finally {
-                _state.value = state.value.copy(isLoading = false)
-            }
-        }
-    }
-
-    fun onPermissionResult(granted: Boolean) {
-        _state.value = state.value.copy(
-            permissionGranted = granted,
-            showPermissionDialog = granted.not()
-        )
-
-        if (granted) loadGalleryImages()
-    }
-
-    fun onImageSelected(uri: Uri) {
-        _state.value = state.value.copy(selectedImageUri = if (state.value.selectedImageUri == uri) null else uri)
-    }
-
-    fun onImageCaptured(uri: Uri) {
+    fun onImageSelected(uri: Uri?) {
         _state.value = state.value.copy(selectedImageUri = uri)
-    }
-
-    fun dismissPermissionDialog() {
-        _state.value = state.value.copy(showPermissionDialog = false)
-    }
-
-    fun showPermissionDialog() {
-        _state.value = state.value.copy(showPermissionDialog = true)
     }
 
     fun createImageUri(): Uri {

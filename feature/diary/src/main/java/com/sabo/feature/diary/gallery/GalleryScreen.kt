@@ -3,14 +3,14 @@ package com.sabo.feature.diary.gallery
 import android.Manifest
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -20,18 +20,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,7 +42,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.sabo.core.designsystem.R
 import com.sabo.core.designsystem.component.NavigationType
 import com.sabo.core.designsystem.component.SsukssukTopAppBar
@@ -67,23 +61,24 @@ internal fun GalleryScreen(
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
-    val permissionState = rememberMultiplePermissionsState(
-        listOf(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.CAMERA)
-    )
-
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
     var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
-    val takePictureLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
-        if (isSuccess) {
-            capturedImageUri?.let { uri ->
-                viewModel.onImageCaptured(uri)
-            }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let {
+            viewModel.onImageSelected(it)
         }
     }
 
-    LaunchedEffect(permissionState.allPermissionsGranted) {
-        viewModel.onPermissionResult(permissionState.allPermissionsGranted)
-        if (permissionState.allPermissionsGranted) {
-            viewModel.loadGalleryImages()
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { isSuccess ->
+        if (isSuccess) {
+            capturedImageUri?.let { uri ->
+                viewModel.onImageSelected(uri)
+            }
         }
     }
 
@@ -103,24 +98,24 @@ internal fun GalleryScreen(
             uri = uiState.selectedImageUri
         )
 
-        GalleryHeader(
-            onClickCategory = {}
-        )
+        Spacer(modifier = Modifier.weight(1f))
 
-        GalleryGridList(
+        SelectionButtons(
             modifier = modifier,
-            images = uiState.images,
-            selectedImageUri = uiState.selectedImageUri,
+            onClickGallery = {
+                photoPickerLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            },
             onClickCamera = {
-                if (permissionState.allPermissionsGranted) {
+                if (cameraPermissionState.status.isGranted) {
                     val uri = viewModel.createImageUri()
                     capturedImageUri = uri
                     takePictureLauncher.launch(uri)
                 } else {
-                    viewModel.showPermissionDialog()
+                    cameraPermissionState.launchPermissionRequest()
                 }
-            },
-            onClickImage = viewModel::onImageSelected
+            }
         )
 
         if (uiState.selectedImageUri != null) {
@@ -129,46 +124,65 @@ internal fun GalleryScreen(
             }
         }
     }
+}
 
-    if (uiState.showPermissionDialog) {
-        MediaPermissionDialog(
-            onDismiss = viewModel::dismissPermissionDialog,
-            onConfirm = {
-                permissionState.launchMultiplePermissionRequest()
-                viewModel.dismissPermissionDialog()
-            }
+@Composable
+private fun SelectionButtons(
+    modifier: Modifier = Modifier,
+    onClickGallery: () -> Unit = {},
+    onClickCamera: () -> Unit = {}
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        SelectionButton(
+            text = "갤러리에서 선택",
+            icon = R.drawable.icon_photo_camera_32,
+            onClick = onClickGallery
+        )
+        SelectionButton(
+            text = "사진 촬영",
+            icon = R.drawable.icon_photo_camera_32,
+            onClick = onClickCamera
         )
     }
 }
 
 @Composable
-private fun GalleryHeader(
-    modifier: Modifier = Modifier,
-    onClickCategory: () -> Unit = {}
+private fun SelectionButton(
+    text: String,
+    icon: Int,
+    onClick: () -> Unit
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight()
-            .background(color = Color(0xFFFFFFFF))
-            .padding(horizontal = 20.dp, vertical = 14.dp),
-        contentAlignment = Alignment.CenterStart
+            .background(
+                color = DiaryColorsPalette.current.green50,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .clickable { onClick() }
+            .padding(vertical = 16.dp),
+        contentAlignment = Alignment.Center
     ) {
         Row(
-            modifier = modifier
-                .wrapContentSize()
-                .clickable { onClickCategory() },
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "모든 사진",
-                style = DiaryTypography.bodySmallMedium
-            )
-            Spacer(modifier = Modifier.width(4.dp))
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.icon_arrow_down_24),
+                imageVector = ImageVector.vectorResource(icon),
                 contentDescription = null,
-                tint = DiaryColorsPalette.current.gray700
+                tint = DiaryColorsPalette.current.green600,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            Text(
+                text = text,
+                style = DiaryTypography.bodyMediumSemiBold,
+                color = DiaryColorsPalette.current.green600
             )
         }
     }
@@ -185,7 +199,7 @@ private fun ImagePreviewContainer(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(390.dp)
-                .padding(vertical = 24.dp)
+                .padding(24.dp)
         ) {
             AsyncImage(
                 model = uri,
@@ -198,95 +212,6 @@ private fun ImagePreviewContainer(
                     .align(Alignment.Center)
             )
         }
-    }
-}
-
-@Composable
-private fun ColumnScope.GalleryGridList(
-    modifier: Modifier = Modifier,
-    images: List<Uri>,
-    selectedImageUri: Uri?,
-    onClickCamera: () -> Unit,
-    onClickImage: (Uri) -> Unit
-) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        modifier = modifier
-            .fillMaxWidth()
-            .weight(1f),
-        contentPadding = PaddingValues(2.dp)
-    ) {
-        item {
-            CameraOpenItem(
-                onClick = onClickCamera
-            )
-        }
-
-        items(images) { uri ->
-            GalleryImage(
-                uri = uri,
-                isSelected = selectedImageUri == uri,
-                onClick = onClickImage
-            )
-        }
-    }
-}
-
-@Composable
-private fun GalleryImage(
-    uri: Uri,
-    isSelected: Boolean,
-    onClick: (Uri) -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .aspectRatio(0.75f)
-            .fillMaxWidth()
-            .clickable { onClick(uri) }
-    ) {
-        AsyncImage(
-            model = uri,
-            contentDescription = null,
-            contentScale = ContentScale.Crop
-        )
-
-        if (isSelected) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Color(0xFF000000).copy(alpha = 0.5f))
-            )
-            Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.icon_check_24),
-                contentDescription = null,
-                tint = Color(0xFFFFFFFF),
-                modifier = Modifier
-                    .padding(10.dp)
-                    .size(24.dp)
-                    .background(color = DiaryColorsPalette.current.green400, shape = CircleShape)
-                    .align(Alignment.BottomEnd)
-            )
-        }
-    }
-}
-
-@Composable
-private fun CameraOpenItem(
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .aspectRatio(0.75f)
-            .fillMaxWidth()
-            .background(color = Color(0x80FFFFFF))
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector = ImageVector.vectorResource(R.drawable.icon_photo_camera_32),
-            contentDescription = null,
-            tint = DiaryColorsPalette.current.gray800
-        )
     }
 }
 

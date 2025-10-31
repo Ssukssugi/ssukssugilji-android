@@ -10,6 +10,10 @@ import androidx.navigation.compose.composable
 import com.sabo.core.navigator.model.CategorySearch
 import com.sabo.core.navigator.model.PlantAddEdit
 import com.sabo.core.navigator.toolkit.navTypeOf
+import com.sabo.core.navigator.toolkit.slideInFromEnd
+import com.sabo.core.navigator.toolkit.slideOutToEnd
+import com.sabo.core.navigator.toolkit.zoomIn
+import com.sabo.core.navigator.toolkit.zoomOut
 import com.sabo.feature.diary.plantadd.PlantAddRoute
 import com.sabo.feature.diary.plantadd.PlantAddViewModel
 import kotlin.reflect.typeOf
@@ -29,7 +33,12 @@ fun NavGraphBuilder.plantAddNavGraph(
     onClickBack: () -> Unit,
     navigateToHome: () -> Unit
 ) {
-    composable<PlantAddEdit.PlantAdd> { entry ->
+    composable<PlantAddEdit.PlantAdd>(
+        enterTransition = slideInFromEnd(),
+        exitTransition = zoomOut(),
+        popEnterTransition = zoomIn(),
+        popExitTransition = slideOutToEnd()
+    ) { entry ->
         val viewModel = hiltViewModel<PlantAddViewModel>()
 
         val selectedCategory by entry.savedStateHandle
@@ -55,7 +64,11 @@ fun NavGraphBuilder.plantAddNavGraph(
     composable<PlantAddEdit.PlantEdit>(
         typeMap = mapOf(
             typeOf<PlantAddEdit.PlantEdit>() to navTypeOf<PlantAddEdit.PlantEdit>()
-        )
+        ),
+        enterTransition = slideInFromEnd(),
+        exitTransition = zoomOut(),
+        popEnterTransition = zoomIn(),
+        popExitTransition = slideOutToEnd()
     ) { entry ->
         val viewModel = hiltViewModel<PlantAddViewModel>()
 

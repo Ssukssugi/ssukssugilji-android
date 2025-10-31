@@ -12,7 +12,7 @@ internal fun Project.configureKotlinAndroid() {
     pluginManager.apply("org.jetbrains.kotlin.plugin.serialization")
 
     androidExtension.apply {
-        compileSdk = 35
+        compileSdk = 36
 
         defaultConfig {
             minSdk = 33

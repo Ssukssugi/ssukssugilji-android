@@ -13,6 +13,10 @@ import com.sabo.core.navigator.model.Profile
 import com.sabo.core.navigator.model.Settings
 import com.sabo.core.navigator.model.UserDelete
 import com.sabo.core.navigator.model.WebLink
+import com.sabo.core.navigator.toolkit.slideInFromEnd
+import com.sabo.core.navigator.toolkit.slideOutToEnd
+import com.sabo.core.navigator.toolkit.zoomIn
+import com.sabo.core.navigator.toolkit.zoomOut
 import com.sabo.feature.profile.ProfileScreen
 import com.sabo.feature.profile.ProfileViewModel
 import com.sabo.feature.profile.changeprofile.ChangeProfileScreen
@@ -39,7 +43,12 @@ fun NavGraphBuilder.profileNavGraph(
     onClickPolicy: () -> Unit,
     onClickProfile: (String) -> Unit
 ) {
-    composable<Profile> { backStackEntry ->
+    composable<Profile>(
+        enterTransition = slideInFromEnd(),
+        exitTransition = zoomOut(),
+        popEnterTransition = zoomIn(),
+        popExitTransition = slideOutToEnd()
+    ) { backStackEntry ->
         val viewModel: ProfileViewModel = hiltViewModel()
 
         val isProfileUpdated by backStackEntry.savedStateHandle
@@ -65,7 +74,12 @@ fun NavGraphBuilder.settingsNavGraph(
     navigateToLogin: () -> Unit,
     onClickDeleteAccount: () -> Unit
 ) {
-    composable<Settings> {
+    composable<Settings>(
+        enterTransition = slideInFromEnd(),
+        exitTransition = zoomOut(),
+        popEnterTransition = zoomIn(),
+        popExitTransition = slideOutToEnd()
+    ) {
         SettingsScreen(
             onClickBack = onClickBack,
             navigateToLogin = navigateToLogin,
@@ -78,7 +92,12 @@ fun NavGraphBuilder.userDeleteNavGraph(
     onClickBack: () -> Unit,
     navigateToLogin: () -> Unit,
 ) {
-    composable<UserDelete> {
+    composable<UserDelete>(
+        enterTransition = slideInFromEnd(),
+        exitTransition = zoomOut(),
+        popEnterTransition = zoomIn(),
+        popExitTransition = slideOutToEnd()
+    ) {
         UserDeleteScreen(
             onClickBack = onClickBack,
             navigateToLogin = navigateToLogin
@@ -94,7 +113,12 @@ fun NavGraphBuilder.policyNavGraph(
     onClickBack: () -> Unit,
     navigateToWebLink: (WebLink.Link) -> Unit
 ) {
-    composable<Policy> {
+    composable<Policy>(
+        enterTransition = slideInFromEnd(),
+        exitTransition = zoomOut(),
+        popEnterTransition = zoomIn(),
+        popExitTransition = slideOutToEnd()
+    ) {
         PolicyScreen(
             onClickBack = onClickBack,
             navigateToWebLink = navigateToWebLink
@@ -117,7 +141,12 @@ fun NavGraphBuilder.changeProfileNavGraph(
     onClickBack: () -> Unit,
     onSucceedSave: () -> Unit
 ) {
-    composable<ChangeProfile> {
+    composable<ChangeProfile>(
+        enterTransition = slideInFromEnd(),
+        exitTransition = zoomOut(),
+        popEnterTransition = zoomIn(),
+        popExitTransition = slideOutToEnd()
+    ) {
         ChangeProfileScreen(
             onClickBack = onClickBack,
             onSucceedSave = onSucceedSave

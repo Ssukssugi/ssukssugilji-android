@@ -24,7 +24,8 @@ fun NavGraphBuilder.categorySearchScreen(
     onClickBack: () -> Unit,
     onClickCategory: (String) -> Unit
 ) {
-    composable<CategorySearch> { entry ->
+    composable<CategorySearch>(
+    ) { entry ->
         val extra = entry.toRoute<CategorySearch>().keyword
         PlantCategorySearchScreen(
             viewModel = hiltViewModel<PlantCategorySearchViewModel, PlantCategorySearchViewModel.Factory> { factory ->
