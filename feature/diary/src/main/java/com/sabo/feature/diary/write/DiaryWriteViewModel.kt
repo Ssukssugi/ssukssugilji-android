@@ -1,5 +1,6 @@
 package com.sabo.feature.diary.write
 
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,7 @@ import androidx.navigation.toRoute
 import com.sabo.core.data.handle
 import com.sabo.core.data.repository.DiaryRepository
 import com.sabo.core.model.CareType
+import com.sabo.core.navigator.model.DiaryEdit
 import com.sabo.core.navigator.model.DiaryWrite
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,7 +19,9 @@ import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.viewmodel.container
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,10 +31,38 @@ class DiaryWriteViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) : ContainerHost<DiaryWriteUiState, DiaryWriteSideEffect>, ViewModel() {
 
-    private val route = savedStateHandle.toRoute<DiaryWrite>()
+    private val writeRoute = runCatching { savedStateHandle.toRoute<DiaryWrite>() }.getOrNull()
+    private val editRoute = runCatching { savedStateHandle.toRoute<DiaryEdit>() }.getOrNull()
+
+    private val isEditMode = editRoute != null
+    private val diaryId = editRoute?.diaryId
+    private val initialImageUri = editRoute?.imageUri ?: writeRoute?.imageUri ?: ""
+
     override val container: Container<DiaryWriteUiState, DiaryWriteSideEffect> = container(
-        initialState = DiaryWriteUiState(isLoading = true, imageUri = route.imageUri.toUri(), date = imageDateLoader.getImageDateFromUri(route.imageUri.toUri())),
-        onCreate = { loadPlants() }
+        initialState = when {
+            editRoute != null -> {
+                val state = DiaryWriteUiState(
+                    isLoading = true,
+                    imageUri = editRoute.imageUri.toUri(),
+                    date = LocalDate.parse(editRoute.date, DateTimeFormatter.ISO_LOCAL_DATE),
+                    careTypes = CareType.entries.map { careType ->
+                        CareTypeItem(
+                            type = careType,
+                            isSelected = editRoute.careType.contains(careType)
+                        )
+                    }
+                )
+                state.content.setTextAndPlaceCursorAtEnd(editRoute.content)
+                state
+            }
+            writeRoute != null -> DiaryWriteUiState(
+                isLoading = true,
+                imageUri = writeRoute.imageUri.toUri(),
+                date = imageDateLoader.getImageDateFromUri(writeRoute.imageUri.toUri())
+            )
+            else -> DiaryWriteUiState(isLoading = true)
+        },
+        onCreate = { loadPlants(editRoute?.plantId) }
     )
 
     val isSaveEnabled = container.stateFlow
@@ -41,13 +73,20 @@ class DiaryWriteViewModel @Inject constructor(
             initialValue = false
         )
 
-    private fun loadPlants() = intent {
+    private fun loadPlants(selectedPlantId: Long? = null) = intent {
         diaryRepository.getMyPlants().handle(
             onSuccess = {
                 reduce {
                     state.copy(
                         isLoading = false,
-                        plants = it.map { plant -> PlantListItem(id = plant.plantId, name = plant.name, imageUrl = plant.image) }
+                        plants = it.map { plant ->
+                            PlantListItem(
+                                id = plant.plantId,
+                                name = plant.name,
+                                imageUrl = plant.image,
+                                isSelected = selectedPlantId == plant.plantId
+                            )
+                        }
                     )
                 }
             }
@@ -94,27 +133,58 @@ class DiaryWriteViewModel @Inject constructor(
             return@intent
         }
         reduce { state.copy(isSaveLoading = true) }
-        diaryRepository.savePlantDiary(
-            plantId = state.plants.first { it.isSelected }.id,
-            imageUrl = state.imageUri.toString(),
-            careTypes = state.careTypes.filter { it.isSelected }.map { it.type },
-            date = state.date,
-            diary = state.content.text.toString()
-        ).handle(
-            onSuccess = {
-                reduce {
-                    state.copy(isSaveSuccess = true)
-                }
-            },
-            onError = {
 
-            },
-            onFinish = {
-                reduce {
-                    state.copy(isSaveLoading = false)
+        val selectedPlantId = state.plants.first { it.isSelected }.id
+        val currentImageUri = state.imageUri.toString()
+        val updateImage = isEditMode && currentImageUri != initialImageUri
+
+        if (isEditMode && diaryId != null) {
+            diaryRepository.updateDiaryDetail(
+                diaryId = diaryId,
+                plantId = selectedPlantId,
+                imageUrl = currentImageUri,
+                careTypes = state.careTypes.filter { it.isSelected }.map { it.type },
+                date = state.date,
+                diary = state.content.text.toString(),
+                updateImage = updateImage
+            ).handle(
+                onSuccess = {
+                    reduce {
+                        state.copy(isSaveSuccess = true)
+                    }
+                },
+                onError = {
+
+                },
+                onFinish = {
+                    reduce {
+                        state.copy(isSaveLoading = false)
+                    }
                 }
-            }
-        )
+            )
+        } else {
+            diaryRepository.savePlantDiary(
+                plantId = selectedPlantId,
+                imageUrl = currentImageUri,
+                careTypes = state.careTypes.filter { it.isSelected }.map { it.type },
+                date = state.date,
+                diary = state.content.text.toString()
+            ).handle(
+                onSuccess = {
+                    reduce {
+                        state.copy(isSaveSuccess = true)
+                    }
+                },
+                onError = {
+
+                },
+                onFinish = {
+                    reduce {
+                        state.copy(isSaveLoading = false)
+                    }
+                }
+            )
+        }
     }
     
     fun onClickGoToDiaryDetail() = intent {

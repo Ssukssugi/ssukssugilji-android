@@ -8,6 +8,7 @@ import com.sabo.core.data.Result
 import com.sabo.core.data.repository.DiaryRepository
 import com.sabo.core.designsystem.component.CareTypeIcon
 import com.sabo.core.navigator.model.DiaryDetail
+import com.sabo.core.navigator.model.DiaryEdit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -20,7 +21,7 @@ import javax.inject.Inject
 class DiaryDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val diaryRepository: DiaryRepository
-): ContainerHost<DiaryDetailUiState, DiaryDetailUiEvent>, ViewModel() {
+) : ContainerHost<DiaryDetailUiState, DiaryDetailUiEvent>, ViewModel() {
     private val plantId = savedStateHandle.toRoute<DiaryDetail>().plantId
 
     override val container: Container<DiaryDetailUiState, DiaryDetailUiEvent> = container(
@@ -30,7 +31,7 @@ class DiaryDetailViewModel @Inject constructor(
 
     fun onSelectDiary(index: Int) = intent {
         reduce {
-        state.copy(selectedDiaryIndex = index)
+            state.copy(selectedDiaryIndex = index)
         }
         updateSelectedDiaryContent()
     }
@@ -82,6 +83,35 @@ class DiaryDetailViewModel @Inject constructor(
                     image = selectedDiary.image
                 )
             )
+        }
+    }
+
+    fun navigateToDiaryEdit() = intent {
+        val selectedDiary = state.diaries.getOrNull(state.selectedDiaryIndex) ?: return@intent
+        val route = DiaryEdit(
+            plantId = plantId,
+            diaryId = selectedDiary.diaryId,
+            imageUri = selectedDiary.image,
+            date = selectedDiary.date,
+            careType = selectedDiary.cares,
+            content = selectedDiary.content
+        )
+        postSideEffect(DiaryDetailUiEvent.NavigateToEditDiary(route = route))
+    }
+
+    fun deleteDiary() = intent {
+        val selectedDiary = state.diaries.getOrNull(state.selectedDiaryIndex) ?: return@intent
+        diaryRepository.deleteDiary(selectedDiary.diaryId).let { result ->
+            when (result) {
+                is Result.Success -> {
+                    loadDiaries()
+                    postSideEffect(DiaryDetailUiEvent.ShowDeleteDiarySnackBar)
+                }
+
+                is Result.Error -> {
+                    // 에러 처리
+                }
+            }
         }
     }
 }

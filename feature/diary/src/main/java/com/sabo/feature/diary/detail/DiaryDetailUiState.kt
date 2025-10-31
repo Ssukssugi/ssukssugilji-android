@@ -1,6 +1,7 @@
 package com.sabo.feature.diary.detail
 
 import com.sabo.core.designsystem.component.CareTypeIcon
+import com.sabo.core.navigator.model.DiaryEdit
 import com.sabo.core.network.model.response.GetPlantDiaries
 
 data class DiaryDetailUiState(
@@ -23,5 +24,6 @@ sealed interface Content {
 }
 
 sealed interface DiaryDetailUiEvent {
-    data class SelectDiary(val index: Int) : DiaryDetailUiEvent
+    data class NavigateToEditDiary(val route: DiaryEdit): DiaryDetailUiEvent
+    data object ShowDeleteDiarySnackBar: DiaryDetailUiEvent
 }

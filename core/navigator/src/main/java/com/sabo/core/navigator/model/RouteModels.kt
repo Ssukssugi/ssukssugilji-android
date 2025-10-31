@@ -1,5 +1,6 @@
 package com.sabo.core.navigator.model
 
+import com.sabo.core.model.CareType
 import com.sabo.core.model.PlantEnvironmentPlace
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -45,6 +46,16 @@ data object Gallery : RouteModel
 
 @Serializable
 data class DiaryWrite(val imageUri: String) : RouteModel
+
+@Serializable
+data class DiaryEdit(
+    val plantId: Long,
+    val diaryId: Long,
+    val imageUri: String,
+    val date: String,
+    val careType: List<CareType>,
+    val content: String
+): RouteModel
 
 @Serializable
 data class DiaryDetail(val plantId: Long, val diaryId: Long) : RouteModel

@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import com.sabo.core.navigator.model.DiaryEdit
 import com.sabo.core.navigator.model.Home
 import com.sabo.core.navigator.model.Login
 import com.sabo.core.navigator.model.PlantAddEdit
@@ -16,6 +17,7 @@ import com.sabo.feature.diary.gallery.navigation.navigateToGallery
 import com.sabo.feature.diary.plantadd.categorySearch.navigation.navigateToCategorySearch
 import com.sabo.feature.diary.plantadd.navigation.navigateToPlantAdd
 import com.sabo.feature.diary.plantadd.navigation.navigateToPlantEdit
+import com.sabo.feature.diary.write.navigation.navigateToDiaryEdit
 import com.sabo.feature.diary.write.navigation.navigateToDiaryWrite
 import com.sabo.feature.home.navigation.navigateToHome
 import com.sabo.feature.profile.navigation.navigateToChangeProfile
@@ -79,6 +81,10 @@ class MainNavigator(
 
     fun navigateToDiaryDetail(plantId: Long, diaryId: Long, navOption: NavOptions? = null) {
         navController.navigateToDiaryDetail(plantId = plantId, diaryId = diaryId, navOptions = navOption)
+    }
+
+    fun navigateToDiaryEdit(route: DiaryEdit, navOption: NavOptions? = null) {
+        navController.navigateToDiaryEdit(route)
     }
 
     fun navigateToProfile() {

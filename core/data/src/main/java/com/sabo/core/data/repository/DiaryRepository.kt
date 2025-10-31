@@ -25,4 +25,8 @@ interface DiaryRepository {
     suspend fun getPlantDiaries(plantId: Long): Result<GetPlantDiaries>
 
     suspend fun savePlantDiary(plantId: Long, date: LocalDate, careTypes: List<CareType>, diary: String, imageUrl: String): Result<SaveNewDiary>
+
+    suspend fun updateDiaryDetail(diaryId: Long, plantId: Long, date: LocalDate, careTypes: List<CareType>, diary: String, imageUrl: String, updateImage: Boolean): Result<Unit>
+
+    suspend fun deleteDiary(diaryId: Long): Result<Unit>
 }

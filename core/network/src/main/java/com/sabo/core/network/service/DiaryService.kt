@@ -60,4 +60,17 @@ interface DiaryService {
         @Part("request") request: RequestBody,
         @Part plantImage: MultipartBody.Part
     ): Response<SaveNewDiary>
+
+    @Multipart
+    @PUT("/api/v1/diaries")
+    suspend fun updateDiary(
+        @Query("diaryId") diaryId: Long,
+        @Part("request") request: RequestBody,
+        @Part plantImage: MultipartBody.Part?
+    ): Response<Unit>
+
+    @DELETE("/api/v1/diaries")
+    suspend fun deleteDiary(
+        @Query("diaryId") diaryId: Long
+    ): Response<Unit>
 }

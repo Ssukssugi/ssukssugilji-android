@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -24,11 +25,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +45,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.sabo.core.designsystem.R
@@ -47,6 +55,7 @@ import com.sabo.core.designsystem.component.SsukssukTopAppBar
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
+import com.sabo.core.navigator.model.DiaryEdit
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 import java.time.LocalDate
@@ -56,14 +65,20 @@ import java.time.temporal.ChronoUnit
 @Composable
 internal fun DiaryDetailScreen(
     viewModel: DiaryDetailViewModel = hiltViewModel(),
-    onClickBack: () -> Unit = {}
+    onClickBack: () -> Unit = {},
+    navigateToEditDiary: (DiaryEdit) -> Unit = {}
 ) {
     val state = viewModel.collectAsState().value
 
     viewModel.collectSideEffect {
-
+        when (it) {
+            is DiaryDetailUiEvent.NavigateToEditDiary -> navigateToEditDiary(it.route)
+            DiaryDetailUiEvent.ShowDeleteDiarySnackBar -> {}
+        }
     }
 
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var showDiaryDeleteDialog by remember { mutableStateOf(false) }
     val lazyRowState = rememberLazyListState()
 
     Column(
@@ -74,7 +89,8 @@ internal fun DiaryDetailScreen(
         DiaryDetailTopAppBar(
             profileImage = state.profileImage,
             nickname = state.nickname,
-            onClickBack = onClickBack
+            onClickBack = onClickBack,
+            onClickMore = { showBottomSheet = true }
         )
 
         Box(
@@ -108,13 +124,29 @@ internal fun DiaryDetailScreen(
             }
         }
     }
+
+    if (showBottomSheet) {
+        DiaryOptionModalBottomSheet(
+            onDismissRequest = { showBottomSheet = false },
+            onEditClick = viewModel::navigateToDiaryEdit,
+            onDeleteClick = { showDiaryDeleteDialog = true }
+        )
+    }
+
+    if (showDiaryDeleteDialog) {
+        DiaryDeleteDialog(
+            onDismiss = { showDiaryDeleteDialog = false },
+            onConfirm = viewModel::deleteDiary
+        )
+    }
 }
 
 @Composable
 private fun DiaryDetailTopAppBar(
     profileImage: String = "",
     nickname: String = "",
-    onClickBack: () -> Unit = {}
+    onClickBack: () -> Unit = {},
+    onClickMore: () -> Unit = {}
 ) {
     SsukssukTopAppBar(
         navigationType = NavigationType.BACK,
@@ -146,7 +178,10 @@ private fun DiaryDetailTopAppBar(
                     imageVector = ImageVector.vectorResource(R.drawable.icon_more),
                     contentDescription = null,
                     tint = DiaryColorsPalette.current.gray500,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .clickable { onClickMore() }
                 )
                 Spacer(modifier = Modifier.width(20.dp))
             }
@@ -191,7 +226,7 @@ private fun DiaryDetailContent(
         sheetPeekHeight = 280.dp,
         sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         sheetContainerColor = Color.White,
-        sheetDragHandle = {  },
+        sheetDragHandle = { },
         sheetContent = {
             DiaryInfoBottomSheet(content = content)
         }
@@ -283,6 +318,182 @@ private fun DiaryInfoBottomSheet(
             style = DiaryTypography.bodyMediumRegular,
             color = DiaryColorsPalette.current.gray700
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DiaryOptionModalBottomSheet(
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {},
+    onDismissRequest: () -> Unit = {}
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        dragHandle = {
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .size(width = 56.dp, height = 4.dp)
+                    .background(
+                        color = Color(0xFFDDDDDD),
+                        shape = RoundedCornerShape(2.dp)
+                    )
+            )
+        },
+        containerColor = Color(0xFFFFFFFF)
+    ) {
+        DiaryOptionBottomSheetContent(
+            onEditClick = {
+                onEditClick()
+                onDismissRequest()
+            },
+            onDeleteClick = {
+                onDeleteClick()
+                onDismissRequest()
+            }
+        )
+    }
+}
+
+@Composable
+private fun DiaryOptionBottomSheetContent(
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Spacer(modifier = Modifier.height(24.dp))
+        DiaryBottomSheetItem(
+            iconRes = R.drawable.icon_edit_diary,
+            text = "수정하기",
+            tint = DiaryColorsPalette.current.gray600,
+            onClick = onEditClick
+        )
+        DiaryBottomSheetItem(
+            iconRes = R.drawable.icon_trash,
+            text = "삭제하기",
+            tint = DiaryColorsPalette.current.red400,
+            onClick = onDeleteClick
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun DiaryBottomSheetItem(
+    iconRes: Int,
+    text: String,
+    tint: Color,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = ImageVector.vectorResource(iconRes),
+            contentDescription = null,
+            tint = tint,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = text,
+            style = DiaryTypography.bodyLargeSemiBold,
+            color = tint
+        )
+    }
+}
+
+@Composable
+private fun DiaryDeleteDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(24.dp))
+                .background(Color.White)
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(40.dp))
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.icon_notice_triangle),
+                contentDescription = null,
+                tint = DiaryColorsPalette.current.red400,
+                modifier = Modifier.size(64.dp)
+            )
+            Text(
+                text = "이 일지를 정말 삭제할까요?",
+                style = DiaryTypography.subtitleLargeBold,
+                color = DiaryColorsPalette.current.gray900,
+                modifier = Modifier
+                    .padding(top = 24.dp, bottom = 8.dp)
+            )
+            Text(
+                text = "삭제한 일지는 다시 복구할 수 없어요!\n신중하게 고민 후 삭제를 진행해주세요.",
+                style = DiaryTypography.bodyLargeMedium,
+                color = DiaryColorsPalette.current.gray600
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .wrapContentHeight()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(DiaryColorsPalette.current.green50)
+                        .clickable {
+                            onConfirm()
+                            onDismiss()
+                        }
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "삭제하기",
+                        color = DiaryColorsPalette.current.green600,
+                        style = DiaryTypography.subtitleMediumBold
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .wrapContentHeight()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(DiaryColorsPalette.current.green400)
+                        .clickable { onDismiss() }
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "돌아가기",
+                        color = DiaryColorsPalette.current.gray50,
+                        style = DiaryTypography.subtitleMediumBold
+                    )
+                }
+            }
+        }
     }
 }
 

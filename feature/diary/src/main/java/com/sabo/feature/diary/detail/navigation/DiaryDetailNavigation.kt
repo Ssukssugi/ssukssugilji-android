@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.sabo.core.navigator.model.DiaryDetail
+import com.sabo.core.navigator.model.DiaryEdit
 import com.sabo.core.navigator.toolkit.slideInFromEnd
 import com.sabo.core.navigator.toolkit.slideOutToEnd
 import com.sabo.core.navigator.toolkit.zoomIn
@@ -19,7 +20,8 @@ fun NavController.navigateToDiaryDetail(plantId: Long, diaryId: Long, navOptions
 }
 
 fun NavGraphBuilder.diaryDetailScreen(
-    onClickBack: () -> Unit
+    onClickBack: () -> Unit,
+    navigateToEditDiary: (DiaryEdit) -> Unit
 ) {
     composable<DiaryDetail>(
         enterTransition = slideInFromEnd(),
@@ -28,7 +30,8 @@ fun NavGraphBuilder.diaryDetailScreen(
         popExitTransition = slideOutToEnd()
     ) {
         DiaryDetailScreen(
-            onClickBack = onClickBack
+            onClickBack = onClickBack,
+            navigateToEditDiary = navigateToEditDiary
         )
     }
 }

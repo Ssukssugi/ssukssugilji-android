@@ -7,6 +7,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.provider.MediaStore
 import com.sabo.core.network.model.request.SaveNewDiaryRequest
+import com.sabo.core.network.model.request.UpdateDiaryRequest
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -23,6 +24,11 @@ class MultipartUtil @Inject constructor(
 ) {
     fun createDiaryRequestBody(request: SaveNewDiaryRequest): okhttp3.RequestBody {
         val json = Json.encodeToString(SaveNewDiaryRequest.serializer(), request)
+        return json.toRequestBody("application/json".toMediaTypeOrNull())
+    }
+
+    fun createUpdateDiaryRequestBody(request: UpdateDiaryRequest): okhttp3.RequestBody {
+        val json = Json.encodeToString(UpdateDiaryRequest.serializer(), request)
         return json.toRequestBody("application/json".toMediaTypeOrNull())
     }
 

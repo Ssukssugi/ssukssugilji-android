@@ -7,6 +7,7 @@ import com.sabo.core.model.CareType
 import com.sabo.core.model.PlantEnvironmentPlace
 import com.sabo.core.network.model.request.SaveNewDiaryRequest
 import com.sabo.core.network.model.request.SaveNewPlantRequest
+import com.sabo.core.network.model.request.UpdateDiaryRequest
 import com.sabo.core.network.model.response.GetMyPlant
 import com.sabo.core.network.model.response.GetPlantDiaries
 import com.sabo.core.network.model.response.GetPlantProfile
@@ -118,5 +119,41 @@ class DefaultDiaryRepository @Inject constructor(
         transform = {
             it
         }
+    )
+
+    override suspend fun updateDiaryDetail(
+        diaryId: Long,
+        plantId: Long,
+        date: LocalDate,
+        careTypes: List<CareType>,
+        diary: String,
+        imageUrl: String,
+        updateImage: Boolean
+    ) = handleResult(
+        execute = {
+            val request = UpdateDiaryRequest(
+                plantId = plantId,
+                date = date.format(DateTimeFormatter.ISO_DATE),
+                careTypes = careTypes.map { it.name },
+                diary = diary,
+                updateImage = updateImage
+            )
+
+            val requestBody = multipartUtil.createUpdateDiaryRequestBody(request)
+            val imagePart = if (updateImage) {
+                multipartUtil.createImageMultipartBody(imageUri = imageUrl.toUri())
+            } else {
+                null
+            }
+            diaryService.updateDiary(diaryId, requestBody, imagePart)
+        },
+        transform = {}
+    )
+
+    override suspend fun deleteDiary(diaryId: Long): Result<Unit> = handleResult(
+        execute = {
+            diaryService.deleteDiary(diaryId)
+        },
+        transform = {}
     )
 }
