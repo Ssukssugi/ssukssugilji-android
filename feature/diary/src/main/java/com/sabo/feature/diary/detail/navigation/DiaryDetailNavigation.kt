@@ -21,7 +21,8 @@ fun NavController.navigateToDiaryDetail(plantId: Long, diaryId: Long, navOptions
 
 fun NavGraphBuilder.diaryDetailScreen(
     onClickBack: () -> Unit,
-    navigateToEditDiary: (DiaryEdit) -> Unit
+    navigateToEditDiary: (DiaryEdit) -> Unit,
+    popUpWithResult: () -> Unit
 ) {
     composable<DiaryDetail>(
         enterTransition = slideInFromEnd(),
@@ -31,7 +32,8 @@ fun NavGraphBuilder.diaryDetailScreen(
     ) {
         DiaryDetailScreen(
             onClickBack = onClickBack,
-            navigateToEditDiary = navigateToEditDiary
+            navigateToEditDiary = navigateToEditDiary,
+            popBackStackWithResult = popUpWithResult
         )
     }
 }

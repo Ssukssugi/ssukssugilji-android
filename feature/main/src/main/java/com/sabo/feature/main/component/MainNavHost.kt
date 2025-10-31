@@ -118,7 +118,8 @@ internal fun MainNavHost(
             )
             diaryDetailScreen(
                 onClickBack = navigator::popBackStack,
-                navigateToEditDiary = navigator::navigateToDiaryEdit
+                navigateToEditDiary = navigator::navigateToDiaryEdit,
+                popUpWithResult = navigator::navigateToHome
             )
             profileNavGraph(
                 onClickBack = navigator::popBackStack,

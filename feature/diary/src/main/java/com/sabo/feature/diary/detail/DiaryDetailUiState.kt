@@ -26,4 +26,5 @@ sealed interface Content {
 sealed interface DiaryDetailUiEvent {
     data class NavigateToEditDiary(val route: DiaryEdit): DiaryDetailUiEvent
     data object ShowDeleteDiarySnackBar: DiaryDetailUiEvent
+    data object PopBackStack: DiaryDetailUiEvent
 }

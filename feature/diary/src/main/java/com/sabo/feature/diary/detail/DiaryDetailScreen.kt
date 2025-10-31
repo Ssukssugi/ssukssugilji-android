@@ -52,6 +52,8 @@ import coil3.compose.AsyncImage
 import com.sabo.core.designsystem.R
 import com.sabo.core.designsystem.component.NavigationType
 import com.sabo.core.designsystem.component.SsukssukTopAppBar
+import com.sabo.core.designsystem.component.TopSnackBar
+import com.sabo.core.designsystem.component.rememberSnackBarState
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
@@ -66,14 +68,24 @@ import java.time.temporal.ChronoUnit
 internal fun DiaryDetailScreen(
     viewModel: DiaryDetailViewModel = hiltViewModel(),
     onClickBack: () -> Unit = {},
-    navigateToEditDiary: (DiaryEdit) -> Unit = {}
+    navigateToEditDiary: (DiaryEdit) -> Unit = {},
+    popBackStackWithResult: () -> Unit = {}
 ) {
     val state = viewModel.collectAsState().value
+    var snackBarState by rememberSnackBarState()
 
     viewModel.collectSideEffect {
         when (it) {
             is DiaryDetailUiEvent.NavigateToEditDiary -> navigateToEditDiary(it.route)
-            DiaryDetailUiEvent.ShowDeleteDiarySnackBar -> {}
+            DiaryDetailUiEvent.ShowDeleteDiarySnackBar -> {
+                snackBarState = snackBarState.copy(isVisible =  false)
+                snackBarState = snackBarState.copy(
+                    message = "삭제가 완료되었습니!",
+                    iconRes = R.drawable.icon_circle_check,
+                    isVisible = true
+                )
+            }
+            DiaryDetailUiEvent.PopBackStack -> popBackStackWithResult()
         }
     }
 
@@ -137,6 +149,15 @@ internal fun DiaryDetailScreen(
         DiaryDeleteDialog(
             onDismiss = { showDiaryDeleteDialog = false },
             onConfirm = viewModel::deleteDiary
+        )
+    }
+
+    if (snackBarState.isVisible) {
+        TopSnackBar(
+            message = snackBarState.message,
+            iconRes = snackBarState.iconRes,
+            iconTint = snackBarState.iconTint,
+            onDismiss = { snackBarState = snackBarState.copy(isVisible = false) }
         )
     }
 }

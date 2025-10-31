@@ -48,6 +48,10 @@ class DiaryDetailViewModel @Inject constructor(
             if (plantDiariesResult is Result.Success) {
                 val allDiaries = plantDiariesResult.data.byMonth.flatMap { it.diaries }
 
+                if (allDiaries.isEmpty()) {
+                    postSideEffect(DiaryDetailUiEvent.PopBackStack)
+                }
+
                 reduce {
                     state.copy(
                         isLoading = false,
