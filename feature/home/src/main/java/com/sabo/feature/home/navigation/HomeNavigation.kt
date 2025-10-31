@@ -21,7 +21,7 @@ fun NavGraphBuilder.homeNavGraph(
     navigateToGallery: () -> Unit,
     navigateToPlantAdd: () -> Unit,
     navigateToProfile: () -> Unit,
-    navigateToDiaryDetail: (Long) -> Unit,
+    navigateToDiaryDetail: (Long, Long) -> Unit,
     navigateToPlantEdit: (PlantAddEdit.PlantEdit) -> Unit
 ) {
     composable<Home> { entry ->

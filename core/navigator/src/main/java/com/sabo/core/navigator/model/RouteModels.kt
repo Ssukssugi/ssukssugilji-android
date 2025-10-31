@@ -47,7 +47,7 @@ data object Gallery : RouteModel
 data class DiaryWrite(val imageUri: String) : RouteModel
 
 @Serializable
-data class DiaryDetail(val plantId: Long) : RouteModel
+data class DiaryDetail(val plantId: Long, val diaryId: Long) : RouteModel
 
 @Serializable
 data object Profile : RouteModel

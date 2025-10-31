@@ -109,6 +109,7 @@ internal fun MainNavHost(
                 navigateToDiaryDetail = {
                     navigator.navigateToDiaryDetail(
                         plantId = it,
+                        diaryId = -1L,
                         navOption = navOptions {
                             popUpTo<Home> {
                                 inclusive = false
@@ -117,7 +118,9 @@ internal fun MainNavHost(
                     )
                 }
             )
-            diaryDetailScreen()
+            diaryDetailScreen(
+                onClickBack = navigator::popBackStack
+            )
             profileNavGraph(
                 onClickBack = navigator::popBackStack,
                 onClickSetting = navigator::navigateToSettings,

@@ -77,8 +77,8 @@ class MainNavigator(
         navController.navigateToDiaryWrite(imageUri = imageUri)
     }
 
-    fun navigateToDiaryDetail(plantId: Long, navOption: NavOptions? = null) {
-        navController.navigateToDiaryDetail(plantId = plantId, navOptions = navOption)
+    fun navigateToDiaryDetail(plantId: Long, diaryId: Long, navOption: NavOptions? = null) {
+        navController.navigateToDiaryDetail(plantId = plantId, diaryId = diaryId, navOptions = navOption)
     }
 
     fun navigateToProfile() {

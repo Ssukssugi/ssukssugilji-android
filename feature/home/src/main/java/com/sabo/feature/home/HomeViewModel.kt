@@ -92,6 +92,11 @@ class HomeViewModel @Inject constructor(
 
     private fun fetchPlantContent(plantId: Long) = intent {
         viewModelScope.launch {
+            reduce {
+                state.copy(
+                    plantContent = PlantContent.Loading
+                )
+            }
             val profileDeferred = async { diaryRepository.getPlantProfile(plantId) }
             val plantContentDeferred = async { diaryRepository.getPlantDiaries(plantId) }
 
@@ -132,9 +137,9 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onClickDiaryDetail() = intent {
+    fun onClickDiaryDetail(id: Long) = intent {
         val plantId = selectedPlantId.value ?: return@intent
-        postSideEffect(HomeEvent.NavigateToDiaryDetail(plantId))
+        postSideEffect(HomeEvent.NavigateToDiaryDetail(plantId = plantId, diaryId = id))
     }
 
     fun onClickMore(plantId: Long) = intent {

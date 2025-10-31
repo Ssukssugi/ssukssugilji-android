@@ -55,7 +55,7 @@ enum class CareType(@DrawableRes val resId: Int) {
 }
 
 sealed interface HomeEvent {
-    data class NavigateToDiaryDetail(val plantId: Long) : HomeEvent
+    data class NavigateToDiaryDetail(val plantId: Long, val diaryId: Long) : HomeEvent
     data class ShowPlantOptions(val plant: PlantListItem.Plant) : HomeEvent
     data class NavigateToPlantEdit(val route: PlantAddEdit.PlantEdit): HomeEvent
     data object ShowSnackBarDeletePlant : HomeEvent

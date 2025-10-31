@@ -75,7 +75,7 @@ internal fun HomeScreen(
     navigateToGallery: () -> Unit,
     navigateToPlantAdd: () -> Unit,
     navigateToProfile: () -> Unit,
-    navigateToDiaryDetail: (Long) -> Unit,
+    navigateToDiaryDetail: (Long, Long) -> Unit,
     navigateToPlantEdit: (PlantAddEdit.PlantEdit) -> Unit
 ) {
 
@@ -88,7 +88,7 @@ internal fun HomeScreen(
 
     viewModel.collectSideEffect {
         when (it) {
-            is HomeEvent.NavigateToDiaryDetail -> navigateToDiaryDetail(it.plantId)
+            is HomeEvent.NavigateToDiaryDetail -> navigateToDiaryDetail(it.plantId, it.diaryId)
             is HomeEvent.ShowPlantOptions -> {
                 selectedPlant = it.plant
                 showBottomSheet = true
@@ -157,7 +157,7 @@ private fun HomeContent(
     navigateToGallery: () -> Unit = {},
     navigateToPlantAdd: () -> Unit = {},
     navigateToProfile: () -> Unit = {},
-    onClickDiaryDetail: () -> Unit = {},
+    onClickDiaryDetail: (Long) -> Unit = {},
     onClickMore: (Long) -> Unit = {},
     onClickOtherPlant: (Long) -> Unit = {}
 ) {
@@ -264,7 +264,7 @@ private fun SelectedPlantContent(
     scrollState: LazyListState = rememberLazyListState(),
     data: PlantContent,
     onClickMore: (Long) -> Unit = {},
-    onClickDiaryDetail: () -> Unit = {}
+    onClickDiaryDetail: (Long) -> Unit = {}
 ) {
     when (data) {
         PlantContent.Loading -> {
@@ -305,7 +305,10 @@ private fun SelectedPlantContent(
                 }
 
                 data.historyList.map {
-                    plantMonthlyHistory(it)
+                    plantMonthlyHistory(
+                        data = it,
+                        onClickDiaryDetail = onClickDiaryDetail
+                    )
                 }
             }
         }
@@ -398,7 +401,8 @@ private fun PlantInfoMain(
 }
 
 private fun LazyListScope.plantMonthlyHistory(
-    data: PlantHistory
+    data: PlantHistory,
+    onClickDiaryDetail: (Long) -> Unit = {}
 ) {
     item {
         Spacer(modifier = Modifier.height(20.dp))
@@ -417,14 +421,18 @@ private fun LazyListScope.plantMonthlyHistory(
         items = data.diaryList,
         key = { it.id }
     ) {
-        DiaryItem(it)
+        DiaryItem(
+            diary = it,
+            onClickDiaryDetail = onClickDiaryDetail
+        )
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
 @Composable
 private fun DiaryItem(
-    diary: Diary
+    diary: Diary,
+    onClickDiaryDetail: (Long) -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -463,6 +471,8 @@ private fun DiaryItem(
             modifier = Modifier
                 .weight(1f, fill = true)
                 .background(color = DiaryColorsPalette.current.gray50, shape = RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(12.dp))
+                .clickable { onClickDiaryDetail(diary.id) }
                 .border(width = 1.dp, color = DiaryColorsPalette.current.gray200, shape = RoundedCornerShape(12.dp))
                 .padding(12.dp)
         ) {
@@ -810,7 +820,7 @@ private fun PlantDeleteDialog(
                         .wrapContentHeight()
                         .clip(RoundedCornerShape(16.dp))
                         .background(DiaryColorsPalette.current.green400)
-                        .clickable { onConfirm() }
+                        .clickable { onDismiss() }
                         .padding(vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
