@@ -4,6 +4,7 @@ import com.sabo.core.network.service.DiaryService
 import com.sabo.core.network.service.LoginService
 import com.sabo.core.network.service.ProfileService
 import com.sabo.core.network.service.SignUpService
+import com.sabo.core.network.service.TownService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,5 +39,11 @@ object ServiceModule {
     @Provides
     fun provideProfileService(retrofit: Retrofit): ProfileService {
         return retrofit.create<ProfileService>()
+    }
+
+    @Singleton
+    @Provides
+    fun provideTownService(retrofit: Retrofit): TownService {
+        return retrofit.create<TownService>()
     }
 }

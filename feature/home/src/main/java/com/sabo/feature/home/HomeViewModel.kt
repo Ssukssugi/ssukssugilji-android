@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.sabo.core.data.Result
 import com.sabo.core.data.handle
 import com.sabo.core.data.repository.DiaryRepository
+import com.sabo.core.data.repository.TownRepository
 import com.sabo.core.mapper.DateMapper.toLocalDate
 import com.sabo.core.navigator.model.PlantAddEdit
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,26 +16,31 @@ import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.viewmodel.container
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val diaryRepository: DiaryRepository
+    private val diaryRepository: DiaryRepository,
+    private val townRepository: TownRepository
 ) : ContainerHost<HomeUiState, HomeEvent>, ViewModel() {
 
     override val container: Container<HomeUiState, HomeEvent> = container(
         initialState = HomeUiState(
             isLoading = true,
             plantList = emptyList(),
-            plantContent = PlantContent.Loading
+            homeContent = HomeContent.Diary(plantContent = PlantContent.Loading)
         ),
         onCreate = {
             fetchPlantStory()
-
             viewModelScope.launch {
                 selectedPlantId.collect {
-                    if (it == null) return@collect
-                    fetchPlantContent(it)
+                    if (it == null) {
+                        fetchTownGrowth()
+                    } else {
+                        fetchPlantContent(it)
+                    }
                 }
             }
         }
@@ -45,16 +51,12 @@ class HomeViewModel @Inject constructor(
     private fun fetchPlantStory() = intent {
         val plants: List<PlantListItem> = when (val response = diaryRepository.getMyPlants()) {
             is Result.Success -> {
-                selectedPlantId.update {
-                    response.data.firstOrNull()?.plantId
-                }
-
-                response.data.mapIndexed { index, plant ->
+                response.data.map { plant ->
                     PlantListItem.Plant(
                         id = plant.plantId,
                         name = plant.name,
                         image = plant.image,
-                        isSelected = index == 0
+                        isSelected = plant.plantId == selectedPlantId.value
                     ) as PlantListItem
                 }
             }
@@ -70,7 +72,9 @@ class HomeViewModel @Inject constructor(
             state.copy(
                 isLoading = false,
                 plantList = plants,
-                plantContent = if (plants.size == 1) PlantContent.Empty else PlantContent.Loading
+                homeContent = HomeContent.Diary(
+                    plantContent = if (plants.size == 1) PlantContent.Empty else PlantContent.Loading
+                )
             )
         }
     }
@@ -94,7 +98,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             reduce {
                 state.copy(
-                    plantContent = PlantContent.Loading
+                    homeContent = HomeContent.Diary(plantContent = PlantContent.Loading)
                 )
             }
             val profileDeferred = async { diaryRepository.getPlantProfile(plantId) }
@@ -106,30 +110,32 @@ class HomeViewModel @Inject constructor(
             if (profile != null && plantContent != null) {
                 reduce {
                     state.copy(
-                        plantContent = PlantContent.PlantInfo(
-                            id = plantId,
-                            place = profile.place,
-                            name = profile.name,
-                            image = profile.plantImage,
-                            category = profile.plantCategory,
-                            shine = profile.shine,
-                            historyList = plantContent.byMonth.map { content ->
-                                PlantHistory(
-                                    month = content.month,
-                                    year = content.year,
-                                    diaryList = content.diaries.map { diary ->
-                                        Diary(
-                                            id = diary.diaryId,
-                                            date = diary.date.toLocalDate(),
-                                            image = diary.image,
-                                            content = diary.content,
-                                            cares = diary.cares.map { care ->
-                                                CareType.valueOf(care.name)
-                                            }
-                                        )
-                                    }
-                                )
-                            }
+                        homeContent = HomeContent.Diary(
+                            plantContent = PlantContent.PlantInfo(
+                                id = plantId,
+                                place = profile.place,
+                                name = profile.name,
+                                image = profile.plantImage,
+                                category = profile.plantCategory,
+                                shine = profile.shine,
+                                historyList = plantContent.byMonth.map { content ->
+                                    PlantHistory(
+                                        month = content.month,
+                                        year = content.year,
+                                        diaryList = content.diaries.map { diary ->
+                                            Diary(
+                                                id = diary.diaryId,
+                                                date = diary.date.toLocalDate(),
+                                                image = diary.image,
+                                                content = diary.content,
+                                                cares = diary.cares.map { care ->
+                                                    CareType.valueOf(care.name)
+                                                }
+                                            )
+                                        }
+                                    )
+                                }
+                            )
                         )
                     )
                 }
@@ -150,7 +156,8 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onEditPlant() = intent {
-        val plant = state.plantContent as? PlantContent.PlantInfo ?: return@intent
+        val diaryContent = state.homeContent as? HomeContent.Diary ?: return@intent
+        val plant = diaryContent.plantContent as? PlantContent.PlantInfo ?: return@intent
         postSideEffect(
             HomeEvent.NavigateToPlantEdit(
                 PlantAddEdit.PlantEdit(
@@ -169,10 +176,11 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onDeletePlant() = intent {
-        val plant = state.plantContent as? PlantContent.PlantInfo ?: return@intent
+        val diaryContent = state.homeContent as? HomeContent.Diary ?: return@intent
+        val plant = diaryContent.plantContent as? PlantContent.PlantInfo ?: return@intent
         reduce {
             state.copy(
-                plantContent = PlantContent.Loading
+                homeContent = HomeContent.Diary(plantContent = PlantContent.Loading)
             )
         }
         diaryRepository.deletePlant(plantId = plant.id).handle(
@@ -181,5 +189,70 @@ class HomeViewModel @Inject constructor(
                 postSideEffect(HomeEvent.ShowSnackBarDeletePlant)
             }
         )
+    }
+
+    private fun fetchTownGrowth() = intent {
+        reduce {
+            state.copy(
+                homeContent = HomeContent.Town(
+                    townContent = TownContent(isLoading = true, dataList = emptyList())
+                )
+            )
+        }
+
+        when (val result = townRepository.getTownGrowth(null)) {
+            is Result.Success -> {
+                val townItems = result.data.contents.map { growth ->
+                    val beforeDate = LocalDate.parse(growth.before.date)
+                    val afterDate = LocalDate.parse(growth.after.date)
+                    val dateDiff = ChronoUnit.DAYS.between(beforeDate, afterDate).toInt()
+
+                    TownListItem.Post(
+                        id = growth.growthId,
+                        profile = growth.plant.image,
+                        plantName = growth.plant.name,
+                        nickName = growth.owner.nickname,
+                        oldImage = growth.before.imageUrl,
+                        newImage = growth.after.imageUrl,
+                        dateDiff = dateDiff
+                    )
+                }
+
+                reduce {
+                    state.copy(
+                        homeContent = HomeContent.Town(
+                            townContent = TownContent(
+                                isLoading = false,
+                                dataList = townItems
+                            )
+                        )
+                    )
+                }
+            }
+
+            is Result.Error -> {
+                reduce {
+                    state.copy(
+                        homeContent = HomeContent.Town(
+                            townContent = TownContent(isLoading = false, dataList = emptyList())
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    fun onSelectTown() = intent {
+        selectedPlantId.update { null }
+        reduce {
+            state.copy(
+                plantList = state.plantList.map { plant ->
+                    when (plant) {
+                        PlantListItem.AddPlant -> plant
+                        is PlantListItem.Plant -> plant.copy(isSelected = false)
+                    }
+                }
+            )
+        }
     }
 }

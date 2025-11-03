@@ -9,8 +9,17 @@ import java.time.LocalDate
 data class HomeUiState(
     val isLoading: Boolean = false,
     val plantList: List<PlantListItem>,
-    val plantContent: PlantContent
+    val homeContent: HomeContent
 )
+
+sealed interface HomeContent {
+    data class Diary(
+        val plantContent: PlantContent
+    ): HomeContent
+    data class Town(
+        val townContent: TownContent
+    ): HomeContent
+}
 
 sealed interface PlantListItem {
     data object AddPlant : PlantListItem
@@ -49,6 +58,25 @@ data class Diary(
     val content: String,
     val cares: List<CareType>
 )
+
+data class TownContent(
+    val isLoading: Boolean,
+    val dataList: List<TownListItem>
+)
+
+sealed interface TownListItem {
+    data class Post(
+        val id: Long,
+        val profile: String,
+        val plantName: String,
+        val nickName: String,
+        val oldImage: String,
+        val newImage: String,
+        val dateDiff: Int
+    ): TownListItem
+
+    data class LoadMore(val lastId: Long): TownListItem
+}
 
 enum class CareType(@DrawableRes val resId: Int) {
     WATER(R.drawable.img_care_water), DIVIDING(R.drawable.img_care_dividing), PRUNING(R.drawable.img_care_cut), NUTRIENT(R.drawable.img_care_medicine)

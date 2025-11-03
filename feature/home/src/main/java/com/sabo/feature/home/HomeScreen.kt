@@ -93,10 +93,12 @@ internal fun HomeScreen(
                 selectedPlant = it.plant
                 showBottomSheet = true
             }
+
             is HomeEvent.NavigateToPlantEdit -> {
                 showBottomSheet = false
                 navigateToPlantEdit(it.route)
             }
+
             HomeEvent.ShowSnackBarDeletePlant -> {
                 snackBarState = snackBarState.copy(isVisible = false)
                 snackBarState = snackBarState.copy(
@@ -111,13 +113,14 @@ internal fun HomeScreen(
     HomeContent(
         modifier = modifier,
         plantList = state.plantList,
-        plantContent = state.plantContent,
+        content = state.homeContent,
         navigateToGallery = navigateToGallery,
         navigateToPlantAdd = navigateToPlantAdd,
         navigateToProfile = navigateToProfile,
         onClickDiaryDetail = viewModel::onClickDiaryDetail,
         onClickMore = viewModel::onClickMore,
-        onClickOtherPlant = viewModel::onSelectPlant
+        onClickOtherPlant = viewModel::onSelectPlant,
+        onClickTown = viewModel::onSelectTown
     )
 
     if (showBottomSheet) {
@@ -153,13 +156,14 @@ internal fun HomeScreen(
 private fun HomeContent(
     modifier: Modifier = Modifier,
     plantList: List<PlantListItem>,
-    plantContent: PlantContent,
+    content: HomeContent,
     navigateToGallery: () -> Unit = {},
     navigateToPlantAdd: () -> Unit = {},
     navigateToProfile: () -> Unit = {},
     onClickDiaryDetail: (Long) -> Unit = {},
     onClickMore: (Long) -> Unit = {},
-    onClickOtherPlant: (Long) -> Unit = {}
+    onClickOtherPlant: (Long) -> Unit = {},
+    onClickTown: () -> Unit = {}
 ) {
     val storyRowState = rememberLazyListState()
     val contentColumnState = rememberLazyListState()
@@ -199,40 +203,57 @@ private fun HomeContent(
 
             PlantStory(
                 plantList = plantList,
+                isTownSelected = content is HomeContent.Town,
                 scrollState = storyRowState,
                 onClickAddPlant = navigateToPlantAdd,
-                onClickPlant = onClickOtherPlant
+                onClickPlant = onClickOtherPlant,
+                onClickTown = onClickTown
             )
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),
                 color = DiaryColorsPalette.current.gray500,
                 thickness = 1.dp
             )
-            SelectedPlantContent(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f, fill = true),
-                scrollState = contentColumnState,
-                data = plantContent,
-                onClickDiaryDetail = onClickDiaryDetail,
-                onClickMore = onClickMore
+
+            when (content) {
+                is HomeContent.Diary -> {
+                    SelectedPlantContent(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f, fill = true),
+                        scrollState = contentColumnState,
+                        data = content.plantContent,
+                        onClickDiaryDetail = onClickDiaryDetail,
+                        onClickMore = onClickMore
+                    )
+                }
+
+                is HomeContent.Town -> {
+                    TownListContent(
+                        state = content.townContent
+                    )
+                }
+            }
+        }
+        if (content is HomeContent.Diary) {
+            WriteDiaryFAB(
+                modifier = modifier,
+                anyPlants = plantList.filterIsInstance<PlantListItem.Plant>().isNotEmpty(),
+                navigateToGallery = navigateToGallery,
+                navigateToAddPlant = navigateToPlantAdd
             )
         }
-        WriteDiaryFAB(
-            modifier = modifier,
-            anyPlants = plantList.filterIsInstance<PlantListItem.Plant>().isNotEmpty(),
-            navigateToGallery = navigateToGallery,
-            navigateToAddPlant = navigateToPlantAdd
-        )
     }
 }
 
 @Composable
 private fun PlantStory(
     plantList: List<PlantListItem>,
+    isTownSelected: Boolean = false,
     scrollState: LazyListState = rememberLazyListState(),
     onClickPlant: (Long) -> Unit = {},
-    onClickAddPlant: () -> Unit = {}
+    onClickAddPlant: () -> Unit = {},
+    onClickTown: () -> Unit = {}
 ) {
     LazyRow(
         state = scrollState,
@@ -241,6 +262,25 @@ private fun PlantStory(
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 14.dp),
         horizontalArrangement = Arrangement.spacedBy(9.dp)
     ) {
+        item {
+            TownButton(
+                isSelected = isTownSelected,
+                onClickTown = onClickTown
+            )
+        }
+
+        item {
+            Spacer(modifier = Modifier.width(4.dp))
+            Box(
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .width(1.dp)
+                    .height(40.dp)
+                    .background(color = DiaryColorsPalette.current.gray400)
+            )
+            Spacer(modifier = Modifier.width(9.dp))
+        }
+
         items(
             items = plantList,
             key = {
@@ -253,6 +293,129 @@ private fun PlantStory(
             when (it) {
                 PlantListItem.AddPlant -> AddPlantItem(onClickItem = onClickAddPlant)
                 is PlantListItem.Plant -> PlantStoryItem(data = it, onClickItem = onClickPlant)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TownButton(
+    isSelected: Boolean = false,
+    onClickTown: () -> Unit = {}
+) {
+    Column(
+        modifier = Modifier
+            .noRippleClickable { onClickTown() },
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(R.drawable.img_logo_cat),
+            contentDescription = null,
+            modifier = Modifier
+                .size(48.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "쑥쑥마을",
+            style = DiaryTypography.captionLargeBold,
+            color = if (isSelected) DiaryColorsPalette.current.gray800 else DiaryColorsPalette.current.gray500
+        )
+    }
+}
+
+@Composable
+private fun TownListContent(
+    state: TownContent
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+
+        LazyColumn(
+
+        ) {
+            item {
+                Row(
+                    modifier = Modifier
+                        .padding(top = 9.dp, bottom = 9.dp, start = 24.dp, end = 20.dp)
+                        .fillMaxWidth()
+                ) {
+                    Spacer(modifier = Modifier.weight(1f, fill = true))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "나의 게시물",
+                            style = DiaryTypography.bodySmallSemiBold,
+                            color = DiaryColorsPalette.current.gray600
+                        )
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.icon_arrow_right_24),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(24.dp),
+                            tint = DiaryColorsPalette.current.gray600
+                        )
+                    }
+                }
+            }
+
+            items(
+                items = state.dataList,
+                key = {
+                    when (it) {
+                        is TownListItem.Post -> it.id
+                        is TownListItem.LoadMore -> it.lastId
+                    }
+                }
+            ) {
+
+            }
+        }
+
+        if (state.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(56.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun TownListItem(
+    data: TownListItem.Post,
+    onClick: (Long) -> Unit = {}
+) {
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 20.dp, vertical = 8.dp)
+            .fillMaxWidth()
+            .background(color = DiaryColorsPalette.current.gray50, shape = RoundedCornerShape(16.dp))
+            .border(width = 1.dp, color = DiaryColorsPalette.current.gray200, shape = RoundedCornerShape(16.dp))
+            .clip(shape = RoundedCornerShape(16.dp))
+            .clickable { onClick(data.id) }
+            .padding(top = 16.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AsyncImage(
+                    model = data.profile,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.FillBounds
+                )
             }
         }
     }
@@ -846,30 +1009,63 @@ private fun HomeContentPreview() {
             plantList = listOf(
                 PlantListItem.AddPlant, PlantListItem.Plant(-1, "name", "image", true)
             ),
-            plantContent = PlantContent.PlantInfo(
-                id = -1,
-                place = PlantEnvironmentPlace.ROOM,
-                name = "name",
-                category = "category",
-                image = "image",
-                shine = null,
-                historyList = listOf(
-                    PlantHistory(
-                        year = 2025,
-                        month = 6,
-                        diaryList = listOf(
-                            Diary(
-                                id = -1,
-                                date = LocalDate.of(2025, 6, 25),
-                                content = "content",
-                                image = "image",
-                                cares = listOf(CareType.WATER, CareType.DIVIDING)
+            content = HomeContent.Diary(
+                PlantContent.PlantInfo(
+                    id = -1,
+                    place = PlantEnvironmentPlace.ROOM,
+                    name = "name",
+                    category = "category",
+                    image = "image",
+                    shine = null,
+                    historyList = listOf(
+                        PlantHistory(
+                            year = 2025,
+                            month = 6,
+                            diaryList = listOf(
+                                Diary(
+                                    id = -1,
+                                    date = LocalDate.of(2025, 6, 25),
+                                    content = "content",
+                                    image = "image",
+                                    cares = listOf(CareType.WATER, CareType.DIVIDING)
+                                )
                             )
                         )
                     )
                 )
             ),
             onClickMore = { }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TownContentPreview() {
+    SsukssukDiaryTheme {
+        TownListContent(
+            state = TownContent(
+                isLoading = true,
+                dataList = emptyList()
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun TownContentItemPreview() {
+    SsukssukDiaryTheme {
+        TownListItem(
+            data = TownListItem.Post(
+                id = 1,
+                profile = "test",
+                plantName = "Plant Name",
+                nickName = "Nick Name",
+                oldImage = "",
+                newImage = "",
+                dateDiff = 6
+            )
         )
     }
 }

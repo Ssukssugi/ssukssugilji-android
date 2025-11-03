@@ -1,5 +1,7 @@
 package com.sabo.feature.home.navigation
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,7 +26,12 @@ fun NavGraphBuilder.homeNavGraph(
     navigateToDiaryDetail: (Long, Long) -> Unit,
     navigateToPlantEdit: (PlantAddEdit.PlantEdit) -> Unit
 ) {
-    composable<Home> { entry ->
+    composable<Home>(
+        enterTransition = { EnterTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None },
+        exitTransition = { ExitTransition.None }
+    ) { entry ->
         val viewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
 
         val editedPlantId by entry.savedStateHandle
