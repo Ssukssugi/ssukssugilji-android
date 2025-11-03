@@ -22,7 +22,9 @@ class DiaryDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val diaryRepository: DiaryRepository
 ) : ContainerHost<DiaryDetailUiState, DiaryDetailUiEvent>, ViewModel() {
-    private val plantId = savedStateHandle.toRoute<DiaryDetail>().plantId
+    private val route = savedStateHandle.toRoute<DiaryDetail>()
+    private val plantId = route.plantId
+    private val targetDiaryId = route.diaryId
 
     override val container: Container<DiaryDetailUiState, DiaryDetailUiEvent> = container(
         initialState = DiaryDetailUiState(isLoading = true),
@@ -52,13 +54,16 @@ class DiaryDetailViewModel @Inject constructor(
                     postSideEffect(DiaryDetailUiEvent.PopBackStack)
                 }
 
+                val targetIndex = allDiaries.indexOfFirst { it.diaryId == targetDiaryId }
+                    .takeIf { it >= 0 } ?: 0
+
                 reduce {
                     state.copy(
                         isLoading = false,
                         profileImage = plantProfile.plantImage ?: "",
                         nickname = plantProfile.name,
                         diaries = allDiaries,
-                        selectedDiaryIndex = if (allDiaries.isNotEmpty()) 0 else -1
+                        selectedDiaryIndex = if (allDiaries.isNotEmpty()) targetIndex else -1
                     )
                 }
 

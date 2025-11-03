@@ -1,5 +1,6 @@
 package com.sabo.feature.diary.detail
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,16 +32,19 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,11 +62,14 @@ import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
 import com.sabo.core.navigator.model.DiaryEdit
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import kotlin.math.abs
 
 @Composable
 internal fun DiaryDetailScreen(
@@ -78,13 +85,14 @@ internal fun DiaryDetailScreen(
         when (it) {
             is DiaryDetailUiEvent.NavigateToEditDiary -> navigateToEditDiary(it.route)
             DiaryDetailUiEvent.ShowDeleteDiarySnackBar -> {
-                snackBarState = snackBarState.copy(isVisible =  false)
+                snackBarState = snackBarState.copy(isVisible = false)
                 snackBarState = snackBarState.copy(
                     message = "삭제가 완료되었습니!",
                     iconRes = R.drawable.icon_circle_check,
                     isVisible = true
                 )
             }
+
             DiaryDetailUiEvent.PopBackStack -> popBackStackWithResult()
         }
     }
@@ -92,6 +100,41 @@ internal fun DiaryDetailScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
     var showDiaryDeleteDialog by remember { mutableStateOf(false) }
     val lazyRowState = rememberLazyListState()
+
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val selectedItemWidth = 40.dp
+    val itemSpacing = 6.dp
+    val sidePadding = (screenWidth - selectedItemWidth) / 2
+
+    LaunchedEffect(state.selectedDiaryIndex, state.diaries.size) {
+        if (state.diaries.isNotEmpty() && state.selectedDiaryIndex >= 0) {
+            lazyRowState.scrollToItem(state.selectedDiaryIndex)
+        }
+    }
+
+    LaunchedEffect(lazyRowState, state.selectedDiaryIndex) {
+        snapshotFlow { lazyRowState.isScrollInProgress }
+            .distinctUntilChanged()
+            .filter { !it }
+            .collect {
+                val layoutInfo = lazyRowState.layoutInfo
+                val screenCenter = layoutInfo.viewportSize.width / 2f
+                val contentPaddingPx = layoutInfo.beforeContentPadding
+
+                val itemDistances = layoutInfo.visibleItemsInfo.map { item ->
+                    val itemVisualCenter = contentPaddingPx + item.offset + item.size / 2f
+                    val distance = abs(itemVisualCenter - screenCenter)
+                    item.index to distance
+                }
+
+                val centerIndex = itemDistances.minByOrNull { it.second }?.first
+
+                if (centerIndex != null && centerIndex != state.selectedDiaryIndex) {
+                    viewModel.onSelectDiary(centerIndex)
+                }
+            }
+    }
 
     Column(
         modifier = Modifier
@@ -120,8 +163,11 @@ internal fun DiaryDetailScreen(
                 modifier = Modifier
                     .height(80.dp)
                     .background(color = Color.Transparent),
-                contentPadding = PaddingValues(vertical = 12.dp, horizontal = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                contentPadding = PaddingValues(
+                    vertical = 12.dp,
+                    horizontal = sidePadding
+                ),
+                horizontalArrangement = Arrangement.spacedBy(itemSpacing)
             ) {
                 itemsIndexed(
                     items = state.diaries,
@@ -130,7 +176,9 @@ internal fun DiaryDetailScreen(
                     DiaryHistoryImage(
                         imageUrl = diary.image,
                         isSelected = index == state.selectedDiaryIndex,
-                        onClick = { viewModel.onSelectDiary(index) }
+                        onClick = {
+                            viewModel.onSelectDiary(index)
+                        }
                     )
                 }
             }
@@ -216,16 +264,22 @@ private fun DiaryHistoryImage(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val imageWidth by animateDpAsState(
+        targetValue = if (isSelected) 40.dp else 32.dp,
+        label = "imageWidth"
+    )
+
     AsyncImage(
         model = imageUrl,
         contentDescription = null,
         modifier = Modifier
-            .width(40.dp)
+            .width(imageWidth)
             .aspectRatio(3f / 5f)
             .background(
                 color = if (isSelected) DiaryColorsPalette.current.gray900 else DiaryColorsPalette.current.gray500,
                 shape = RoundedCornerShape(2.5.dp)
             )
+            .clip(RoundedCornerShape(2.5.dp))
             .clickable { onClick() },
         contentScale = ContentScale.Crop
     )
@@ -247,6 +301,7 @@ private fun DiaryDetailContent(
         sheetPeekHeight = 280.dp,
         sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         sheetContainerColor = Color.White,
+        sheetShadowElevation = 0.dp,
         sheetDragHandle = { },
         sheetContent = {
             DiaryInfoBottomSheet(content = content)
