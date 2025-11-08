@@ -11,4 +11,7 @@ interface TownService {
     suspend fun getTownGrowth(
         @Query("lastGrowthId") lastGrowthId: Long? = null
     ): Response<GetTownGrowth>
+
+    @GET("/api/v1/growth")
+    suspend fun getMyGrowth(): Response<GetTownGrowth>
 }

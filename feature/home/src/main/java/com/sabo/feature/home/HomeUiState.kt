@@ -63,6 +63,7 @@ data class Diary(
 
 data class TownContent(
     val isLoading: Boolean,
+    val isNewUser: Boolean = false,
     val dataList: List<TownListItem>
 )
 

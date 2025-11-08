@@ -192,17 +192,23 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun fetchTownGrowth() = intent {
-        reduce {
-            state.copy(
-                homeContent = HomeContent.Town(
-                    townContent = TownContent(isLoading = true, dataList = emptyList())
+        viewModelScope.launch {
+            reduce {
+                state.copy(
+                    homeContent = HomeContent.Town(
+                        townContent = TownContent(isLoading = true, isNewUser = false, dataList = emptyList())
+                    )
                 )
-            )
-        }
+            }
 
-        when (val result = townRepository.getTownGrowth(null)) {
-            is Result.Success -> {
-                val townItems = result.data.growths
+            val growthDeferred = async { townRepository.getTownGrowth(null) }
+            val isNewUserDeferred = async { townRepository.getMyGrowth() }
+
+            val growthResult = growthDeferred.await()
+            val isNewUserResult = isNewUserDeferred.await()
+
+            if (growthResult is Result.Success && isNewUserResult is Result.Success) {
+                val townItems = growthResult.data.growths
                     .distinctBy { it.growthId }
                     .map { growth -> growth.toPresentation() }
 
@@ -212,23 +218,16 @@ class HomeViewModel @Inject constructor(
                     townItems
                 }
 
+                val isNewUser = isNewUserResult.data.growths.isEmpty()
+
                 reduce {
                     state.copy(
                         homeContent = HomeContent.Town(
                             townContent = TownContent(
                                 isLoading = false,
-                                dataList = newList
+                                dataList = newList,
+                                isNewUser = isNewUser
                             )
-                        )
-                    )
-                }
-            }
-
-            is Result.Error -> {
-                reduce {
-                    state.copy(
-                        homeContent = HomeContent.Town(
-                            townContent = TownContent(isLoading = false, dataList = emptyList())
                         )
                     )
                 }

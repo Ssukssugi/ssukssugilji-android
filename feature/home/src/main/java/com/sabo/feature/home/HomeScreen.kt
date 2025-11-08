@@ -386,7 +386,7 @@ private fun TownListContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "나의 게시물",
+                            text = "나의 게시글",
                             style = DiaryTypography.bodySmallSemiBold,
                             color = DiaryColorsPalette.current.gray600
                         )
@@ -396,6 +396,28 @@ private fun TownListContent(
                             modifier = Modifier
                                 .size(24.dp),
                             tint = DiaryColorsPalette.current.gray600
+                        )
+                    }
+                }
+            }
+
+            if (state.isNewUser) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 27.dp, vertical = 16.dp)
+                            .fillMaxWidth()
+                            .background(color = DiaryColorsPalette.current.gray100, shape = CircleShape)
+                            .clip(CircleShape)
+                            .clickable {  }
+                            .padding(vertical = 12.dp)
+                    ) {
+                        Text(
+                            text = "쑥쑥성장 소개하기",
+                            style = DiaryTypography.bodyLargeBold,
+                            color = DiaryColorsPalette.current.green400,
+                            modifier = Modifier
+                                .align(Alignment.Center)
                         )
                     }
                 }
@@ -1271,7 +1293,8 @@ private fun TownContentPreview() {
         TownListContent(
             state = TownContent(
                 isLoading = true,
-                dataList = emptyList()
+                dataList = emptyList(),
+                isNewUser = true
             )
         )
     }
