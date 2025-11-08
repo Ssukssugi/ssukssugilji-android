@@ -503,6 +503,18 @@ private fun TownListItem(
                     TownGrowthPlantImage(imageUrl = data.oldImage)
                     TownGrowthPlantImage(imageUrl = data.newImage)
                 }
+
+                Text(
+                    text = "${data.dateDiff}일 뒤",
+                    style = DiaryTypography.captionMediumBold,
+                    color = DiaryColorsPalette.current.green400,
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(bottom = 12.dp)
+                        .background(color = Color(0xB3161E2D), shape = RoundedCornerShape(50.dp))
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                        .align(Alignment.BottomCenter)
+                )
             }
         }
     }

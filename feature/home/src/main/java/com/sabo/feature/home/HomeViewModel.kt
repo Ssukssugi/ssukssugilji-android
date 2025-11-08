@@ -202,7 +202,9 @@ class HomeViewModel @Inject constructor(
 
         when (val result = townRepository.getTownGrowth(null)) {
             is Result.Success -> {
-                val townItems = result.data.growths.map { growth -> growth.toPresentation() }
+                val townItems = result.data.growths
+                    .distinctBy { it.growthId }
+                    .map { growth -> growth.toPresentation() }
 
                 val newList = if (townItems.isNotEmpty()) {
                     townItems + TownListItem.LoadMore(lastId = townItems.last().id)
@@ -238,11 +240,19 @@ class HomeViewModel @Inject constructor(
         val townState = state.homeContent as? HomeContent.Town ?: return@intent
         when (val result = townRepository.getTownGrowth(lastId)) {
             is Result.Success -> {
+                val existingIds = townState.townContent.dataList
+                    .filterIsInstance<TownListItem.Post>()
+                    .map { it.id }
+                    .toSet()
+
+                val newGrowths = result.data.growths
+                    .distinctBy { it.growthId }
+                    .filter { it.growthId !in existingIds }
+
                 val newTownItems = townState.townContent.dataList.toMutableList().apply {
                     removeAt(lastIndex)
-                    val growths = result.data.growths
-                    addAll(growths.map { it.toPresentation() })
-                    if (growths.isNotEmpty()) add(TownListItem.LoadMore(lastId = growths.last().growthId))
+                    addAll(newGrowths.map { it.toPresentation() })
+                    if (newGrowths.isNotEmpty()) add(TownListItem.LoadMore(lastId = newGrowths.last().growthId))
                 }
 
                 reduce {
