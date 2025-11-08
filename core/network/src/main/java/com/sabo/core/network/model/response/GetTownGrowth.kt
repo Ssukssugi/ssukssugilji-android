@@ -1,10 +1,11 @@
 package com.sabo.core.network.model.response
 
+import com.sabo.core.model.PlantEnvironmentPlace
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class GetTownGrowth(
-    val contents: List<GrowthContent>
+    val growths: List<GrowthContent>
 ) {
     @Serializable
     data class GrowthContent(
@@ -24,7 +25,10 @@ data class GetTownGrowth(
     @Serializable
     data class Plant(
         val name: String,
-        val image: String
+        val plantCategory: String,
+        val plantImage: String,
+        val shine: Int,
+        val place: PlantEnvironmentPlace = PlantEnvironmentPlace.ETC
     )
 
     @Serializable

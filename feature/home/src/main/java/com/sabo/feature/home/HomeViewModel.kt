@@ -15,11 +15,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
+import org.orbitmvi.orbit.annotation.OrbitExperimental
 import org.orbitmvi.orbit.viewmodel.container
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
+@OptIn(OrbitExperimental::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository,
@@ -34,7 +34,7 @@ class HomeViewModel @Inject constructor(
         ),
         onCreate = {
             fetchPlantStory()
-            viewModelScope.launch {
+            subIntent {
                 selectedPlantId.collect {
                     if (it == null) {
                         fetchTownGrowth()
@@ -202,20 +202,12 @@ class HomeViewModel @Inject constructor(
 
         when (val result = townRepository.getTownGrowth(null)) {
             is Result.Success -> {
-                val townItems = result.data.contents.map { growth ->
-                    val beforeDate = LocalDate.parse(growth.before.date)
-                    val afterDate = LocalDate.parse(growth.after.date)
-                    val dateDiff = ChronoUnit.DAYS.between(beforeDate, afterDate).toInt()
+                val townItems = result.data.growths.map { growth -> growth.toPresentation() }
 
-                    TownListItem.Post(
-                        id = growth.growthId,
-                        profile = growth.plant.image,
-                        plantName = growth.plant.name,
-                        nickName = growth.owner.nickname,
-                        oldImage = growth.before.imageUrl,
-                        newImage = growth.after.imageUrl,
-                        dateDiff = dateDiff
-                    )
+                val newList = if (townItems.isNotEmpty()) {
+                    townItems + TownListItem.LoadMore(lastId = townItems.last().id)
+                } else {
+                    townItems
                 }
 
                 reduce {
@@ -223,7 +215,7 @@ class HomeViewModel @Inject constructor(
                         homeContent = HomeContent.Town(
                             townContent = TownContent(
                                 isLoading = false,
-                                dataList = townItems
+                                dataList = newList
                             )
                         )
                     )
@@ -239,6 +231,30 @@ class HomeViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    fun loadMoreTownGrowth(lastId: Long) = intent {
+        val townState = state.homeContent as? HomeContent.Town ?: return@intent
+        when (val result = townRepository.getTownGrowth(lastId)) {
+            is Result.Success -> {
+                val newTownItems = townState.townContent.dataList.toMutableList().apply {
+                    removeAt(lastIndex)
+                    val growths = result.data.growths
+                    addAll(growths.map { it.toPresentation() })
+                    if (growths.isNotEmpty()) add(TownListItem.LoadMore(lastId = growths.last().growthId))
+                }
+
+                reduce {
+                    state.copy(
+                        homeContent = townState.copy(
+                            townContent = townState.townContent.copy(dataList = newTownItems)
+                        )
+                    )
+                }
+            }
+
+            is Result.Error -> {}
         }
     }
 

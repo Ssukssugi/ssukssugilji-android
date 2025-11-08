@@ -1,5 +1,6 @@
 package com.sabo.feature.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,7 +11,9 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,15 +37,20 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.animation.core.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -64,6 +72,7 @@ import com.sabo.core.designsystem.toolkit.noRippleClickable
 import com.sabo.core.mapper.DateMapper.toDisplayDayOfWeek
 import com.sabo.core.model.PlantEnvironmentPlace
 import com.sabo.core.navigator.model.PlantAddEdit
+import kotlinx.coroutines.flow.distinctUntilChanged
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 import java.time.LocalDate
@@ -120,7 +129,8 @@ internal fun HomeScreen(
         onClickDiaryDetail = viewModel::onClickDiaryDetail,
         onClickMore = viewModel::onClickMore,
         onClickOtherPlant = viewModel::onSelectPlant,
-        onClickTown = viewModel::onSelectTown
+        onClickTown = viewModel::onSelectTown,
+        onLoadMoreTown = viewModel::loadMoreTownGrowth
     )
 
     if (showBottomSheet) {
@@ -163,7 +173,8 @@ private fun HomeContent(
     onClickDiaryDetail: (Long) -> Unit = {},
     onClickMore: (Long) -> Unit = {},
     onClickOtherPlant: (Long) -> Unit = {},
-    onClickTown: () -> Unit = {}
+    onClickTown: () -> Unit = {},
+    onLoadMoreTown: (Long) -> Unit = {}
 ) {
     val storyRowState = rememberLazyListState()
     val contentColumnState = rememberLazyListState()
@@ -230,7 +241,8 @@ private fun HomeContent(
 
                 is HomeContent.Town -> {
                     TownListContent(
-                        state = content.townContent
+                        state = content.townContent,
+                        onLoadMore = onLoadMoreTown
                     )
                 }
             }
@@ -325,15 +337,43 @@ private fun TownButton(
 
 @Composable
 private fun TownListContent(
-    state: TownContent
+    state: TownContent,
+    onLoadMore: (Long) -> Unit = {}
 ) {
+    val listState = rememberLazyListState()
+    var isLoadingMore by remember { mutableStateOf(false) }
+
+    LaunchedEffect(listState, state.dataList.size) {
+        snapshotFlow {
+            listState.layoutInfo.visibleItemsInfo.lastOrNull()?.let {
+                val totalItemsCount = listState.layoutInfo.totalItemsCount
+                it.index >= totalItemsCount - 2
+            } ?: false
+        }
+            .distinctUntilChanged()
+            .collect { shouldLoadMore ->
+                if (shouldLoadMore && !isLoadingMore && !state.isLoading) {
+                    val loadMoreItem = state.dataList.lastOrNull()
+                    if (loadMoreItem is TownListItem.LoadMore) {
+                        isLoadingMore = true
+                        onLoadMore(loadMoreItem.lastId)
+                    }
+                }
+            }
+    }
+
+    LaunchedEffect(state.dataList.size) {
+        isLoadingMore = false
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-
         LazyColumn(
-
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
         ) {
             item {
                 Row(
@@ -366,11 +406,21 @@ private fun TownListContent(
                 key = {
                     when (it) {
                         is TownListItem.Post -> it.id
-                        is TownListItem.LoadMore -> it.lastId
+                        is TownListItem.LoadMore -> "load_more_${it.lastId}"
                     }
                 }
-            ) {
+            ) { data ->
+                when (data) {
+                    is TownListItem.Post -> TownListItem(
+                        data = data
+                    )
 
+                    is TownListItem.LoadMore -> {
+                        LoadingShimmerEffect {
+                            TownListItemSkeleton()
+                        }
+                    }
+                }
             }
         }
 
@@ -387,7 +437,8 @@ private fun TownListContent(
 @Composable
 private fun TownListItem(
     data: TownListItem.Post,
-    onClick: (Long) -> Unit = {}
+    onClickGrowth: (Long) -> Unit = {},
+    onClickGrowthItemMore: (Long) -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -396,17 +447,17 @@ private fun TownListItem(
             .background(color = DiaryColorsPalette.current.gray50, shape = RoundedCornerShape(16.dp))
             .border(width = 1.dp, color = DiaryColorsPalette.current.gray200, shape = RoundedCornerShape(16.dp))
             .clip(shape = RoundedCornerShape(16.dp))
-            .clickable { onClick(data.id) }
+            .clickable { onClickGrowth(data.id) }
             .padding(top = 16.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 AsyncImage(
                     model = data.profile,
@@ -416,6 +467,168 @@ private fun TownListItem(
                         .clip(CircleShape),
                     contentScale = ContentScale.FillBounds
                 )
+                Text(
+                    text = data.plantName,
+                    style = DiaryTypography.bodyMediumSemiBold,
+                    color = DiaryColorsPalette.current.gray600
+                )
+                Text(
+                    text = data.nickName,
+                    style = DiaryTypography.captionSmallMedium,
+                    color = DiaryColorsPalette.current.gray500
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.icon_more),
+                    contentDescription = null,
+                    tint = DiaryColorsPalette.current.gray500,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .clickable { onClickGrowthItemMore(data.id) }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    TownGrowthPlantImage(imageUrl = data.oldImage)
+                    TownGrowthPlantImage(imageUrl = data.newImage)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RowScope.TownGrowthPlantImage(imageUrl: String) {
+    AsyncImage(
+        model = imageUrl,
+        contentDescription = null,
+        modifier = Modifier
+            .weight(1f)
+            .aspectRatio(1f)
+            .background(
+                color = DiaryColorsPalette.current.gray200,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .clip(RoundedCornerShape(8.dp))
+    )
+}
+
+@Composable
+fun LoadingShimmerEffect(content: @Composable (Brush) -> Unit) {
+    val shimmerColors = listOf(
+        Color.LightGray.copy(alpha = 0.6f),
+        Color.LightGray.copy(alpha = 0.2f),
+        Color.LightGray.copy(alpha = 0.6f),
+    )
+
+    val transition = rememberInfiniteTransition(label = "")
+    val translateAnim = transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 1000,
+                easing = FastOutSlowInEasing
+            ),
+            repeatMode = RepeatMode.Reverse
+        ), label = ""
+    )
+
+    val brush = Brush.linearGradient(
+        colors = shimmerColors,
+        start = Offset.Zero,
+        end = Offset(x = translateAnim.value, y = translateAnim.value)
+    )
+
+    content(brush)
+}
+
+@Composable
+private fun TownListItemSkeleton() {
+    LoadingShimmerEffect { brush ->
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 20.dp, vertical = 8.dp)
+                .fillMaxWidth()
+                .background(color = DiaryColorsPalette.current.gray50, shape = RoundedCornerShape(16.dp))
+                .border(width = 1.dp, color = DiaryColorsPalette.current.gray200, shape = RoundedCornerShape(16.dp))
+                .clip(shape = RoundedCornerShape(16.dp))
+                .padding(top = 16.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    // Profile image skeleton
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clip(CircleShape)
+                            .background(brush)
+                    )
+                    // Plant name text skeleton
+                    Box(
+                        modifier = Modifier
+                            .width(80.dp)
+                            .height(16.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(brush)
+                    )
+                    // Nickname text skeleton
+                    Box(
+                        modifier = Modifier
+                            .width(60.dp)
+                            .height(14.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(brush)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        // Old image skeleton
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(brush)
+                        )
+                        // New image skeleton
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(brush)
+                        )
+                    }
+                }
             }
         }
     }
@@ -1067,5 +1280,13 @@ private fun TownContentItemPreview() {
                 dateDiff = 6
             )
         )
+    }
+}
+
+@Preview
+@Composable
+private fun TownListItemSkeletonPreview() {
+    SsukssukDiaryTheme {
+        TownListItemSkeleton()
     }
 }

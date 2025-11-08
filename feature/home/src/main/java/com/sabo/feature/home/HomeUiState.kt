@@ -4,7 +4,9 @@ import androidx.annotation.DrawableRes
 import com.sabo.core.designsystem.R
 import com.sabo.core.model.PlantEnvironmentPlace
 import com.sabo.core.navigator.model.PlantAddEdit
+import com.sabo.core.network.model.response.GetTownGrowth
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 data class HomeUiState(
     val isLoading: Boolean = false,
@@ -76,6 +78,22 @@ sealed interface TownListItem {
     ): TownListItem
 
     data class LoadMore(val lastId: Long): TownListItem
+}
+
+fun GetTownGrowth.GrowthContent.toPresentation(): TownListItem.Post {
+    val beforeDate = LocalDate.parse(before.date)
+    val afterDate = LocalDate.parse(after.date)
+    val dateDiff = ChronoUnit.DAYS.between(beforeDate, afterDate).toInt()
+
+    return TownListItem.Post(
+        id = growthId,
+        profile = plant.plantImage,
+        plantName = plant.name,
+        nickName = owner.nickname,
+        oldImage = before.imageUrl,
+        newImage = after.imageUrl,
+        dateDiff = dateDiff
+    )
 }
 
 enum class CareType(@DrawableRes val resId: Int) {
