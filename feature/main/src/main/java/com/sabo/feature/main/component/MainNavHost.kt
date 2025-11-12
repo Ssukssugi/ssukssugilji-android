@@ -28,6 +28,7 @@ import com.sabo.feature.profile.navigation.profileNavGraph
 import com.sabo.feature.profile.navigation.settingsNavGraph
 import com.sabo.feature.profile.navigation.userDeleteNavGraph
 import com.sabo.feature.signup.signUpNavGraph
+import com.sabo.feature.town.mygrowths.navigation.myGrowthScreen
 import com.sabo.feature.web.navigation.webLinkScreen
 
 @Composable
@@ -76,7 +77,8 @@ internal fun MainNavHost(
                 navigateToPlantAdd = navigator::navigateToPlantAdd,
                 navigateToProfile = navigator::navigateToProfile,
                 navigateToDiaryDetail = navigator::navigateToDiaryDetail,
-                navigateToPlantEdit = navigator::navigateToPlantEdit
+                navigateToPlantEdit = navigator::navigateToPlantEdit,
+                navigateToMyGrowths = navigator::navigateToMyGrowths
             )
             plantAddNavGraph(
                 onClickCategory = navigator::navigateToCategorySearch,
@@ -120,6 +122,9 @@ internal fun MainNavHost(
                 onClickBack = navigator::popBackStack,
                 navigateToEditDiary = navigator::navigateToDiaryEdit,
                 popUpWithResult = navigator::navigateToHome
+            )
+            myGrowthScreen(
+                onClickBack = navigator::popBackStack
             )
             profileNavGraph(
                 onClickBack = navigator::popBackStack,

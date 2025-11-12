@@ -26,6 +26,7 @@ import com.sabo.feature.profile.navigation.navigateToProfile
 import com.sabo.feature.profile.navigation.navigateToSettings
 import com.sabo.feature.profile.navigation.navigateToUserDelete
 import com.sabo.feature.signup.navigateToSignUp
+import com.sabo.feature.town.mygrowths.navigation.navigateToMyGrowth
 import com.sabo.feature.web.navigation.navigateToWebLink
 
 class MainNavigator(
@@ -86,6 +87,10 @@ class MainNavigator(
 
     fun navigateToDiaryEdit(route: DiaryEdit, navOption: NavOptions? = null) {
         navController.navigateToDiaryEdit(route)
+    }
+
+    fun navigateToMyGrowths() {
+        navController.navigateToMyGrowth()
     }
 
     fun navigateToProfile() {

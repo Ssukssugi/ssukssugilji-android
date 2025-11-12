@@ -14,4 +14,5 @@ dependencies {
     implementation(projects.feature.home)
     implementation(projects.feature.diary)
     implementation(projects.feature.profile)
+    implementation(projects.feature.town)
 }

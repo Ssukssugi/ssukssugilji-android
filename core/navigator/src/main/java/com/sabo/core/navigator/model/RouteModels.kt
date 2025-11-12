@@ -61,6 +61,9 @@ data class DiaryEdit(
 data class DiaryDetail(val plantId: Long, val diaryId: Long) : RouteModel
 
 @Serializable
+data object MyGrowth : RouteModel
+
+@Serializable
 data object Profile : RouteModel
 
 @Serializable

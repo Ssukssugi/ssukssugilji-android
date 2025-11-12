@@ -89,7 +89,8 @@ internal fun HomeScreen(
     navigateToPlantAdd: () -> Unit,
     navigateToProfile: () -> Unit,
     navigateToDiaryDetail: (Long, Long) -> Unit,
-    navigateToPlantEdit: (PlantAddEdit.PlantEdit) -> Unit
+    navigateToPlantEdit: (PlantAddEdit.PlantEdit) -> Unit,
+    navigateToMyGrowths: () -> Unit
 ) {
 
     val state = viewModel.collectAsState().value
@@ -154,7 +155,8 @@ internal fun HomeScreen(
         onClickOtherPlant = viewModel::onSelectPlant,
         onClickTown = viewModel::onSelectTown,
         onLoadMoreTown = viewModel::loadMoreTownGrowth,
-        onClickPostMore = viewModel::onClickGrowthPostMore
+        onClickPostMore = viewModel::onClickGrowthPostMore,
+        navigateToMyGrowths = navigateToMyGrowths
     )
 
     if (showBottomSheet) {
@@ -222,7 +224,8 @@ private fun HomeContent(
     onClickOtherPlant: (Long) -> Unit = {},
     onClickTown: () -> Unit = {},
     onLoadMoreTown: (Long) -> Unit = {},
-    onClickPostMore: (Long) -> Unit = {}
+    onClickPostMore: (Long) -> Unit = {},
+    navigateToMyGrowths: () -> Unit = {}
 ) {
     val storyRowState = rememberLazyListState()
     val contentColumnState = rememberLazyListState()
@@ -291,7 +294,8 @@ private fun HomeContent(
                     TownListContent(
                         state = content.townContent,
                         onLoadMore = onLoadMoreTown,
-                        onClickPostMore = onClickPostMore
+                        onClickPostMore = onClickPostMore,
+                        onClickMyPost = navigateToMyGrowths
                     )
                 }
             }
@@ -389,7 +393,7 @@ private fun TownListContent(
     state: TownContent,
     onLoadMore: (Long) -> Unit = {},
     onClickMyPost: () -> Unit = {},
-    onClickPostMore: (Long) -> Unit = {}
+    onClickPostMore: (Long) -> Unit = {},
 ) {
     val listState = rememberLazyListState()
     var isLoadingMore by remember { mutableStateOf(false) }

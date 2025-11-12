@@ -12,6 +12,9 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.sabo.core.navigator.model.Home
 import com.sabo.core.navigator.model.PlantAddEdit
+import com.sabo.core.navigator.toolkit.slideInFromEnd
+import com.sabo.core.navigator.toolkit.zoomIn
+import com.sabo.core.navigator.toolkit.zoomOut
 import com.sabo.feature.home.HomeScreen
 import com.sabo.feature.home.HomeViewModel
 
@@ -24,13 +27,12 @@ fun NavGraphBuilder.homeNavGraph(
     navigateToPlantAdd: () -> Unit,
     navigateToProfile: () -> Unit,
     navigateToDiaryDetail: (Long, Long) -> Unit,
-    navigateToPlantEdit: (PlantAddEdit.PlantEdit) -> Unit
+    navigateToPlantEdit: (PlantAddEdit.PlantEdit) -> Unit,
+    navigateToMyGrowths: () -> Unit
 ) {
     composable<Home>(
-        enterTransition = { EnterTransition.None },
-        popEnterTransition = { EnterTransition.None },
-        popExitTransition = { ExitTransition.None },
-        exitTransition = { ExitTransition.None }
+        popEnterTransition = zoomIn(),
+        exitTransition = zoomOut()
     ) { entry ->
         val viewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
 
@@ -51,7 +53,8 @@ fun NavGraphBuilder.homeNavGraph(
             navigateToPlantAdd = navigateToPlantAdd,
             navigateToProfile = navigateToProfile,
             navigateToDiaryDetail = navigateToDiaryDetail,
-            navigateToPlantEdit = navigateToPlantEdit
+            navigateToPlantEdit = navigateToPlantEdit,
+            navigateToMyGrowths = navigateToMyGrowths
         )
     }
 }
