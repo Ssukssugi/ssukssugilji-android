@@ -28,7 +28,6 @@ class HomeViewModel @Inject constructor(
 
     override val container: Container<HomeUiState, HomeEvent> = container(
         initialState = HomeUiState(
-            isLoading = true,
             plantList = emptyList(),
             homeContent = HomeContent.Diary(plantContent = PlantContent.Loading)
         ),
@@ -70,11 +69,7 @@ class HomeViewModel @Inject constructor(
 
         reduce {
             state.copy(
-                isLoading = false,
-                plantList = plants,
-                homeContent = HomeContent.Diary(
-                    plantContent = if (plants.size == 1) PlantContent.Empty else PlantContent.Loading
-                )
+                plantList = plants
             )
         }
     }
@@ -208,9 +203,7 @@ class HomeViewModel @Inject constructor(
             val isNewUserResult = isNewUserDeferred.await()
 
             if (growthResult is Result.Success && isNewUserResult is Result.Success) {
-                val townItems = growthResult.data.growths
-                    .distinctBy { it.growthId }
-                    .map { growth -> growth.toPresentation() }
+                val townItems = growthResult.data.growths.map { growth -> growth.toPresentation() }
 
                 val newList = if (townItems.isNotEmpty()) {
                     townItems + TownListItem.LoadMore(lastId = townItems.last().id)
@@ -244,9 +237,7 @@ class HomeViewModel @Inject constructor(
                     .map { it.id }
                     .toSet()
 
-                val newGrowths = result.data.growths
-                    .distinctBy { it.growthId }
-                    .filter { it.growthId !in existingIds }
+                val newGrowths = result.data.growths.filter { it.growthId !in existingIds }
 
                 val newTownItems = townState.townContent.dataList.toMutableList().apply {
                     removeAt(lastIndex)
@@ -279,5 +270,21 @@ class HomeViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    fun onClickGrowthPostMore(id: Long) = intent {
+        postSideEffect(HomeEvent.ShowPostOptions(growthId = id))
+    }
+
+    fun reportGrowthPost(id: Long) = intent {
+        reduce { state.copy(isLoading = true) }
+        townRepository.reportTown(growthId = id).handle(
+            onSuccess = {
+                postSideEffect(HomeEvent.ShowSnackBarReportGrowth)
+            },
+            onFinish = {
+                reduce { state.copy(isLoading = false) }
+            }
+        )
     }
 }

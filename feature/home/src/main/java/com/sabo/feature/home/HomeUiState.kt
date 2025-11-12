@@ -106,4 +106,6 @@ sealed interface HomeEvent {
     data class ShowPlantOptions(val plant: PlantListItem.Plant) : HomeEvent
     data class NavigateToPlantEdit(val route: PlantAddEdit.PlantEdit): HomeEvent
     data object ShowSnackBarDeletePlant : HomeEvent
+    data class ShowPostOptions(val growthId: Long) : HomeEvent
+    data object ShowSnackBarReportGrowth: HomeEvent
 }

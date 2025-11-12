@@ -23,4 +23,11 @@ class DefaultTownRepository @Inject constructor(
         },
         transform = { it }
     )
+
+    override suspend fun reportTown(growthId: Long) = handleResult(
+        execute = {
+            townService.reportGrowth(growthId)
+        },
+        transform = {}
+    )
 }

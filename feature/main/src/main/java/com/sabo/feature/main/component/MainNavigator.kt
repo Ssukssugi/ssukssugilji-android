@@ -36,10 +36,11 @@ class MainNavigator(
         navController.navigate(
             route = Login,
             navOptions = navOptions {
-                popUpTo<Login> {
-                    inclusive = true
+                popUpTo(0) {
+                    saveState = false
                 }
                 launchSingleTop = true
+                restoreState = false
             }
         )
     }

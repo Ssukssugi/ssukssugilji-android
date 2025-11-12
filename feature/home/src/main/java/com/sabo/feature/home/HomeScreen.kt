@@ -1,6 +1,11 @@
 package com.sabo.feature.home
 
-import android.util.Log
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,11 +51,10 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.animation.core.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -93,6 +97,11 @@ internal fun HomeScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedPlant by remember { mutableStateOf<PlantListItem.Plant?>(null) }
     var showPlantDeleteDialog by remember { mutableStateOf(false) }
+
+    var selectedGrowthId by remember { mutableStateOf<Long?>(null) }
+    var showPostOptionBottomSheet by remember { mutableStateOf(false) }
+    var showUserReportDialog by remember { mutableStateOf(false) }
+
     var snackBarState by rememberSnackBarState()
 
     viewModel.collectSideEffect {
@@ -116,6 +125,20 @@ internal fun HomeScreen(
                     isVisible = true
                 )
             }
+
+            HomeEvent.ShowSnackBarReportGrowth -> {
+                snackBarState = snackBarState.copy(isVisible = false)
+                snackBarState = snackBarState.copy(
+                    message = "게시글 신고가 완료되었어요!",
+                    iconRes = R.drawable.icon_circle_check,
+                    isVisible = true
+                )
+            }
+
+            is HomeEvent.ShowPostOptions -> {
+                selectedGrowthId = it.growthId
+                showPostOptionBottomSheet = true
+            }
         }
     }
 
@@ -130,7 +153,8 @@ internal fun HomeScreen(
         onClickMore = viewModel::onClickMore,
         onClickOtherPlant = viewModel::onSelectPlant,
         onClickTown = viewModel::onSelectTown,
-        onLoadMoreTown = viewModel::loadMoreTownGrowth
+        onLoadMoreTown = viewModel::loadMoreTownGrowth,
+        onClickPostMore = viewModel::onClickGrowthPostMore
     )
 
     if (showBottomSheet) {
@@ -149,6 +173,29 @@ internal fun HomeScreen(
         PlantDeleteDialog(
             onDismiss = { showPlantDeleteDialog = false },
             onConfirm = viewModel::onDeletePlant
+        )
+    }
+
+    if (showPostOptionBottomSheet) {
+        UserReportOptionsBottomSheet(
+            onDismissRequest = {
+                showPostOptionBottomSheet = false
+                selectedGrowthId = null
+            },
+            onReportClick = { showUserReportDialog = true }
+        )
+    }
+
+    if (showUserReportDialog) {
+        UserReportDialog(
+            onDismiss = {
+                showUserReportDialog = false
+                selectedGrowthId = null
+            },
+            onConfirm = {
+                selectedGrowthId?.let { viewModel.reportGrowthPost(it) }
+                showPostOptionBottomSheet = false
+            }
         )
     }
 
@@ -174,7 +221,8 @@ private fun HomeContent(
     onClickMore: (Long) -> Unit = {},
     onClickOtherPlant: (Long) -> Unit = {},
     onClickTown: () -> Unit = {},
-    onLoadMoreTown: (Long) -> Unit = {}
+    onLoadMoreTown: (Long) -> Unit = {},
+    onClickPostMore: (Long) -> Unit = {}
 ) {
     val storyRowState = rememberLazyListState()
     val contentColumnState = rememberLazyListState()
@@ -242,7 +290,8 @@ private fun HomeContent(
                 is HomeContent.Town -> {
                     TownListContent(
                         state = content.townContent,
-                        onLoadMore = onLoadMoreTown
+                        onLoadMore = onLoadMoreTown,
+                        onClickPostMore = onClickPostMore
                     )
                 }
             }
@@ -338,7 +387,9 @@ private fun TownButton(
 @Composable
 private fun TownListContent(
     state: TownContent,
-    onLoadMore: (Long) -> Unit = {}
+    onLoadMore: (Long) -> Unit = {},
+    onClickMyPost: () -> Unit = {},
+    onClickPostMore: (Long) -> Unit = {}
 ) {
     val listState = rememberLazyListState()
     var isLoadingMore by remember { mutableStateOf(false) }
@@ -383,12 +434,13 @@ private fun TownListContent(
                 ) {
                     Spacer(modifier = Modifier.weight(1f, fill = true))
                     Row(
+                        modifier = Modifier.clickable { onClickMyPost() },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = "나의 게시글",
                             style = DiaryTypography.bodySmallSemiBold,
-                            color = DiaryColorsPalette.current.gray600
+                            color = DiaryColorsPalette.current.gray600,
                         )
                         Icon(
                             imageVector = ImageVector.vectorResource(R.drawable.icon_arrow_right_24),
@@ -409,7 +461,7 @@ private fun TownListContent(
                             .fillMaxWidth()
                             .background(color = DiaryColorsPalette.current.gray100, shape = CircleShape)
                             .clip(CircleShape)
-                            .clickable {  }
+                            .clickable { }
                             .padding(vertical = 12.dp)
                     ) {
                         Text(
@@ -434,7 +486,8 @@ private fun TownListContent(
             ) { data ->
                 when (data) {
                     is TownListItem.Post -> TownListItem(
-                        data = data
+                        data = data,
+                        onClickGrowthItemMore = onClickPostMore
                     )
 
                     is TownListItem.LoadMore -> {
@@ -547,6 +600,7 @@ private fun RowScope.TownGrowthPlantImage(imageUrl: String) {
     AsyncImage(
         model = imageUrl,
         contentDescription = null,
+        contentScale = ContentScale.Crop,
         modifier = Modifier
             .weight(1f)
             .aspectRatio(1f)
@@ -609,14 +663,12 @@ private fun TownListItemSkeleton() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    // Profile image skeleton
                     Box(
                         modifier = Modifier
                             .size(24.dp)
                             .clip(CircleShape)
                             .background(brush)
                     )
-                    // Plant name text skeleton
                     Box(
                         modifier = Modifier
                             .width(80.dp)
@@ -624,7 +676,6 @@ private fun TownListItemSkeleton() {
                             .clip(RoundedCornerShape(4.dp))
                             .background(brush)
                     )
-                    // Nickname text skeleton
                     Box(
                         modifier = Modifier
                             .width(60.dp)
@@ -645,7 +696,6 @@ private fun TownListItemSkeleton() {
                             .fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        // Old image skeleton
                         Box(
                             modifier = Modifier
                                 .weight(1f)
@@ -653,7 +703,6 @@ private fun TownListItemSkeleton() {
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(brush)
                         )
-                        // New image skeleton
                         Box(
                             modifier = Modifier
                                 .weight(1f)
@@ -1079,6 +1128,43 @@ private fun PlantOptionsModalBottomSheet(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun UserReportOptionsBottomSheet(
+    onDismissRequest: () -> Unit,
+    onReportClick: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        dragHandle = {
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .size(width = 56.dp, height = 4.dp)
+                    .background(
+                        color = Color(0xFFDDDDDD),
+                        shape = RoundedCornerShape(2.dp)
+                    )
+            )
+        },
+        containerColor = Color(0xFFFFFFFF)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color(0xFFFFFFFF))
+                .padding(vertical = 24.dp)
+        ) {
+            PlantBottomSheetEditItem(
+                iconRes = R.drawable.icon_trash,
+                text = "신고하기",
+                tint = DiaryColorsPalette.current.red400,
+                onClick = { onReportClick() }
+            )
+        }
+    }
+}
+
 @Composable
 private fun PlantOptionsBottomSheet(
     plant: PlantListItem.Plant,
@@ -1222,6 +1308,93 @@ private fun PlantDeleteDialog(
                 ) {
                     Text(
                         text = "삭제하기",
+                        color = DiaryColorsPalette.current.green600,
+                        style = DiaryTypography.subtitleMediumBold
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .wrapContentHeight()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(DiaryColorsPalette.current.green400)
+                        .clickable { onDismiss() }
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "돌아가기",
+                        color = DiaryColorsPalette.current.gray50,
+                        style = DiaryTypography.subtitleMediumBold
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun UserReportDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(24.dp))
+                .background(Color.White)
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(40.dp))
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.icon_notice_triangle),
+                contentDescription = null,
+                tint = DiaryColorsPalette.current.red400,
+                modifier = Modifier.size(64.dp)
+            )
+            Text(
+                text = "이 게시글을 정말 신고할까요?",
+                style = DiaryTypography.subtitleLargeBold,
+                color = DiaryColorsPalette.current.gray900,
+                modifier = Modifier
+                    .padding(top = 24.dp, bottom = 8.dp)
+            )
+            Text(
+                text = "신고 접수 시, 운영자의 검토 후\n게시글이 처리될 예정입니다.",
+                style = DiaryTypography.bodyLargeMedium,
+                color = DiaryColorsPalette.current.gray600
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .wrapContentHeight()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(DiaryColorsPalette.current.green50)
+                        .clickable {
+                            onConfirm()
+                            onDismiss()
+                        }
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "신고하기",
                         color = DiaryColorsPalette.current.green600,
                         style = DiaryTypography.subtitleMediumBold
                     )
