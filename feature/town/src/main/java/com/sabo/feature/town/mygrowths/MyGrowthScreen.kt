@@ -110,6 +110,7 @@ private fun MyGrowthContent(
         }
 
         PostingButton(
+            modifier = Modifier.align(Alignment.BottomCenter),
             onClick = onClickPosting
         )
     }
@@ -268,11 +269,12 @@ private fun EmptyContent(
 
 @Composable
 private fun PostingButton(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
     Box(
-        modifier = Modifier
-            .padding(horizontal = 20.dp, vertical = 4.dp)
+        modifier = modifier
+            .padding(horizontal = 20.dp, vertical = 8.dp)
             .fillMaxWidth()
             .background(
                 color = DiaryColorsPalette.current.green400,
