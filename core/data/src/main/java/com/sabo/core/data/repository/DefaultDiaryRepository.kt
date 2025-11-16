@@ -84,9 +84,9 @@ class DefaultDiaryRepository @Inject constructor(
         transform = { it.map { model ->  model.name } }
     )
 
-    override suspend fun getMyPlants(): Result<List<GetMyPlant.Plant>> = handleResult(
+    override suspend fun getMyPlants(includeDiaryCount: Boolean): Result<List<GetMyPlant.Plant>> = handleResult(
         execute = {
-            diaryService.getMyPlants()
+            diaryService.getMyPlants(diaryCount = includeDiaryCount)
         },
         transform = { it.plants }
     )

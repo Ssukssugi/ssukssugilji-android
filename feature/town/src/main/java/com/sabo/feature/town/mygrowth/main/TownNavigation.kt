@@ -1,4 +1,4 @@
-package com.sabo.feature.town.mygrowths.navigation
+package com.sabo.feature.town.mygrowth.main
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -8,14 +8,14 @@ import com.sabo.core.navigator.toolkit.slideInFromEnd
 import com.sabo.core.navigator.toolkit.slideOutToEnd
 import com.sabo.core.navigator.toolkit.zoomIn
 import com.sabo.core.navigator.toolkit.zoomOut
-import com.sabo.feature.town.mygrowths.MyGrowthScreen
 
 fun NavController.navigateToMyGrowth() {
     navigate(MyGrowth)
 }
 
 fun NavGraphBuilder.myGrowthScreen(
-    onClickBack: () -> Unit
+    onClickBack: () -> Unit,
+    onClickPosting: () -> Unit
 ) {
     composable<MyGrowth>(
         enterTransition = slideInFromEnd(),
@@ -25,7 +25,7 @@ fun NavGraphBuilder.myGrowthScreen(
     ) {
         MyGrowthScreen(
             onClickBack = onClickBack,
-            onClickPosting = {}
+            onClickPosting = onClickPosting
         )
     }
 }

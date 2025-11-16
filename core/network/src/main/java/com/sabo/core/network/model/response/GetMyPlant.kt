@@ -11,6 +11,7 @@ data class GetMyPlant(
         val plantId: Long,
         val name: String,
         val plantCategory: String,
-        val image: String? = null
+        val image: String? = null,
+        val diaryCount: Int?
     )
 }

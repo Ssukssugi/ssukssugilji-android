@@ -18,7 +18,7 @@ interface DiaryRepository {
 
     suspend fun getPlantCategories(keyword: String): Result<List<String>>
 
-    suspend fun getMyPlants(): Result<List<GetMyPlant.Plant>>
+    suspend fun getMyPlants(includeDiaryCount: Boolean): Result<List<GetMyPlant.Plant>>
 
     suspend fun getPlantProfile(plantId: Long): Result<GetPlantProfile>
 

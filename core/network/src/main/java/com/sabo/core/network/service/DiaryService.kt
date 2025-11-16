@@ -42,7 +42,9 @@ interface DiaryService {
     ): Response<List<GetPlantCategories>>
 
     @GET("/api/v1/plants")
-    suspend fun getMyPlants(): Response<GetMyPlant>
+    suspend fun getMyPlants(
+        @Query("diaryCount") diaryCount: Boolean
+    ): Response<GetMyPlant>
 
     @GET("api/v1/plants/profile")
     suspend fun getPlantProfile(

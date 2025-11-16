@@ -26,7 +26,8 @@ import com.sabo.feature.profile.navigation.navigateToProfile
 import com.sabo.feature.profile.navigation.navigateToSettings
 import com.sabo.feature.profile.navigation.navigateToUserDelete
 import com.sabo.feature.signup.navigateToSignUp
-import com.sabo.feature.town.mygrowths.navigation.navigateToMyGrowth
+import com.sabo.feature.town.mygrowth.main.navigateToMyGrowth
+import com.sabo.feature.town.mygrowth.posting.navigateToGrowthSelectPlant
 import com.sabo.feature.web.navigation.navigateToWebLink
 
 class MainNavigator(
@@ -91,6 +92,10 @@ class MainNavigator(
 
     fun navigateToMyGrowths() {
         navController.navigateToMyGrowth()
+    }
+
+    fun navigateToSelectGrowthPlant() {
+        navController.navigateToGrowthSelectPlant()
     }
 
     fun navigateToProfile() {

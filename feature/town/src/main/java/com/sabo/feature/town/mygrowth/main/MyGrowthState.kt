@@ -1,4 +1,4 @@
-package com.sabo.feature.town.mygrowths
+package com.sabo.feature.town.mygrowth.main
 
 import com.sabo.core.network.model.response.GetTownGrowth
 import java.time.LocalDate

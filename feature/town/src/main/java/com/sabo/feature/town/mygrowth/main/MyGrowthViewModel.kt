@@ -1,4 +1,4 @@
-package com.sabo.feature.town.mygrowths
+package com.sabo.feature.town.mygrowth.main
 
 import androidx.lifecycle.ViewModel
 import com.sabo.core.data.handle

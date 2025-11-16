@@ -28,7 +28,8 @@ import com.sabo.feature.profile.navigation.profileNavGraph
 import com.sabo.feature.profile.navigation.settingsNavGraph
 import com.sabo.feature.profile.navigation.userDeleteNavGraph
 import com.sabo.feature.signup.signUpNavGraph
-import com.sabo.feature.town.mygrowths.navigation.myGrowthScreen
+import com.sabo.feature.town.mygrowth.main.myGrowthScreen
+import com.sabo.feature.town.mygrowth.posting.selectPlantScreen
 import com.sabo.feature.web.navigation.webLinkScreen
 
 @Composable
@@ -124,7 +125,12 @@ internal fun MainNavHost(
                 popUpWithResult = navigator::navigateToHome
             )
             myGrowthScreen(
-                onClickBack = navigator::popBackStack
+                onClickBack = navigator::popBackStack,
+                onClickPosting = navigator::navigateToSelectGrowthPlant
+            )
+            selectPlantScreen(
+                onClickBack = navigator::popBackStack,
+                onClickNext = {}
             )
             profileNavGraph(
                 onClickBack = navigator::popBackStack,

@@ -74,7 +74,7 @@ class DiaryWriteViewModel @Inject constructor(
         )
 
     private fun loadPlants(selectedPlantId: Long? = null) = intent {
-        diaryRepository.getMyPlants().handle(
+        diaryRepository.getMyPlants(false).handle(
             onSuccess = {
                 reduce {
                     state.copy(

@@ -48,7 +48,7 @@ class HomeViewModel @Inject constructor(
     private val selectedPlantId = MutableStateFlow<Long?>(null)
 
     private fun fetchPlantStory() = intent {
-        val plants: List<PlantListItem> = when (val response = diaryRepository.getMyPlants()) {
+        val plants: List<PlantListItem> = when (val response = diaryRepository.getMyPlants(false)) {
             is Result.Success -> {
                 response.data.map { plant ->
                     PlantListItem.Plant(
