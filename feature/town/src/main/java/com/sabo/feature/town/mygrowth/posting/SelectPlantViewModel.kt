@@ -3,6 +3,7 @@ package com.sabo.feature.town.mygrowth.posting
 import androidx.lifecycle.ViewModel
 import com.sabo.core.data.handle
 import com.sabo.core.data.repository.DiaryRepository
+import com.sabo.core.navigator.model.GrowthVariation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -55,5 +56,10 @@ class SelectPlantViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    fun onClickComplete() = intent {
+        val selectedPlant = state.plantList.find { it.isSelected } ?: return@intent
+        postSideEffect(SelectPlantSideEffect.NavigateToGrowthVariation(GrowthVariation(plantId = selectedPlant.id, plantName = selectedPlant.nickname)))
     }
 }

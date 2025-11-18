@@ -67,6 +67,12 @@ data object MyGrowth : RouteModel
 data object SelectGrowthPlant : RouteModel
 
 @Serializable
+data class GrowthVariation(
+    val plantId: Long,
+    val plantName: String
+) : RouteModel
+
+@Serializable
 data object Profile : RouteModel
 
 @Serializable

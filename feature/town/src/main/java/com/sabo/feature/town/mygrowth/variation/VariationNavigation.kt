@@ -1,32 +1,41 @@
-package com.sabo.feature.town.mygrowth.posting
+package com.sabo.feature.town.mygrowth.variation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.sabo.core.navigator.model.GrowthVariation
-import com.sabo.core.navigator.model.SelectGrowthPlant
+import com.sabo.core.navigator.toolkit.navTypeOf
 import com.sabo.core.navigator.toolkit.slideInFromBottom
 import com.sabo.core.navigator.toolkit.slideOutToBottom
 import com.sabo.core.navigator.toolkit.zoomIn
 import com.sabo.core.navigator.toolkit.zoomOut
+import kotlin.reflect.typeOf
 
-fun NavController.navigateToGrowthSelectPlant() {
-    navigate(SelectGrowthPlant)
+fun NavController.navigateToGrowthVariation(
+    route: GrowthVariation,
+    navOptions: NavOptions? = null
+) {
+    navigate(
+        route = route,
+        navOptions = navOptions
+    )
 }
 
-fun NavGraphBuilder.selectPlantScreen(
+fun NavGraphBuilder.growthVariationScreen(
     onClickBack: () -> Unit,
-    onClickNext: (GrowthVariation) -> Unit
+    onNavigateToHomeWithSuccess: () -> Unit
 ) {
-    composable<SelectGrowthPlant>(
+    composable<GrowthVariation>(
+        typeMap = mapOf(typeOf<GrowthVariation>() to navTypeOf<GrowthVariation>()),
         enterTransition = slideInFromBottom(),
         exitTransition = zoomOut(),
         popEnterTransition = zoomIn(),
         popExitTransition = slideOutToBottom()
     ) {
-        SelectPlantScreen(
+        VariationScreen(
             onClickBack = onClickBack,
-            navigateToGrowthVariation = onClickNext
+            onNavigateToHomeWithSuccess = onNavigateToHomeWithSuccess
         )
     }
 }

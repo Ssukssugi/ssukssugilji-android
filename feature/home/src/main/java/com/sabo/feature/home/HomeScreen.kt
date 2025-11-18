@@ -516,7 +516,6 @@ private fun TownListContent(
 @Composable
 private fun TownListItem(
     data: TownListItem.Post,
-    onClickGrowth: (Long) -> Unit = {},
     onClickGrowthItemMore: (Long) -> Unit = {}
 ) {
     Box(
@@ -526,7 +525,6 @@ private fun TownListItem(
             .background(color = DiaryColorsPalette.current.gray50, shape = RoundedCornerShape(16.dp))
             .border(width = 1.dp, color = DiaryColorsPalette.current.gray200, shape = RoundedCornerShape(16.dp))
             .clip(shape = RoundedCornerShape(16.dp))
-            .clickable { onClickGrowth(data.id) }
             .padding(top = 16.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
     ) {
         Column(

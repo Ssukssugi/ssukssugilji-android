@@ -1,5 +1,7 @@
 package com.sabo.feature.town.mygrowth.posting
 
+import com.sabo.core.navigator.model.GrowthVariation
+
 data class SelectPlantState(
     val isLoading: Boolean = false,
     val plantList: List<Plant>
@@ -14,4 +16,6 @@ data class Plant(
     val enabled: Boolean
 )
 
-sealed interface SelectPlantSideEffect
+sealed interface SelectPlantSideEffect {
+    data class NavigateToGrowthVariation(val route: GrowthVariation) : SelectPlantSideEffect
+}

@@ -36,6 +36,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun TopSnackBar(
+    modifier: Modifier = Modifier,
     message: String,
     iconRes: Int = -1,
     iconTint: Color = Color.Unspecified,
@@ -63,7 +64,7 @@ fun TopSnackBar(
         exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut()
     ) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {

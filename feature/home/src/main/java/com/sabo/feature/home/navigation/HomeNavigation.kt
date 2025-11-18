@@ -1,7 +1,5 @@
 package com.sabo.feature.home.navigation
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -12,7 +10,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.sabo.core.navigator.model.Home
 import com.sabo.core.navigator.model.PlantAddEdit
-import com.sabo.core.navigator.toolkit.slideInFromEnd
 import com.sabo.core.navigator.toolkit.zoomIn
 import com.sabo.core.navigator.toolkit.zoomOut
 import com.sabo.feature.home.HomeScreen

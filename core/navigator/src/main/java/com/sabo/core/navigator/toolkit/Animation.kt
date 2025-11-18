@@ -56,12 +56,6 @@ fun slideInFromEnd(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> Ent
             durationMillis = ANIMATION_DURATION_MILLIS,
             easing = FastOutSlowInEasing
         )
-    ) + fadeIn(
-        animationSpec = tween(
-            durationMillis = ANIMATION_DURATION_MILLIS,
-            easing = FastOutSlowInEasing
-        ),
-        initialAlpha = 0.3f
     )
 }
 
@@ -72,12 +66,6 @@ fun slideOutToEnd(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> Exit
             durationMillis = ANIMATION_DURATION_MILLIS,
             easing = FastOutSlowInEasing
         )
-    ) + fadeOut(
-        animationSpec = tween(
-            durationMillis = ANIMATION_DURATION_MILLIS,
-            easing = FastOutSlowInEasing
-        ),
-        targetAlpha = 0.3f
     )
 }
 
@@ -88,12 +76,6 @@ fun slideInFromBottom(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> 
             durationMillis = ANIMATION_DURATION_MILLIS,
             easing = FastOutSlowInEasing
         )
-    ) + fadeIn(
-        animationSpec = tween(
-            durationMillis = ANIMATION_DURATION_MILLIS,
-            easing = FastOutSlowInEasing
-        ),
-        initialAlpha = 0.3f
     )
 }
 
@@ -104,11 +86,5 @@ fun slideOutToBottom(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> E
             durationMillis = ANIMATION_DURATION_MILLIS,
             easing = FastOutSlowInEasing
         )
-    ) + fadeOut(
-        animationSpec = tween(
-            durationMillis = ANIMATION_DURATION_MILLIS,
-            easing = FastOutSlowInEasing
-        ),
-        targetAlpha = 0.3f
     )
 }

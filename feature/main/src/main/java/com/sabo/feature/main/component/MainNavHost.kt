@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
+import com.sabo.core.designsystem.R
+import com.sabo.core.designsystem.component.SnackBarState
 import com.sabo.core.navigator.model.Home
 import com.sabo.core.navigator.model.Login
 import com.sabo.core.navigator.model.WebLink
@@ -30,13 +32,15 @@ import com.sabo.feature.profile.navigation.userDeleteNavGraph
 import com.sabo.feature.signup.signUpNavGraph
 import com.sabo.feature.town.mygrowth.main.myGrowthScreen
 import com.sabo.feature.town.mygrowth.posting.selectPlantScreen
+import com.sabo.feature.town.mygrowth.variation.growthVariationScreen
 import com.sabo.feature.web.navigation.webLinkScreen
 
 @Composable
 internal fun MainNavHost(
     modifier: Modifier = Modifier,
     navigator: MainNavigator,
-    padding: PaddingValues
+    padding: PaddingValues,
+    onShowSuccessSnackBar: (SnackBarState) -> Unit
 ) {
     Box(
         modifier = modifier
@@ -130,7 +134,26 @@ internal fun MainNavHost(
             )
             selectPlantScreen(
                 onClickBack = navigator::popBackStack,
-                onClickNext = {}
+                onClickNext = navigator::navigateToGrowthVariation
+            )
+            growthVariationScreen(
+                onClickBack = navigator::popBackStack,
+                onNavigateToHomeWithSuccess = {
+                    navigator.navController.navigate(
+                        route = Home,
+                        navOptions = navOptions {
+                            popUpTo(Home) {
+                                inclusive = false
+                            }
+                        }
+                    )
+                    onShowSuccessSnackBar(
+                        SnackBarState(
+                            message = "쑥쑥마을에 소개가 완료되었어요!",
+                            iconRes = R.drawable.icon_circle_check
+                        )
+                    )
+                }
             )
             profileNavGraph(
                 onClickBack = navigator::popBackStack,

@@ -8,6 +8,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.sabo.core.navigator.model.DiaryEdit
+import com.sabo.core.navigator.model.GrowthVariation
 import com.sabo.core.navigator.model.Home
 import com.sabo.core.navigator.model.Login
 import com.sabo.core.navigator.model.PlantAddEdit
@@ -28,6 +29,7 @@ import com.sabo.feature.profile.navigation.navigateToUserDelete
 import com.sabo.feature.signup.navigateToSignUp
 import com.sabo.feature.town.mygrowth.main.navigateToMyGrowth
 import com.sabo.feature.town.mygrowth.posting.navigateToGrowthSelectPlant
+import com.sabo.feature.town.mygrowth.variation.navigateToGrowthVariation
 import com.sabo.feature.web.navigation.navigateToWebLink
 
 class MainNavigator(
@@ -96,6 +98,10 @@ class MainNavigator(
 
     fun navigateToSelectGrowthPlant() {
         navController.navigateToGrowthSelectPlant()
+    }
+
+    fun navigateToGrowthVariation(route: GrowthVariation) {
+        navController.navigateToGrowthVariation(route = route)
     }
 
     fun navigateToProfile() {

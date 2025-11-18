@@ -41,16 +41,25 @@ import com.sabo.core.designsystem.component.SsukssukTopAppBar
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
+import com.sabo.core.navigator.model.GrowthVariation
 import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 internal fun SelectPlantScreen(
     viewModel: SelectPlantViewModel = hiltViewModel(),
-    onClickBack: () -> Unit
+    onClickBack: () -> Unit,
+    navigateToGrowthVariation: (GrowthVariation) -> Unit
 ) {
 
     val state = viewModel.collectAsState().value
     val listState = rememberLazyListState()
+
+    viewModel.collectSideEffect {
+        when (it) {
+            is SelectPlantSideEffect.NavigateToGrowthVariation -> navigateToGrowthVariation(it.route)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -70,7 +79,8 @@ internal fun SelectPlantScreen(
                     modifier = Modifier.weight(1f, fill = true),
                     listState = listState,
                     plantList = state.plantList,
-                    onClickPlant = viewModel::selectPlant
+                    onClickPlant = viewModel::selectPlant,
+                    onClickComplete = viewModel::onClickComplete
                 )
             }
         }
@@ -96,7 +106,8 @@ private fun SelectPlantContent(
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
     plantList: List<Plant> = emptyList(),
-    onClickPlant: (Long) -> Unit = {}
+    onClickPlant: (Long) -> Unit = {},
+    onClickComplete: () -> Unit = {}
 ) {
 
     val enableCompleteButton = remember(plantList) {
@@ -125,7 +136,8 @@ private fun SelectPlantContent(
 
         CompleteButton(
             modifier = Modifier.align(Alignment.BottomCenter),
-            enabled = enableCompleteButton
+            enabled = enableCompleteButton,
+            onClick = onClickComplete
         )
     }
 }
