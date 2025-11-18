@@ -143,7 +143,7 @@ internal fun MainNavHost(
                         route = Home,
                         navOptions = navOptions {
                             popUpTo(Home) {
-                                inclusive = false
+                                inclusive = true
                             }
                         }
                     )
