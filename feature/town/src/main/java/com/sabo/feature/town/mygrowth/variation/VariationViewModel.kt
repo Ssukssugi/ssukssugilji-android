@@ -35,13 +35,21 @@ class VariationViewModel @Inject constructor(
                     state.copy(
                         beforeImage = null,
                         afterImage = null,
-                        imageList = result.byMonth.flatMap { it.diaries }.map { diary ->
-                            HistoryImage(
-                                url = diary.image,
-                                selectedType = null,
-                                diaryId = diary.diaryId
-                            )
-                        }
+                        imageList = result.byMonth
+                            .sortedWith(compareBy({ it.year }, { it.month }))
+                            .flatMap { monthData ->
+                                monthData.diaries
+                                    .groupBy { it.date }
+                                    .toSortedMap()
+                                    .flatMap { (_, diaries) -> diaries.reversed() }
+                            }
+                            .map { diary ->
+                                HistoryImage(
+                                    url = diary.image,
+                                    selectedType = null,
+                                    diaryId = diary.diaryId
+                                )
+                            }
                     )
                 }
             },
