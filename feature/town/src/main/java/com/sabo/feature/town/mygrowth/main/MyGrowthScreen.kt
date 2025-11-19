@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -109,10 +111,23 @@ private fun MyGrowthContent(
             }
         }
 
-        PostingButton(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            onClick = onClickPosting
-        )
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFFFFFFFF).copy(alpha = 0f),
+                            Color(0xFFFFFFFF)
+                        )
+                    )
+                )
+        ) {
+            PostingButton(
+                onClick = onClickPosting
+            )
+        }
     }
 }
 
@@ -124,7 +139,8 @@ private fun MyGrowthList(
 ) {
     LazyColumn(
         state = listState,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 80.dp)
     ) {
         items(
             items = items,
@@ -269,11 +285,10 @@ private fun EmptyContent(
 
 @Composable
 private fun PostingButton(
-    modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .padding(horizontal = 20.dp, vertical = 8.dp)
             .fillMaxWidth()
             .background(
