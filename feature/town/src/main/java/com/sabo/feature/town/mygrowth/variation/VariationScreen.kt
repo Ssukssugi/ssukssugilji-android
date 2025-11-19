@@ -143,8 +143,8 @@ private fun VariationContent(
             ) { historyImage ->
                 HistoryImageItem(
                     historyImage = historyImage,
-                    isBeforeEnabled = isBeforeEnabled,
-                    isAfterEnabled = isAfterEnabled,
+                    isBeforeBadgeActive = state.beforeImage != null && state.afterImage == null,
+                    isAfterBadgeActive = state.afterImage != null,
                     onClick = { onImageClick(historyImage) }
                 )
             }
@@ -166,8 +166,8 @@ private fun VariationContent(
 @Composable
 private fun HistoryImageItem(
     historyImage: HistoryImage,
-    isBeforeEnabled: Boolean,
-    isAfterEnabled: Boolean,
+    isBeforeBadgeActive: Boolean,
+    isAfterBadgeActive: Boolean,
     onClick: () -> Unit
 ) {
     Box(
@@ -190,11 +190,11 @@ private fun HistoryImageItem(
 
             val labelColor = when (type) {
                 VariationImageType.BEFORE -> {
-                    if (isBeforeEnabled) DiaryColorsPalette.current.green400
+                    if (isBeforeBadgeActive) DiaryColorsPalette.current.green400
                     else DiaryColorsPalette.current.gray500
                 }
                 VariationImageType.AFTER -> {
-                    if (isAfterEnabled) DiaryColorsPalette.current.green400
+                    if (isAfterBadgeActive) DiaryColorsPalette.current.green400
                     else DiaryColorsPalette.current.gray500
                 }
             }

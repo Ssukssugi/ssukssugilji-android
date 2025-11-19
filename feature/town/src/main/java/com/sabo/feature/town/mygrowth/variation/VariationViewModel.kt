@@ -62,20 +62,40 @@ class VariationViewModel @Inject constructor(
     }
 
     fun onImageClick(historyImage: HistoryImage) = intent {
-        val currentState = state
+        val clickedIndex = state.imageList.indexOfFirst { it.diaryId == historyImage.diaryId }
+        if (clickedIndex == -1) return@intent
 
-        if (historyImage.selectedType != null) {
-            resetImage(historyImage.selectedType)
-            return@intent
+        val beforeIndex = state.beforeImage?.let { before ->
+            state.imageList.indexOfFirst { it.diaryId == before.diaryId }
+        } ?: -1
+
+        val afterIndex = state.afterImage?.let { after ->
+            state.imageList.indexOfFirst { it.diaryId == after.diaryId }
+        } ?: -1
+
+        when {
+            beforeIndex == -1 && afterIndex == -1 -> {
+                selectImage(historyImage, VariationImageType.BEFORE)
+            }
+
+            beforeIndex != -1 && afterIndex == -1 -> {
+                when {
+                    clickedIndex == beforeIndex -> resetImage(VariationImageType.BEFORE)
+                    clickedIndex < beforeIndex -> resetAndSelectImage(VariationImageType.BEFORE, historyImage)
+                    else -> selectImage(historyImage, VariationImageType.AFTER)
+                }
+            }
+
+            beforeIndex != -1 && afterIndex != -1 -> {
+                when {
+                    clickedIndex == beforeIndex -> resetAllImages()
+                    clickedIndex == afterIndex -> resetImage(VariationImageType.AFTER)
+                    clickedIndex < beforeIndex -> resetAndSelectImage(VariationImageType.BEFORE, historyImage)
+                    clickedIndex > afterIndex -> resetAndSelectImage(VariationImageType.AFTER, historyImage)
+                    else -> resetAndSelectImage(VariationImageType.AFTER, historyImage)
+                }
+            }
         }
-
-        val typeToSelect = when {
-            currentState.beforeImage == null -> VariationImageType.BEFORE
-            currentState.afterImage == null -> VariationImageType.AFTER
-            else -> return@intent
-        }
-
-        selectImage(historyImage, typeToSelect)
     }
 
     private fun selectImage(historyImage: HistoryImage, type: VariationImageType) = intent {
@@ -106,6 +126,46 @@ class VariationViewModel @Inject constructor(
                 afterImage = if (type == VariationImageType.AFTER) null else state.afterImage,
                 imageList = state.imageList.map { image ->
                     if (image.url == imageUrlToReset) {
+                        image.copy(selectedType = null)
+                    } else {
+                        image
+                    }
+                }
+            )
+        }
+    }
+
+    private fun resetAndSelectImage(type: VariationImageType, newImage: HistoryImage) = intent {
+        val imageUrlToReset = when (type) {
+            VariationImageType.BEFORE -> state.beforeImage?.url
+            VariationImageType.AFTER -> state.afterImage?.url
+        }
+
+        reduce {
+            state.copy(
+                beforeImage = if (type == VariationImageType.BEFORE) newImage else state.beforeImage,
+                afterImage = if (type == VariationImageType.AFTER) newImage else state.afterImage,
+                imageList = state.imageList.map { image ->
+                    when (image.url) {
+                        imageUrlToReset -> image.copy(selectedType = null)
+                        newImage.url -> image.copy(selectedType = type)
+                        else -> image
+                    }
+                }
+            )
+        }
+    }
+
+    private fun resetAllImages() = intent {
+        val beforeUrl = state.beforeImage?.url
+        val afterUrl = state.afterImage?.url
+
+        reduce {
+            state.copy(
+                beforeImage = null,
+                afterImage = null,
+                imageList = state.imageList.map { image ->
+                    if (image.url == beforeUrl || image.url == afterUrl) {
                         image.copy(selectedType = null)
                     } else {
                         image
