@@ -51,9 +51,11 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -495,9 +497,7 @@ private fun TownListContent(
                     )
 
                     is TownListItem.LoadMore -> {
-                        LoadingShimmerEffect {
-                            TownListItemSkeleton()
-                        }
+                        TownListItemSkeleton()
                     }
                 }
             }
@@ -615,15 +615,17 @@ private fun RowScope.TownGrowthPlantImage(imageUrl: String) {
 }
 
 @Composable
-fun LoadingShimmerEffect(content: @Composable (Brush) -> Unit) {
-    val shimmerColors = listOf(
-        Color.LightGray.copy(alpha = 0.6f),
-        Color.LightGray.copy(alpha = 0.2f),
-        Color.LightGray.copy(alpha = 0.6f),
-    )
+fun Modifier.shimmer(): Modifier {
+    val shimmerColors = remember {
+        listOf(
+            Color.LightGray.copy(alpha = 0.6f),
+            Color.LightGray.copy(alpha = 0.2f),
+            Color.LightGray.copy(alpha = 0.6f),
+        )
+    }
 
-    val transition = rememberInfiniteTransition(label = "")
-    val translateAnim = transition.animateFloat(
+    val transition = rememberInfiniteTransition(label = "shimmer")
+    val translateAnim by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1000f,
         animationSpec = infiniteRepeatable(
@@ -632,90 +634,93 @@ fun LoadingShimmerEffect(content: @Composable (Brush) -> Unit) {
                 easing = FastOutSlowInEasing
             ),
             repeatMode = RepeatMode.Reverse
-        ), label = ""
+        ), label = "shimmer_translate"
     )
 
-    val brush = Brush.linearGradient(
-        colors = shimmerColors,
-        start = Offset.Zero,
-        end = Offset(x = translateAnim.value, y = translateAnim.value)
-    )
-
-    content(brush)
+    return this.drawWithCache {
+        val brush = Brush.linearGradient(
+            colors = shimmerColors,
+            start = Offset.Zero,
+            end = Offset(x = translateAnim, y = translateAnim)
+        )
+        onDrawBehind {
+            drawRect(brush = brush, size = size)
+        }
+    }
 }
 
 @Composable
 private fun TownListItemSkeleton() {
-    LoadingShimmerEffect { brush ->
+    val shape16 = remember { RoundedCornerShape(16.dp) }
+    val shape8 = remember { RoundedCornerShape(8.dp) }
+    val shape4 = remember { RoundedCornerShape(4.dp) }
+
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 20.dp, vertical = 8.dp)
+            .fillMaxWidth()
+            .background(color = DiaryColorsPalette.current.gray50, shape = shape16)
+            .border(width = 1.dp, color = DiaryColorsPalette.current.gray200, shape = shape16)
+            .padding(top = 16.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            SkeletonHeader(shape4)
+            Spacer(modifier = Modifier.height(12.dp))
+            SkeletonImages(shape8)
+        }
+    }
+}
+
+@Composable
+private fun SkeletonHeader(shape: Shape) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
         Box(
             modifier = Modifier
-                .padding(horizontal = 20.dp, vertical = 8.dp)
-                .fillMaxWidth()
-                .background(color = DiaryColorsPalette.current.gray50, shape = RoundedCornerShape(16.dp))
-                .border(width = 1.dp, color = DiaryColorsPalette.current.gray200, shape = RoundedCornerShape(16.dp))
-                .clip(shape = RoundedCornerShape(16.dp))
-                .padding(top = 16.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .background(brush)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .width(80.dp)
-                            .height(16.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(brush)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .width(60.dp)
-                            .height(14.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(brush)
-                    )
-                }
+                .size(24.dp)
+                .clip(CircleShape)
+                .shimmer()
+        )
+        Box(
+            modifier = Modifier
+                .width(80.dp)
+                .height(16.dp)
+                .clip(shape)
+                .shimmer()
+        )
+        Box(
+            modifier = Modifier
+                .width(60.dp)
+                .height(14.dp)
+                .clip(shape)
+                .shimmer()
+        )
+    }
+}
 
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(brush)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(brush)
-                        )
-                    }
-                }
-            }
-        }
+@Composable
+private fun SkeletonImages(shape: Shape) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .aspectRatio(1f)
+                .clip(shape)
+                .shimmer()
+        )
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .aspectRatio(1f)
+                .clip(shape)
+                .shimmer()
+        )
     }
 }
 
