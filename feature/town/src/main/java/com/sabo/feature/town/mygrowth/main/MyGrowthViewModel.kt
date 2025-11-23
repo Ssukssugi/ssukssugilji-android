@@ -39,4 +39,24 @@ class MyGrowthViewModel @Inject constructor(
             }
         )
     }
+
+    fun showGrowthDeleteDialog(growthId: Long) = intent {
+        postSideEffect(
+            MyGrowthSideEffect.ShowDeleteDialog(growthId = growthId)
+        )
+    }
+
+    fun deleteGrowth(growthId: Long) = intent {
+        reduce { state.copy(isLoading = true) }
+        townRepository.deleteGrowth(growthId = growthId).handle(
+            onSuccess = {
+                fetchGrowths()
+            },
+            onFinish = {
+                reduce {
+                    state.copy(isLoading = false)
+                }
+            }
+        )
+    }
 }

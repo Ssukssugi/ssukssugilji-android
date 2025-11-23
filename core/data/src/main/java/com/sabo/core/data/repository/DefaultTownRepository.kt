@@ -40,4 +40,11 @@ class DefaultTownRepository @Inject constructor(
         },
         transform = {}
     )
+
+    override suspend fun deleteGrowth(growthId: Long): Result<Unit> = handleResult(
+        execute = {
+            townService.deleteGrowth(growthId = growthId)
+        },
+        transform = {}
+    )
 }

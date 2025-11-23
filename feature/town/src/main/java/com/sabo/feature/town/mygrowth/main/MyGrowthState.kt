@@ -36,4 +36,6 @@ fun GetTownGrowth.GrowthContent.toPresentation(): Growth {
     )
 }
 
-sealed interface MyGrowthSideEffect
+sealed interface MyGrowthSideEffect {
+    data class ShowDeleteDialog(val growthId: Long): MyGrowthSideEffect
+}
