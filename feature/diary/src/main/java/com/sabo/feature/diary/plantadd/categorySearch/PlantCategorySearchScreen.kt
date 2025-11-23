@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -37,11 +38,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sabo.core.designsystem.component.NavigationType
+import com.sabo.core.designsystem.component.SsukssukTopAppBar
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
-import com.sabo.core.designsystem.component.NavigationType
-import com.sabo.core.designsystem.component.SsukssukTopAppBar
 
 @Composable
 internal fun PlantCategorySearchScreen(
@@ -131,14 +132,14 @@ private fun PlantCategorySearchContent(
                             .fillMaxWidth()
                             .padding(vertical = 16.dp)
                     ) {
+                        innerTextField()
+
                         if (state.textFieldState.text.isEmpty()) {
                             Text(
                                 text = "예) 몬스테라, 방울토마토, 스위트바질",
                                 style = DiaryTypography.bodyMediumSemiBold,
                                 color = DiaryColorsPalette.current.gray400
                             )
-                        } else {
-                            innerTextField()
                         }
                     }
                     Box(
@@ -158,6 +159,10 @@ private fun PlantCategorySearchContent(
             keyword = state.textFieldState.text.toString(),
             results = state.searchResult,
             onClickCategory = onClickCategory
+        )
+
+        CompleteButton(
+            onClick = { onClickCategory(state.textFieldState.text.toString()) }
         )
     }
 }
@@ -204,6 +209,27 @@ private fun ColumnScope.SearchResultListContent(
                 maxLines = 1,
             )
         }
+    }
+}
+
+@Composable
+private fun CompleteButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = DiaryColorsPalette.current.green500)
+            .clickable { onClick() }
+            .padding(vertical = 14.dp)
+    ) {
+        Text(
+            text = "확인",
+            style = DiaryTypography.subtitleMediumBold,
+            color = DiaryColorsPalette.current.gray50,
+            modifier = modifier.align(Alignment.Center)
+        )
     }
 }
 
