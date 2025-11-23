@@ -1,4 +1,4 @@
-package com.sabo.feature.home.component
+package com.sabo.core.designsystem.toolkit
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode

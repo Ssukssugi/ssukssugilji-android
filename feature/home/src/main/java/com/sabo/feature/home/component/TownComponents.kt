@@ -44,6 +44,7 @@ import coil3.compose.AsyncImage
 import com.sabo.core.designsystem.R
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
+import com.sabo.core.designsystem.toolkit.shimmer
 import com.sabo.feature.home.TownContent
 import com.sabo.feature.home.TownListItem
 import kotlinx.coroutines.flow.distinctUntilChanged
