@@ -52,7 +52,7 @@ class PlantCategorySearchViewModel @AssistedInject constructor(
         diaryRepository.getPlantCategories(keyword).handle(
             onSuccess = { response ->
                 _state.value = _state.value.copy(
-                    searchResult = response
+                    searchResult = response.map { PlantResult(imageUrl = it.imageUrl, category = it.name) }
                 )
             },
             onError = {

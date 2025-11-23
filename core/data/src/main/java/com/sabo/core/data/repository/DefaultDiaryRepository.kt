@@ -9,6 +9,7 @@ import com.sabo.core.network.model.request.SaveNewDiaryRequest
 import com.sabo.core.network.model.request.SaveNewPlantRequest
 import com.sabo.core.network.model.request.UpdateDiaryRequest
 import com.sabo.core.network.model.response.GetMyPlant
+import com.sabo.core.network.model.response.GetPlantCategories
 import com.sabo.core.network.model.response.GetPlantDiaries
 import com.sabo.core.network.model.response.GetPlantProfile
 import com.sabo.core.network.model.response.SaveNewPlant
@@ -78,11 +79,11 @@ class DefaultDiaryRepository @Inject constructor(
         transform = {}
     )
 
-    override suspend fun getPlantCategories(keyword: String): Result<List<String>> = handleResult(
+    override suspend fun getPlantCategories(keyword: String): Result<List<GetPlantCategories>> = handleResult(
         execute = {
             diaryService.getPlantCategories(keyword)
         },
-        transform = { it.map { model ->  model.name } }
+        transform = { it }
     )
 
     override suspend fun getMyPlants(includeDiaryCount: Boolean): Result<List<GetMyPlant.Plant>> = handleResult(
