@@ -63,7 +63,6 @@ import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
 import com.sabo.core.navigator.model.DiaryEdit
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 import java.time.LocalDate
@@ -114,11 +113,9 @@ internal fun DiaryDetailScreen(
     }
 
     LaunchedEffect(lazyRowState, state.selectedDiaryIndex) {
-        snapshotFlow { lazyRowState.isScrollInProgress }
+        snapshotFlow { lazyRowState.layoutInfo }
             .distinctUntilChanged()
-            .filter { !it }
-            .collect {
-                val layoutInfo = lazyRowState.layoutInfo
+            .collect { layoutInfo ->
                 val screenCenter = layoutInfo.viewportSize.width / 2f
                 val contentPaddingPx = layoutInfo.beforeContentPadding
 
