@@ -584,20 +584,18 @@ private fun AddButton(
 ) {
     Box(
         modifier = modifier
-            .padding(horizontal = 20.dp, vertical = 16.dp)
             .fillMaxWidth()
             .background(
-                color = if (isEnabled) DiaryColorsPalette.current.green500 else DiaryColorsPalette.current.green100,
-                shape = RoundedCornerShape(16.dp)
+                color = if (isEnabled) DiaryColorsPalette.current.green500 else DiaryColorsPalette.current.green100
             )
             .clickable(
                 enabled = isEnabled
             ) { onclick() }
-            .padding(vertical = 16.dp)
+            .padding(vertical = 14.dp)
     ) {
         Text(
             text = when (mode) {
-                PlantAddState.Input.Mode.Add -> "추가하기"
+                PlantAddState.Input.Mode.Add -> "확인"
                 is PlantAddState.Input.Mode.Edit -> "수정 완료"
             },
             style = DiaryTypography.subtitleMediumBold,
