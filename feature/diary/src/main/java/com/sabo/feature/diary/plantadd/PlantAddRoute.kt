@@ -46,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -178,9 +179,10 @@ private fun ColumnScope.PlantInfoInputScreen(
                 }
 
                 AsyncImage(
-                    model = R.drawable.icon_insert_photo_32,
+                    model = R.drawable.img_add_plant,
                     contentDescription = null,
-                    modifier = modifier.size(40.dp)
+                    modifier = modifier.size(80.dp),
+                    contentScale = ContentScale.Inside
                 )
             }
 
