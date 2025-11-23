@@ -57,8 +57,14 @@ internal fun PlantOptionsModalBottomSheet(
         plant?.let {
             PlantOptionsBottomSheet(
                 plant = it,
-                onEditClick = onEditClick,
-                onDeleteClick = onDeleteClick
+                onEditClick = {
+                    onDismissRequest()
+                    onEditClick()
+                },
+                onDeleteClick = {
+                    onDismissRequest()
+                    onDeleteClick()
+                }
             )
         }
     }
