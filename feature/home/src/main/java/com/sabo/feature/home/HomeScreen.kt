@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -230,11 +229,6 @@ private fun HomeContent(
                 onClickPlant = onClickOtherPlant,
                 onClickAddPlant = navigateToPlantAdd,
                 onClickTown = onClickTown
-            )
-            HorizontalDivider(
-                modifier = Modifier.fillMaxWidth(),
-                color = DiaryColorsPalette.current.gray500,
-                thickness = 1.dp
             )
 
             when (content) {

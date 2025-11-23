@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -46,46 +47,64 @@ internal fun PlantStory(
     onClickAddPlant: () -> Unit = {},
     onClickTown: () -> Unit = {}
 ) {
-    LazyRow(
-        state = scrollState,
-        modifier = Modifier
-            .fillMaxWidth(),
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 14.dp),
-        horizontalArrangement = Arrangement.spacedBy(9.dp)
+    Box(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        item {
-            TownButton(
-                isSelected = isTownSelected,
-                onClickTown = onClickTown
-            )
-        }
+        LazyRow(
+            state = scrollState,
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 14.dp),
+            horizontalArrangement = Arrangement.spacedBy(9.dp)
+        ) {
+            item {
+                TownButton(
+                    isSelected = isTownSelected,
+                    onClickTown = onClickTown
+                )
+            }
 
-        item {
-            Spacer(modifier = Modifier.width(4.dp))
-            Box(
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .width(1.dp)
-                    .height(40.dp)
-                    .background(color = DiaryColorsPalette.current.gray400)
-            )
-            Spacer(modifier = Modifier.width(9.dp))
-        }
+            item {
+                Spacer(modifier = Modifier.width(4.dp))
+                Box(
+                    modifier = Modifier
+                        .padding(top = 6.dp)
+                        .width(1.dp)
+                        .height(40.dp)
+                        .background(color = DiaryColorsPalette.current.gray400)
+                )
+                Spacer(modifier = Modifier.width(9.dp))
+            }
 
-        items(
-            items = plantList,
-            key = {
+            items(
+                items = plantList,
+                key = {
+                    when (it) {
+                        PlantListItem.AddPlant -> it.javaClass.name
+                        is PlantListItem.Plant -> it.id
+                    }
+                }
+            ) {
                 when (it) {
-                    PlantListItem.AddPlant -> it.javaClass.name
-                    is PlantListItem.Plant -> it.id
+                    PlantListItem.AddPlant -> AddPlantItem(onClickItem = onClickAddPlant)
+                    is PlantListItem.Plant -> PlantStoryItem(data = it, onClickItem = onClickPlant)
                 }
             }
-        ) {
-            when (it) {
-                PlantListItem.AddPlant -> AddPlantItem(onClickItem = onClickAddPlant)
-                is PlantListItem.Plant -> PlantStoryItem(data = it, onClickItem = onClickPlant)
-            }
         }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .align(Alignment.BottomCenter)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Black.copy(alpha = 0.1f),
+                            Color.Transparent
+                        )
+                    )
+                )
+        )
     }
 }
 
