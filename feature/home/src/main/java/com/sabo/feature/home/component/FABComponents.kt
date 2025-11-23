@@ -33,7 +33,7 @@ internal fun BoxScope.WriteDiaryFAB(
             .align(Alignment.BottomCenter)
             .padding(bottom = 16.dp)
             .height(56.dp)
-            .background(Color(0xFF00BA55).copy(alpha = 0.88f), CircleShape)
+            .background(Color(0xFF00BA55), CircleShape)
             .clip(CircleShape)
             .clickable {
                 if (anyPlants) {
