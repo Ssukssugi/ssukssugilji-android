@@ -11,6 +11,7 @@ import com.sabo.core.network.model.request.UpdateDiaryRequest
 import com.sabo.core.network.model.response.GetMyPlant
 import com.sabo.core.network.model.response.GetPlantDiaries
 import com.sabo.core.network.model.response.GetPlantProfile
+import com.sabo.core.network.model.response.SaveNewPlant
 import com.sabo.core.network.service.DiaryService
 import com.sabo.core.network.util.MultipartUtil
 import java.time.LocalDate
@@ -26,7 +27,7 @@ class DefaultDiaryRepository @Inject constructor(
         category: String,
         shine: Int,
         place: PlantEnvironmentPlace
-    ): Result<Unit> = handleResult(
+    ): Result<SaveNewPlant> = handleResult(
         execute = {
             val request = SaveNewPlantRequest(
                 name = name,
@@ -45,7 +46,7 @@ class DefaultDiaryRepository @Inject constructor(
             )
             diaryService.saveNewPlant(request)
         },
-        transform = {}
+        transform = { it }
     )
 
     override suspend fun updatePlant(plantId: Long, name: String, category: String, shine: Int, place: PlantEnvironmentPlace): Result<Unit> = handleResult(

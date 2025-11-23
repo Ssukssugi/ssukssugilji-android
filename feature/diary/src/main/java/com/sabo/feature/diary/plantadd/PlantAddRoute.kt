@@ -71,7 +71,7 @@ internal fun PlantAddRoute(
     onClickBack: () -> Unit = {},
     onClickCategory: (String) -> Unit = {},
     onClickHome: () -> Unit = {},
-    onClickDiary: () -> Unit = {},
+    onClickDiary: (Long) -> Unit = {},
     navigateToHomeAfterPlantUpdated: () -> Unit = {}
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
@@ -115,8 +115,9 @@ internal fun PlantAddRoute(
                 )
             }
 
-            PlantAddState.SaveSuccess -> {
+            is PlantAddState.SaveSuccess -> {
                 SaveSuccessContent(
+                    plantId = state.plantId,
                     onClickHome = onClickHome,
                     onClickDiary = onClickDiary
                 )
@@ -607,8 +608,9 @@ private fun AddButton(
 
 @Composable
 private fun SaveSuccessContent(
+    plantId: Long,
     onClickHome: () -> Unit = {},
-    onClickDiary: () -> Unit = {}
+    onClickDiary: (Long) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -658,7 +660,7 @@ private fun SaveSuccessContent(
                     shape = RoundedCornerShape(16.dp)
                 )
                 .clip(RoundedCornerShape(16.dp))
-                .clickable { onClickDiary() }
+                .clickable { onClickDiary(plantId) }
                 .padding(vertical = 16.dp)
         ) {
             Text(
@@ -696,6 +698,6 @@ private fun PlantInfoInputScreenPreview() {
 @Composable
 private fun SaveSuccessContentPreview() {
     SsukssukDiaryTheme {
-        SaveSuccessContent()
+        SaveSuccessContent(plantId = -1L)
     }
 }

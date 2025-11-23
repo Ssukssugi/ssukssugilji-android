@@ -7,10 +7,11 @@ import com.sabo.core.network.model.response.GetMyPlant
 import com.sabo.core.network.model.response.GetPlantDiaries
 import com.sabo.core.network.model.response.GetPlantProfile
 import com.sabo.core.network.model.response.SaveNewDiary
+import com.sabo.core.network.model.response.SaveNewPlant
 import java.time.LocalDate
 
 interface DiaryRepository {
-    suspend fun saveNewPlant(name: String, category: String, shine: Int, place: PlantEnvironmentPlace): Result<Unit>
+    suspend fun saveNewPlant(name: String, category: String, shine: Int, place: PlantEnvironmentPlace): Result<SaveNewPlant>
 
     suspend fun updatePlant(plantId: Long, name: String, category: String, shine: Int, place: PlantEnvironmentPlace): Result<Unit>
 

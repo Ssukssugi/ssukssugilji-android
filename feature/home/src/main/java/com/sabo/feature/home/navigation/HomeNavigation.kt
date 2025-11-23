@@ -20,7 +20,7 @@ fun NavController.navigateToHome(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.homeNavGraph(
-    navigateToGallery: () -> Unit,
+    navigateToGallery: (Long) -> Unit,
     navigateToPlantAdd: () -> Unit,
     navigateToProfile: () -> Unit,
     navigateToDiaryDetail: (Long, Long) -> Unit,

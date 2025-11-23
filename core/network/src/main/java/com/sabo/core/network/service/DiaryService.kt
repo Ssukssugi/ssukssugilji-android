@@ -6,6 +6,7 @@ import com.sabo.core.network.model.response.GetPlantCategories
 import com.sabo.core.network.model.response.GetPlantDiaries
 import com.sabo.core.network.model.response.GetPlantProfile
 import com.sabo.core.network.model.response.SaveNewDiary
+import com.sabo.core.network.model.response.SaveNewPlant
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -23,7 +24,7 @@ interface DiaryService {
     @POST("/api/v1/plants")
     suspend fun saveNewPlant(
         @Body request: SaveNewPlantRequest
-    ): Response<Unit>
+    ): Response<SaveNewPlant>
 
     @PUT("/api/v1/plants")
     suspend fun updatePlant(

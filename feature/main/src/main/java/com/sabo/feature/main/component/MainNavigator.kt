@@ -76,12 +76,12 @@ class MainNavigator(
         navController.navigateToCategorySearch(keyword)
     }
 
-    fun navigateToGallery(navOption: NavOptions? = null) {
-        navController.navigateToGallery(navOptions = navOption)
+    fun navigateToGallery(plantId: Long, navOption: NavOptions? = null) {
+        navController.navigateToGallery(plantId = plantId, navOptions = navOption)
     }
 
-    fun navigateToDiaryWrite(imageUri: Uri) {
-        navController.navigateToDiaryWrite(imageUri = imageUri)
+    fun navigateToDiaryWrite(plantId: Long, imageUri: Uri) {
+        navController.navigateToDiaryWrite(plantId = plantId, imageUri = imageUri)
     }
 
     fun navigateToDiaryDetail(plantId: Long, diaryId: Long, navOption: NavOptions? = null) {

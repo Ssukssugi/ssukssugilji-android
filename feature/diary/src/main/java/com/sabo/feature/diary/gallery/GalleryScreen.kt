@@ -56,8 +56,9 @@ import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
 internal fun GalleryScreen(
     modifier: Modifier = Modifier,
     viewModel: GalleryViewModel = hiltViewModel(),
+    plantId: Long,
     onClickBack: () -> Unit = {},
-    onClickNext: (Uri) -> Unit = {}
+    onClickNext: (Long, Uri) -> Unit = { _, _ -> }
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
@@ -120,7 +121,9 @@ internal fun GalleryScreen(
 
         if (uiState.selectedImageUri != null) {
             NextButton(modifier) {
-                uiState.selectedImageUri?.let { onClickNext(it) }
+                uiState.selectedImageUri?.let {
+                    onClickNext(plantId, it)
+                }
             }
         }
     }

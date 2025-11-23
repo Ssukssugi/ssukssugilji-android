@@ -29,7 +29,7 @@ fun NavController.navigateToPlantEdit(route: PlantAddEdit.PlantEdit) {
 fun NavGraphBuilder.plantAddNavGraph(
     onClickCategory: (String) -> Unit,
     onClickHome: () -> Unit,
-    onClickDiary: () -> Unit,
+    onClickDiary: (Long) -> Unit,
     onClickBack: () -> Unit,
     navigateToHome: () -> Unit
 ) {

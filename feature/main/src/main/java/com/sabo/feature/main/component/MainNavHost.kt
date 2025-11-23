@@ -90,6 +90,7 @@ internal fun MainNavHost(
                 onClickHome = navigator::navigateToHome,
                 onClickDiary = {
                     navigator.navigateToGallery(
+                        plantId = it,
                         navOption = navOptions {
                             popUpTo<Home> {
                                 inclusive = false

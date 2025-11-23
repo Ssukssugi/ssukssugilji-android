@@ -49,7 +49,7 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
-    navigateToGallery: () -> Unit,
+    navigateToGallery: (Long) -> Unit,
     navigateToPlantAdd: () -> Unit,
     navigateToProfile: () -> Unit,
     navigateToDiaryDetail: (Long, Long) -> Unit,
@@ -180,7 +180,7 @@ private fun HomeContent(
     modifier: Modifier = Modifier,
     plantList: List<PlantListItem>,
     content: HomeContent,
-    navigateToGallery: () -> Unit = {},
+    navigateToGallery: (Long) -> Unit = {},
     navigateToPlantAdd: () -> Unit = {},
     navigateToProfile: () -> Unit = {},
     onClickDiaryDetail: (Long) -> Unit = {},
@@ -263,7 +263,12 @@ private fun HomeContent(
             WriteDiaryFAB(
                 modifier = modifier,
                 anyPlants = plantList.filterIsInstance<PlantListItem.Plant>().isNotEmpty(),
-                navigateToGallery = navigateToGallery,
+                navigateToGallery = {
+                    plantList
+                        .filterIsInstance<PlantListItem.Plant>()
+                        .find { it.isSelected }
+                        ?.let { navigateToGallery(it.id) }
+                },
                 navigateToAddPlant = navigateToPlantAdd
             )
         }

@@ -123,7 +123,7 @@ class PlantAddViewModel @Inject constructor(
                 }
             ).handle(
                 onSuccess = {
-                    _state.value = PlantAddState.SaveSuccess
+                    _state.value = PlantAddState.SaveSuccess(it.plantId)
                 },
                 onError = {
 

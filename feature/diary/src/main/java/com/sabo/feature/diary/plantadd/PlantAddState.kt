@@ -17,7 +17,7 @@ sealed interface PlantAddState {
         }
     }
 
-    data object SaveSuccess : PlantAddState
+    data class SaveSuccess(val plantId: Long) : PlantAddState
 }
 
 sealed interface PlantAddSideEffect {

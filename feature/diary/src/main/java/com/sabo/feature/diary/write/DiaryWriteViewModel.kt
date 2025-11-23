@@ -36,6 +36,8 @@ class DiaryWriteViewModel @Inject constructor(
 
     private val isEditMode = editRoute != null
     private val diaryId = editRoute?.diaryId
+
+    private val initialPlantId: Long? = editRoute?.plantId ?: writeRoute?.plantId
     private val initialImageUri = editRoute?.imageUri ?: writeRoute?.imageUri ?: ""
 
     override val container: Container<DiaryWriteUiState, DiaryWriteSideEffect> = container(
@@ -62,7 +64,7 @@ class DiaryWriteViewModel @Inject constructor(
             )
             else -> DiaryWriteUiState(isLoading = true)
         },
-        onCreate = { loadPlants(editRoute?.plantId) }
+        onCreate = { loadPlants(initialPlantId) }
     )
 
     val isSaveEnabled = container.stateFlow
