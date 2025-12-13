@@ -41,11 +41,9 @@ import com.sabo.feature.home.PlantListItem
 @Composable
 internal fun PlantStory(
     plantList: List<PlantListItem>,
-    isTownSelected: Boolean = false,
     scrollState: LazyListState = rememberLazyListState(),
     onClickPlant: (Long) -> Unit = {},
-    onClickAddPlant: () -> Unit = {},
-    onClickTown: () -> Unit = {}
+    onClickAddPlant: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier.fillMaxWidth()
@@ -57,25 +55,6 @@ internal fun PlantStory(
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 14.dp),
             horizontalArrangement = Arrangement.spacedBy(9.dp)
         ) {
-            item {
-                TownButton(
-                    isSelected = isTownSelected,
-                    onClickTown = onClickTown
-                )
-            }
-
-            item {
-                Spacer(modifier = Modifier.width(4.dp))
-                Box(
-                    modifier = Modifier
-                        .padding(top = 6.dp)
-                        .width(1.dp)
-                        .height(40.dp)
-                        .background(color = DiaryColorsPalette.current.gray400)
-                )
-                Spacer(modifier = Modifier.width(9.dp))
-            }
-
             items(
                 items = plantList,
                 key = {

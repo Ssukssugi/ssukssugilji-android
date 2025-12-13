@@ -43,7 +43,6 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 @Composable
 internal fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
-    onClickBack: () -> Unit = {},
     onClickSetting: () -> Unit = {},
     onClickFAQ: () -> Unit = {},
     onClickPolicy: () -> Unit = {},
@@ -56,7 +55,7 @@ internal fun ProfileScreen(
     viewModel.collectSideEffect {
         when (it) {
             ProfileEvent.ProfileUpdated -> {
-                snackBarState = snackBarState.copy(isVisible =  false)
+                snackBarState = snackBarState.copy(isVisible = false)
                 snackBarState = snackBarState.copy(
                     message = "수정이 완료되었습니다!",
                     iconRes = R.drawable.icon_circle_check,
@@ -72,7 +71,6 @@ internal fun ProfileScreen(
             .background(Color.White)
     ) {
         TopAppBar(
-            onClickBack = onClickBack,
             onClickSetting = onClickSetting
         )
         ProfileContent(
@@ -104,26 +102,25 @@ internal fun ProfileScreen(
 
 @Composable
 private fun TopAppBar(
-    onClickBack: () -> Unit = {},
     onClickSetting: () -> Unit = {}
 ) {
-    SsukssukTopAppBar(
-        navigationType = NavigationType.BACK,
-        containerColor = Color.White,
-        onNavigationClick = onClickBack
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(horizontal = 20.dp, vertical = 9.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "쑥쑥집사 프로필",
+            text = "나의 집사 프로필",
             color = DiaryColorsPalette.current.gray900,
-            style = DiaryTypography.bodySmallBold,
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Center
+            style = DiaryTypography.subtitleLargeBold,
+            modifier = Modifier.weight(1f, fill = true)
         )
         Icon(
             imageVector = ImageVector.vectorResource(id = R.drawable.icon_settings),
             contentDescription = null,
             modifier = Modifier
-                .padding(end = 20.dp)
                 .size(24.dp)
                 .clip(CircleShape)
                 .clickable { onClickSetting() }
@@ -144,12 +141,14 @@ private fun ProfileContent(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            painter = painterResource(id = R.drawable.img_logo_cat),
+            painter = painterResource(id = R.drawable.img_profile_default),
             contentDescription = null,
             modifier = Modifier
                 .size(64.dp)
-                .background(color = Color.White, shape = CircleShape)
+                .background(color = DiaryColorsPalette.current.gray200, shape = CircleShape)
+                .padding(vertical = 14.dp)
         )
+
         Spacer(modifier = Modifier.width(16.dp))
         Text(
             text = name,

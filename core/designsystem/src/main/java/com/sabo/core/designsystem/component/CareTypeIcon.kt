@@ -6,7 +6,7 @@ import com.sabo.core.model.CareType
 
 enum class CareTypeIcon(
     val type: CareType,
-    @DrawableRes val iconRes: Int
+    @param:DrawableRes val iconRes: Int
 ) {
     WATER(
         CareType.WATER,

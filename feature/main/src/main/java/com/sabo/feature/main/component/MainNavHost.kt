@@ -12,7 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
 import com.sabo.core.designsystem.R
 import com.sabo.core.designsystem.component.SnackBarState
-import com.sabo.core.navigator.model.Home
+import com.sabo.core.navigator.model.Diary
 import com.sabo.core.navigator.model.Login
 import com.sabo.core.navigator.model.WebLink
 import com.sabo.feature.diary.detail.navigation.diaryDetailScreen
@@ -23,6 +23,7 @@ import com.sabo.feature.diary.plantadd.navigation.plantAddNavGraph
 import com.sabo.feature.diary.write.navigation.diaryWriteScreen
 import com.sabo.feature.home.navigation.homeNavGraph
 import com.sabo.feature.login.loginNavGraph
+import com.sabo.feature.town.townScreen
 import com.sabo.feature.profile.navigation.changeProfileNavGraph
 import com.sabo.feature.profile.navigation.policyNavGraph
 import com.sabo.feature.profile.navigation.popBackStackWithResultProfileUpdated
@@ -40,7 +41,8 @@ internal fun MainNavHost(
     modifier: Modifier = Modifier,
     navigator: MainNavigator,
     padding: PaddingValues,
-    onShowSuccessSnackBar: (SnackBarState) -> Unit
+    onShowSuccessSnackBar: (SnackBarState) -> Unit,
+    onSelectedPlantIdChange: (Long?) -> Unit = {}
 ) {
     Box(
         modifier = modifier
@@ -80,10 +82,14 @@ internal fun MainNavHost(
             homeNavGraph(
                 navigateToGallery = navigator::navigateToGallery,
                 navigateToPlantAdd = navigator::navigateToPlantAdd,
-                navigateToProfile = navigator::navigateToProfile,
                 navigateToDiaryDetail = navigator::navigateToDiaryDetail,
                 navigateToPlantEdit = navigator::navigateToPlantEdit,
-                navigateToMyGrowths = navigator::navigateToMyGrowths
+                navigateToTownWrite = navigator::navigateToSelectGrowthPlant,
+                onSelectedPlantIdChange = onSelectedPlantIdChange,
+            )
+            townScreen(
+                navigateToMyGrowths = navigator::navigateToMyGrowths,
+                navigateToDiaryWrite = navigator::navigateToPlantAdd,
             )
             plantAddNavGraph(
                 onClickCategory = navigator::navigateToCategorySearch,
@@ -92,7 +98,7 @@ internal fun MainNavHost(
                     navigator.navigateToGallery(
                         plantId = it,
                         navOption = navOptions {
-                            popUpTo<Home> {
+                            popUpTo<Diary> {
                                 inclusive = false
                             }
                         }
@@ -117,7 +123,7 @@ internal fun MainNavHost(
                         plantId = it,
                         diaryId = -1L,
                         navOption = navOptions {
-                            popUpTo<Home> {
+                            popUpTo<Diary> {
                                 inclusive = false
                             }
                         }
@@ -141,9 +147,9 @@ internal fun MainNavHost(
                 onClickBack = navigator::popBackStack,
                 onNavigateToHomeWithSuccess = {
                     navigator.navController.navigate(
-                        route = Home,
+                        route = Diary,
                         navOptions = navOptions {
-                            popUpTo(Home) {
+                            popUpTo(Diary) {
                                 inclusive = true
                             }
                         }
@@ -157,7 +163,6 @@ internal fun MainNavHost(
                 }
             )
             profileNavGraph(
-                onClickBack = navigator::popBackStack,
                 onClickSetting = navigator::navigateToSettings,
                 onClickFAQ = { navigator.navigateToWebLink(WebLink.Link.QNA) },
                 onClickPolicy = navigator::navigateToPolicy,

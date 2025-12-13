@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class AuthDataStore @Inject constructor(
-    @AuthDataStore private val dataStore: DataStore<Preferences>
+    @param:AuthDataStore private val dataStore: DataStore<Preferences>
 ) {
     object PreferencesKey {
         val ACCESS_TOKEN = stringPreferencesKey("ACCESS_TOKEN")

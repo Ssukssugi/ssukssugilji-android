@@ -8,28 +8,28 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.sabo.core.navigator.model.Home
+import com.sabo.core.navigator.model.Diary
 import com.sabo.core.navigator.model.PlantAddEdit
-import com.sabo.core.navigator.toolkit.zoomIn
-import com.sabo.core.navigator.toolkit.zoomOut
+import com.sabo.core.navigator.toolkit.tabFadeIn
+import com.sabo.core.navigator.toolkit.tabFadeOut
 import com.sabo.feature.home.HomeScreen
 import com.sabo.feature.home.HomeViewModel
 
 fun NavController.navigateToHome(navOptions: NavOptions) {
-    this.navigate(Home, navOptions)
+    this.navigate(Diary, navOptions)
 }
 
 fun NavGraphBuilder.homeNavGraph(
     navigateToGallery: (Long) -> Unit,
     navigateToPlantAdd: () -> Unit,
-    navigateToProfile: () -> Unit,
     navigateToDiaryDetail: (Long, Long) -> Unit,
     navigateToPlantEdit: (PlantAddEdit.PlantEdit) -> Unit,
-    navigateToMyGrowths: () -> Unit
+    navigateToTownWrite: () -> Unit,
+    onSelectedPlantIdChange: (Long?) -> Unit = {},
 ) {
-    composable<Home>(
-        popEnterTransition = zoomIn(),
-        exitTransition = zoomOut()
+    composable<Diary>(
+        enterTransition = tabFadeIn(),
+        exitTransition = tabFadeOut()
     ) { entry ->
         val viewModel: HomeViewModel = hiltViewModel<HomeViewModel>()
 
@@ -48,10 +48,10 @@ fun NavGraphBuilder.homeNavGraph(
             viewModel = viewModel,
             navigateToGallery = navigateToGallery,
             navigateToPlantAdd = navigateToPlantAdd,
-            navigateToProfile = navigateToProfile,
             navigateToDiaryDetail = navigateToDiaryDetail,
             navigateToPlantEdit = navigateToPlantEdit,
-            navigateToMyGrowths = navigateToMyGrowths
+            navigateToTownWrite = navigateToTownWrite,
+            onSelectedPlantIdChange = onSelectedPlantIdChange,
         )
     }
 }

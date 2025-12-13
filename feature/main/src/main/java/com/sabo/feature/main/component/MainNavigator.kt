@@ -9,7 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.sabo.core.navigator.model.DiaryEdit
 import com.sabo.core.navigator.model.GrowthVariation
-import com.sabo.core.navigator.model.Home
+import com.sabo.core.navigator.model.Diary
 import com.sabo.core.navigator.model.Login
 import com.sabo.core.navigator.model.PlantAddEdit
 import com.sabo.core.navigator.model.WebLink
@@ -22,6 +22,7 @@ import com.sabo.feature.diary.write.navigation.navigateToDiaryEdit
 import com.sabo.feature.diary.write.navigation.navigateToDiaryWrite
 import com.sabo.feature.home.navigation.navigateToHome
 import com.sabo.feature.profile.navigation.navigateToChangeProfile
+import com.sabo.feature.town.navigateToTown
 import com.sabo.feature.profile.navigation.navigateToPolicy
 import com.sabo.feature.profile.navigation.navigateToProfile
 import com.sabo.feature.profile.navigation.navigateToSettings
@@ -55,13 +56,17 @@ class MainNavigator(
 
     fun navigateToHome(
         navOptions: NavOptions = navOptions {
-            popUpTo<Home> {
+            popUpTo<Diary> {
                 inclusive = true
             }
             launchSingleTop = true
         }
     ) {
         navController.navigateToHome(navOptions = navOptions)
+    }
+
+    fun navigateToTown(navOptions: NavOptions? = null) {
+        navController.navigateToTown(navOptions = navOptions)
     }
 
     fun navigateToPlantAdd() {

@@ -2,6 +2,7 @@ package com.sabo.convention
 
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -50,6 +51,11 @@ internal fun Project.configureKotlinAndroid() {
             resources {
                 excludes += "/META-INF/{AL2.0,LGPL2.1}"
             }
+        }
+
+        val libs = extensions.libs
+        dependencies {
+            implementation(libs.findLibrary("kotlinx.serialization.core").get())
         }
     }
 }

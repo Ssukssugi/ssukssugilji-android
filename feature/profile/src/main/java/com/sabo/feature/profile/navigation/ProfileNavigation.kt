@@ -15,6 +15,8 @@ import com.sabo.core.navigator.model.UserDelete
 import com.sabo.core.navigator.model.WebLink
 import com.sabo.core.navigator.toolkit.slideInFromEnd
 import com.sabo.core.navigator.toolkit.slideOutToEnd
+import com.sabo.core.navigator.toolkit.tabFadeIn
+import com.sabo.core.navigator.toolkit.tabFadeOut
 import com.sabo.core.navigator.toolkit.zoomIn
 import com.sabo.core.navigator.toolkit.zoomOut
 import com.sabo.feature.profile.ProfileScreen
@@ -37,17 +39,14 @@ fun NavController.navigateToUserDelete() {
 }
 
 fun NavGraphBuilder.profileNavGraph(
-    onClickBack: () -> Unit,
     onClickSetting: () -> Unit,
     onClickFAQ: () -> Unit,
     onClickPolicy: () -> Unit,
     onClickProfile: (String) -> Unit
 ) {
     composable<Profile>(
-        enterTransition = slideInFromEnd(),
-        exitTransition = zoomOut(),
-        popEnterTransition = zoomIn(),
-        popExitTransition = slideOutToEnd()
+        enterTransition = tabFadeIn(),
+        exitTransition = tabFadeOut()
     ) { backStackEntry ->
         val viewModel: ProfileViewModel = hiltViewModel()
 
@@ -60,7 +59,6 @@ fun NavGraphBuilder.profileNavGraph(
         }
 
         ProfileScreen(
-            onClickBack = onClickBack,
             onClickSetting = onClickSetting,
             onClickFAQ = onClickFAQ,
             onClickPolicy = onClickPolicy,

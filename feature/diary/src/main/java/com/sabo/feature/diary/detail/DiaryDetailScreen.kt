@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -86,7 +87,7 @@ internal fun DiaryDetailScreen(
             DiaryDetailUiEvent.ShowDeleteDiarySnackBar -> {
                 snackBarState = snackBarState.copy(isVisible = false)
                 snackBarState = snackBarState.copy(
-                    message = "삭제가 완료되었습니!",
+                    message = "삭제가 완료되었습니다!",
                     iconRes = R.drawable.icon_circle_check,
                     isVisible = true
                 )
@@ -307,6 +308,7 @@ private fun DiaryDetailContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .clip(RectangleShape)
                 .background(Color.White)
                 .padding(padding)
         ) {

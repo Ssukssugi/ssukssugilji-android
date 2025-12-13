@@ -12,7 +12,10 @@ data object Login : RouteModel
 data object SignUp : RouteModel
 
 @Serializable
-data object Home : RouteModel
+data object Diary : RouteModel
+
+@Serializable
+data object Town : RouteModel
 
 @Serializable
 sealed interface PlantAddEdit : RouteModel {

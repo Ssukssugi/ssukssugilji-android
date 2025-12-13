@@ -27,7 +27,7 @@ data class GetTownGrowth(
         val name: String,
         val plantCategory: String,
         val plantImage: String,
-        val shine: Int,
+        val shine: Int = 0,
         val place: PlantEnvironmentPlace = PlantEnvironmentPlace.ETC
     )
 

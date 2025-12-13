@@ -1,4 +1,4 @@
-package com.sabo.feature.home.component
+package com.sabo.feature.town.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -45,8 +45,8 @@ import com.sabo.core.designsystem.R
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.toolkit.shimmer
-import com.sabo.feature.home.TownContent
-import com.sabo.feature.home.TownListItem
+import com.sabo.feature.town.TownContent
+import com.sabo.feature.town.TownListItem
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
@@ -82,10 +82,20 @@ internal fun TownListContent(
         isLoadingMore = false
     }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(horizontal = 20.dp, vertical = 9.dp),
+            text = "쑥쑥자랑",
+            color = DiaryColorsPalette.current.gray900,
+            style = DiaryTypography.subtitleLargeBold,
+        )
+
         LazyColumn(
             state = listState,
             modifier = Modifier

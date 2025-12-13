@@ -88,3 +88,21 @@ fun slideOutToBottom(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> E
         )
     )
 }
+
+fun tabFadeIn(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> EnterTransition = {
+    fadeIn(
+        animationSpec = tween(
+            durationMillis = 200,
+            easing = FastOutSlowInEasing
+        )
+    )
+}
+
+fun tabFadeOut(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> ExitTransition = {
+    fadeOut(
+        animationSpec = tween(
+            durationMillis = 200,
+            easing = FastOutSlowInEasing
+        )
+    )
+}
