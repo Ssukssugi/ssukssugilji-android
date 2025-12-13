@@ -137,7 +137,7 @@ private fun MainScreenContent(
                                 MainFAB(
                                     modifier = Modifier
                                         .align(Alignment.BottomEnd)
-                                        .padding(bottom = 80.dp, end = 16.dp),
+                                        .padding(bottom = 80.dp),
                                     isExpanded = isFabExpanded,
                                     onExpandedChange = { isFabExpanded = it },
                                     onTownWriteClick = navigator::navigateToSelectGrowthPlant,
