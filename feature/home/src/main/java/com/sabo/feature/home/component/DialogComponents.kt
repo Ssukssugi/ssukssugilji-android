@@ -64,7 +64,7 @@ internal fun PlantDeleteDialog(
                     .padding(top = 24.dp, bottom = 8.dp)
             )
             Text(
-                text = "삭제시 등록한 식물정보와\n지금까지 작성한 일지가 모두 사라져요.",
+                text = "삭제시 등록한 식물정보와\n지금까지 작성한 일지, 관련 쑥쑥마을 게시글이 모두 사라져요.",
                 style = DiaryTypography.bodyLargeMedium,
                 color = DiaryColorsPalette.current.gray600
             )
@@ -90,93 +90,6 @@ internal fun PlantDeleteDialog(
                 ) {
                     Text(
                         text = "삭제하기",
-                        color = DiaryColorsPalette.current.green600,
-                        style = DiaryTypography.subtitleMediumBold
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .wrapContentHeight()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(DiaryColorsPalette.current.green400)
-                        .clickable { onDismiss() }
-                        .padding(vertical = 16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "돌아가기",
-                        color = DiaryColorsPalette.current.gray50,
-                        style = DiaryTypography.subtitleMediumBold
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-internal fun UserReportDialog(
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit
-) {
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(24.dp))
-                .background(Color.White)
-                .padding(horizontal = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(40.dp))
-            Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.icon_notice_triangle),
-                contentDescription = null,
-                tint = DiaryColorsPalette.current.red400,
-                modifier = Modifier.size(64.dp)
-            )
-            Text(
-                text = "이 게시글을 정말 신고할까요?",
-                style = DiaryTypography.subtitleLargeBold,
-                color = DiaryColorsPalette.current.gray900,
-                modifier = Modifier
-                    .padding(top = 24.dp, bottom = 8.dp)
-            )
-            Text(
-                text = "신고 접수 시, 운영자의 검토 후\n게시글이 처리될 예정입니다.",
-                style = DiaryTypography.bodyLargeMedium,
-                color = DiaryColorsPalette.current.gray600
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .wrapContentHeight()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(DiaryColorsPalette.current.green50)
-                        .clickable {
-                            onConfirm()
-                            onDismiss()
-                        }
-                        .padding(vertical = 16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "신고하기",
                         color = DiaryColorsPalette.current.green600,
                         style = DiaryTypography.subtitleMediumBold
                     )
