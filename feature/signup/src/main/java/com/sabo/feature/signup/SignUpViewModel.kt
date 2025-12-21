@@ -136,4 +136,10 @@ class SignUpViewModel @Inject constructor(
             )
         }
     }
+
+    fun skipSignUp() {
+        viewModelScope.launch {
+            _event.send(SignUpEvent.OnCompletedSignUp)
+        }
+    }
 }

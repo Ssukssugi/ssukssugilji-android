@@ -87,7 +87,8 @@ internal fun SignUpRoute(
         onClickNextButton = viewModel::moveToNextStep,
         onClickAgeChip = { viewModel.selectAge(it) },
         onClickPlantReasonChip = { viewModel.selectPlantReason(it) },
-        onClickHowKnownChip = { viewModel.selectHowKnown(it) }
+        onClickHowKnownChip = { viewModel.selectHowKnown(it) },
+        onClickSkipButton = viewModel::skipSignUp
     )
 }
 
@@ -100,7 +101,8 @@ private fun SignUpContent(
     onClickNextButton: () -> Unit = {},
     onClickAgeChip: (AgeChip) -> Unit = {},
     onClickPlantReasonChip: (PlantReasonChip) -> Unit = {},
-    onClickHowKnownChip: (HowKnownChip) -> Unit = {}
+    onClickHowKnownChip: (HowKnownChip) -> Unit = {},
+    onClickSkipButton: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -117,7 +119,7 @@ private fun SignUpContent(
                 modifier = modifier,
                 uiState = uiState,
                 onClickBackButton = onClickBackButton,
-                onClickSkipButton = {},
+                onClickSkipButton = onClickSkipButton,
                 onClickNextButton = onClickNextButton,
                 onClickAgeChip = onClickAgeChip,
                 onClickPlantReasonChip = onClickPlantReasonChip,
