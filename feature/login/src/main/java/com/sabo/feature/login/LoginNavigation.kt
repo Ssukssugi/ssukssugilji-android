@@ -6,12 +6,16 @@ import com.sabo.core.navigator.model.Login
 
 fun NavGraphBuilder.loginNavGraph(
     navigateToSignUp: () -> Unit,
-    navigateToHome: () -> Unit
+    navigateToHome: () -> Unit,
+    navigateToPolicy: () -> Unit,
+    navigateToPrivacy: () -> Unit
 ) {
     composable<Login> {
         LoginRoute(
             navigateToSignUp = navigateToSignUp,
-            navigateToHome = navigateToHome
+            navigateToHome = navigateToHome,
+            navigateToPolicy = navigateToPolicy,
+            navigateToPrivacy = navigateToPrivacy
         )
     }
 }

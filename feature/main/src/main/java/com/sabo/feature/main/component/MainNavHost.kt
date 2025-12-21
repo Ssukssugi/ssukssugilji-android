@@ -72,6 +72,12 @@ internal fun MainNavHost(
                             launchSingleTop = true
                         }
                     )
+                },
+                navigateToPolicy = {
+                    navigator.navigateToWebLink(WebLink.Link.POLICY)
+                },
+                navigateToPrivacy = {
+                    navigator.navigateToWebLink(WebLink.Link.PRIVACY)
                 }
             )
             signUpNavGraph(

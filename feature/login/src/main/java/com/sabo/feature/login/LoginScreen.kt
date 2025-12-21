@@ -64,7 +64,9 @@ internal fun LoginRoute(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
     navigateToSignUp: () -> Unit,
-    navigateToHome: () -> Unit
+    navigateToHome: () -> Unit,
+    navigateToPolicy: () -> Unit,
+    navigateToPrivacy: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val kakaoLoginManager = rememberKakaoLoginManager {
@@ -96,7 +98,9 @@ internal fun LoginRoute(
             onClickTermAgreeItem = { viewModel.changeAgreeTermState(it) },
             onClickNextButton = viewModel::applyTermsAgreement,
             navigateToHome = navigateToHome,
-            navigateToSignUp = navigateToSignUp
+            navigateToSignUp = navigateToSignUp,
+            navigateToPolicy = navigateToPolicy,
+            navigateToPrivacy = navigateToPrivacy
         )
     }
 }
@@ -111,7 +115,9 @@ private fun LoginContent(
     onClickTermAgreeItem: (TermsAgreeState) -> Unit,
     onClickNextButton: () -> Unit,
     navigateToHome: () -> Unit,
-    navigateToSignUp: () -> Unit
+    navigateToSignUp: () -> Unit,
+    navigateToPolicy: () -> Unit,
+    navigateToPrivacy: () -> Unit
 ) {
     when (uiState) {
         is LoginUiState.BeforeLogin -> LoginScreen(
@@ -123,7 +129,9 @@ private fun LoginContent(
             isShownTermsAgreeDialog = uiState.isShownTermsAgree,
             termsState = uiState.termsState,
             onClickTermAgreeItem = onClickTermAgreeItem,
-            onClickNextButton = onClickNextButton
+            onClickNextButton = onClickNextButton,
+            navigateToPolicy = navigateToPolicy,
+            navigateToPrivacy = navigateToPrivacy
         )
 
         LoginUiState.SignUpLoading -> RedirectLoadingScreen()
@@ -145,7 +153,9 @@ private fun LoginScreen(
     isShownTermsAgreeDialog: Boolean = false,
     termsState: TermsAgreeState,
     onClickTermAgreeItem: (TermsAgreeState) -> Unit,
-    onClickNextButton: () -> Unit = {}
+    onClickNextButton: () -> Unit = {},
+    navigateToPolicy: () -> Unit = {},
+    navigateToPrivacy: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -249,7 +259,9 @@ private fun LoginScreen(
         TermAgreeDialog(
             termsState = termsState,
             onClickTermAgreeItem = onClickTermAgreeItem,
-            onClickNextButton = onClickNextButton
+            onClickNextButton = onClickNextButton,
+            navigateToPolicy = navigateToPolicy,
+            navigateToPrivacy = navigateToPrivacy
         )
     }
 }
@@ -260,7 +272,9 @@ private fun TermAgreeDialog(
     termsState: TermsAgreeState,
     onDismissRequest: () -> Unit = {},
     onClickTermAgreeItem: (TermsAgreeState) -> Unit = {},
-    onClickNextButton: () -> Unit = {}
+    onClickNextButton: () -> Unit = {},
+    navigateToPolicy: () -> Unit = {},
+    navigateToPrivacy: () -> Unit = {}
 ) {
     Dialog(
         onDismissRequest = onDismissRequest,
@@ -301,7 +315,9 @@ private fun TermAgreeDialog(
                     modifier = modifier,
                     state = termsState,
                     onClickTermAgreeItem = onClickTermAgreeItem,
-                    onClickNextButton = onClickNextButton
+                    onClickNextButton = onClickNextButton,
+                    navigateToPolicy = navigateToPolicy,
+                    navigateToPrivacy = navigateToPrivacy
                 )
             }
         }
@@ -313,7 +329,9 @@ private fun TermAgreeContent(
     modifier: Modifier = Modifier,
     state: TermsAgreeState,
     onClickTermAgreeItem: (TermsAgreeState) -> Unit = {},
-    onClickNextButton: () -> Unit = {}
+    onClickNextButton: () -> Unit = {},
+    navigateToPolicy: () -> Unit = {},
+    navigateToPrivacy: () -> Unit = {}
 ) {
     TermAgreeContentItem(
         isChecked = state.isAllAgree(),
@@ -348,7 +366,8 @@ private fun TermAgreeContent(
             Icon(
                 imageVector = ImageVector.vectorResource(com.sabo.core.designsystem.R.drawable.icon_arrow_right_24),
                 contentDescription = null,
-                tint = Color(0xFFCCCCCC)
+                tint = Color(0xFFCCCCCC),
+                modifier = Modifier.clickable { navigateToPolicy() }
             )
         },
         onClick = { onClickTermAgreeItem(state.copy(serviceTerms = state.serviceTerms.not())) }
@@ -366,7 +385,8 @@ private fun TermAgreeContent(
             Icon(
                 imageVector = ImageVector.vectorResource(com.sabo.core.designsystem.R.drawable.icon_arrow_right_24),
                 contentDescription = null,
-                tint = Color(0xFFCCCCCC)
+                tint = Color(0xFFCCCCCC),
+                modifier = Modifier.clickable { navigateToPrivacy() }
             )
         },
         onClick = { onClickTermAgreeItem(state.copy(privateTerms = state.privateTerms.not())) }
