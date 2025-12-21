@@ -3,6 +3,7 @@ package com.sabo.feature.web
 import android.view.ViewGroup
 import android.webkit.WebSettings
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -79,6 +80,7 @@ internal fun WebLinkScreen(
                             loadsImagesAutomatically = true
                             mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
                         }
+                        webViewClient = WebViewClient()
                     }
 
                     myWebView.apply {

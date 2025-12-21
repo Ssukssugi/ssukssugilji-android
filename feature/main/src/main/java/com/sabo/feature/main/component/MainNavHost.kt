@@ -1,8 +1,5 @@
 package com.sabo.feature.main.component
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,7 +24,6 @@ import com.sabo.feature.diary.plantadd.navigation.plantAddNavGraph
 import com.sabo.feature.diary.write.navigation.diaryWriteScreen
 import com.sabo.feature.home.navigation.homeNavGraph
 import com.sabo.feature.login.loginNavGraph
-import com.sabo.feature.town.townScreen
 import com.sabo.feature.profile.navigation.changeProfileNavGraph
 import com.sabo.feature.profile.navigation.policyNavGraph
 import com.sabo.feature.profile.navigation.popBackStackWithResultProfileUpdated
@@ -38,8 +34,8 @@ import com.sabo.feature.signup.signUpNavGraph
 import com.sabo.feature.town.mygrowth.main.myGrowthScreen
 import com.sabo.feature.town.mygrowth.posting.selectPlantScreen
 import com.sabo.feature.town.mygrowth.variation.growthVariationScreen
+import com.sabo.feature.town.townScreen
 import com.sabo.feature.web.navigation.webLinkScreen
-import androidx.core.net.toUri
 
 @Composable
 internal fun MainNavHost(
@@ -49,7 +45,6 @@ internal fun MainNavHost(
     onShowSuccessSnackBar: (SnackBarState) -> Unit,
     onSelectedPlantIdChange: (Long?) -> Unit = {}
 ) {
-    val context = LocalContext.current
 
     Box(
         modifier = modifier
@@ -175,14 +170,7 @@ internal fun MainNavHost(
             )
             profileNavGraph(
                 onClickSetting = navigator::navigateToSettings,
-                onClickFAQ = {
-                    try {
-                        val intent = Intent(Intent.ACTION_VIEW, WebLink.Link.QNA.url.toUri())
-                        context.startActivity(intent)
-                    } catch (e: ActivityNotFoundException) {
-                        navigator.navigateToWebLink(WebLink.Link.QNA)
-                    }
-                },
+                onClickFAQ = { navigator.navigateToWebLink(WebLink.Link.QNA) },
                 onClickPolicy = navigator::navigateToPolicy,
                 onClickProfile = navigator::navigateToChangeProfile
             )
