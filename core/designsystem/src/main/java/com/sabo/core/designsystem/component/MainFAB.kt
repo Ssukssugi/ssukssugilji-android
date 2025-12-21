@@ -87,7 +87,7 @@ fun MainFAB(
             },
             text = {
                 Text(
-                    text = "쑥쑥자랑 글쓰기",
+                    text = "쑥쑥자랑하기",
                     style = DiaryTypography.bodyMediumBold,
                     color = DiaryColorsPalette.current.gray900
                 )
@@ -109,7 +109,7 @@ fun MainFAB(
             },
             text = {
                 Text(
-                    text = "쑥쑥일지 글쓰기",
+                    text = "일지작성하기",
                     style = DiaryTypography.bodyMediumBold,
                     color = DiaryColorsPalette.current.gray900
                 )
