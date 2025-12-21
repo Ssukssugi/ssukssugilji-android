@@ -6,9 +6,7 @@ import com.sabo.core.data.handle
 import com.sabo.core.data.repository.LoginRepository
 import com.sabo.core.model.LoginType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -54,10 +52,7 @@ class LoginViewModel @Inject constructor(
                     emailAddress = it.emailAddress
                     loginType = LoginType.KAKAO
                     if (it.isRegistered) {
-                        navigateAfterLogin(
-                            loginType = LoginType.KAKAO,
-                            isAlreadyMember = it.existInfo
-                        )
+                        _uiState.value = LoginUiState.SuccessLogin(type = LoginType.KAKAO, isRegisteredUser = it.existInfo)
                     } else {
                         _uiState.value = state.copy(isShownTermsAgree = true)
                     }
@@ -80,10 +75,7 @@ class LoginViewModel @Inject constructor(
                     emailAddress = it.emailAddress
                     loginType = LoginType.NAVER
                     if (it.isRegistered) {
-                        navigateAfterLogin(
-                            loginType = LoginType.NAVER,
-                            isAlreadyMember = it.existInfo
-                        )
+                        _uiState.value = LoginUiState.SuccessLogin(type = LoginType.NAVER, isRegisteredUser = it.existInfo)
                     } else {
                         _uiState.value = state.copy(isShownTermsAgree = true)
                     }
@@ -105,10 +97,7 @@ class LoginViewModel @Inject constructor(
                     emailAddress = it.emailAddress
                     loginType = LoginType.GOOGLE
                     if (it.isRegistered) {
-                        navigateAfterLogin(
-                            loginType = LoginType.GOOGLE,
-                            isAlreadyMember = it.existInfo
-                        )
+                        _uiState.value = LoginUiState.SuccessLogin(type = LoginType.GOOGLE, isRegisteredUser = it.existInfo)
                     } else {
                         _uiState.value = state.copy(isShownTermsAgree = true)
                     }
@@ -134,9 +123,6 @@ class LoginViewModel @Inject constructor(
             ).handle(
                 onSuccess = {
                     _uiState.value = LoginUiState.SuccessLogin(type = loginType)
-                    launch {
-                        _loginEvent.send(LoginEvent.GoToSignUp)
-                    }
                 },
                 onError = {
                 }
@@ -147,17 +133,5 @@ class LoginViewModel @Inject constructor(
     fun changeAgreeTermState(newState: TermsAgreeState) {
         val state = uiState.value as? LoginUiState.BeforeLogin ?: return
         _uiState.value = state.copy(termsState = newState)
-    }
-
-    private fun CoroutineScope.navigateAfterLogin(
-        loginType: LoginType,
-        delayTime: Long = 200L,
-        isAlreadyMember: Boolean = false
-    ) {
-        launch {
-            _uiState.value = LoginUiState.SuccessLogin(type = loginType)
-            delay(delayTime)
-            _loginEvent.send(if (isAlreadyMember) LoginEvent.GoToMain else LoginEvent.GoToSignUp)
-        }
     }
 }

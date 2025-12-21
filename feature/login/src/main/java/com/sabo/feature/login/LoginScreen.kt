@@ -29,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,7 +54,9 @@ import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
 import com.sabo.core.model.LoginType
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import com.sabo.core.designsystem.R as dsR
 
 @Composable
@@ -91,7 +94,9 @@ internal fun LoginRoute(
             onClickGoogleLogin = googleLoginManager::requestToken,
             onSuccessNaverLogin = viewModel::onSuccessNaverLogin,
             onClickTermAgreeItem = { viewModel.changeAgreeTermState(it) },
-            onClickNextButton = viewModel::applyTermsAgreement
+            onClickNextButton = viewModel::applyTermsAgreement,
+            navigateToHome = navigateToHome,
+            navigateToSignUp = navigateToSignUp
         )
     }
 }
@@ -104,7 +109,9 @@ private fun LoginContent(
     onClickGoogleLogin: suspend () -> Unit,
     onSuccessNaverLogin: (String) -> Unit,
     onClickTermAgreeItem: (TermsAgreeState) -> Unit,
-    onClickNextButton: () -> Unit
+    onClickNextButton: () -> Unit,
+    navigateToHome: () -> Unit,
+    navigateToSignUp: () -> Unit
 ) {
     when (uiState) {
         is LoginUiState.BeforeLogin -> LoginScreen(
@@ -120,7 +127,11 @@ private fun LoginContent(
         )
 
         LoginUiState.SignUpLoading -> RedirectLoadingScreen()
-        is LoginUiState.SuccessLogin -> LoginSuccessScreen(state = uiState)
+        is LoginUiState.SuccessLogin -> LoginSuccessScreen(
+            state = uiState,
+            navigateToHome = navigateToHome,
+            navigateToSignUp = navigateToSignUp
+        )
     }
 }
 
@@ -454,13 +465,6 @@ private fun RedirectLoadingScreen(
                 title = "잠시만 기다려주세요",
                 subTitle = "로그인하고 있어요"
             )
-            Box(
-                modifier = modifier
-                    .padding(top = 68.dp)
-                    .size(320.dp)
-                    .background(color = Color.Gray)
-                    .align(Alignment.CenterHorizontally)
-            )
         }
     }
 }
@@ -503,8 +507,23 @@ private fun LoginMainInfo(
 @Composable
 private fun LoginSuccessScreen(
     modifier: Modifier = Modifier,
-    state: LoginUiState.SuccessLogin
+    state: LoginUiState.SuccessLogin,
+    navigateToSignUp: () -> Unit = {},
+    navigateToHome: () -> Unit = {}
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(coroutineScope) {
+        if (state.isMarketingReceiveAccepted) {
+            delay(200L)
+            if (state.isRegisteredUser) {
+                navigateToHome()
+            } else {
+                navigateToSignUp()
+            }
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -525,13 +544,103 @@ private fun LoginSuccessScreen(
                 }로 로그인했어요",
                 subTitle = "필수약관에 동의하고\n쑥쑥일지를 시작해보세요"
             )
-            Box(
-                modifier = modifier
-                    .padding(top = 68.dp)
-                    .size(320.dp)
-                    .background(color = Color.Gray)
+            Spacer(modifier = Modifier.height(64.dp))
+            Image(
+                imageVector = ImageVector.vectorResource(dsR.drawable.icn_check_circle_164),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(164.dp)
                     .align(Alignment.CenterHorizontally)
             )
+        }
+    }
+
+    if (state.isMarketingReceiveAccepted.not()) {
+        MarketingDeniedDialog(
+            onDismiss = {
+                if (state.isRegisteredUser) {
+                    navigateToHome()
+                } else {
+                    navigateToSignUp()
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun MarketingDeniedDialog(
+    onDismiss: () -> Unit = {}
+) {
+    val now = rememberSaveable { LocalDateTime.now() }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = true,
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(24.dp))
+                .background(color = Color.White)
+                .padding(horizontal = 20.dp)
+                .padding(top = 16.dp, bottom = 20.dp)
+        ) {
+            Text(
+                text = "마케팅정보 앱 푸시 알림 거부 안내",
+                style = DiaryTypography.bodyLargeBold,
+                color = DiaryColorsPalette.current.gray800,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
+            )
+            Text(
+                text = "전송자: 쑥쑥일지",
+                style = DiaryTypography.bodySmallMedium,
+                color = DiaryColorsPalette.current.gray600
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "수신거부 일시: " +
+                        "${now.year}년 ${now.monthValue.toString().padStart(2, '0')}월 " +
+                        "${now.dayOfMonth.toString().padStart(2, '0')}일 " +
+                        "${now.hour.toString().padStart(2, '0')}시",
+                style = DiaryTypography.bodySmallMedium,
+                color = DiaryColorsPalette.current.gray600
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "처리내용: 수신거부 처리완료",
+                style = DiaryTypography.bodySmallMedium,
+                color = DiaryColorsPalette.current.gray600
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "*환경설정에서 변경 가능",
+                style = DiaryTypography.bodySmallRegular,
+                color = DiaryColorsPalette.current.gray500
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(color = DiaryColorsPalette.current.green400)
+                    .clickable { onDismiss() }
+                    .padding(vertical = 14.dp)
+            ) {
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.Center),
+                    text = "확인",
+                    style = DiaryTypography.subtitleMediumBold,
+                    color = DiaryColorsPalette.current.gray50
+                )
+            }
         }
     }
 }
@@ -630,5 +739,13 @@ private fun TermsAgreeDialogPreview() {
         TermAgreeDialog(
             termsState = TermsAgreeState()
         )
+    }
+}
+
+@Preview
+@Composable
+private fun MarketingDeniedDialogPreview() {
+    SsukssukDiaryTheme {
+        MarketingDeniedDialog()
     }
 }
