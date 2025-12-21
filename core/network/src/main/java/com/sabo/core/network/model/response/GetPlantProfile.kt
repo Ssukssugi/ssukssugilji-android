@@ -9,5 +9,5 @@ data class GetPlantProfile(
     val plantCategory: String,
     val plantImage: String? = null,
     val shine: Int?,
-    val place: PlantEnvironmentPlace
+    val place: PlantEnvironmentPlace?
 )

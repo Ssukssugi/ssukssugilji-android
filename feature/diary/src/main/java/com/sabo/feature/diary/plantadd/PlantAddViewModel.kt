@@ -50,6 +50,7 @@ class PlantAddViewModel @Inject constructor(
                     PlantEnvironmentPlace.HALLWAY -> PlantPlace.HALLWAY
                     PlantEnvironmentPlace.ROOM -> PlantPlace.ROOM
                     PlantEnvironmentPlace.ETC -> PlantPlace.OTHER
+                    null -> null
                 }
             )
         }
@@ -82,6 +83,7 @@ class PlantAddViewModel @Inject constructor(
                     PlantEnvironmentPlace.HALLWAY -> PlantPlace.HALLWAY
                     PlantEnvironmentPlace.ROOM -> PlantPlace.ROOM
                     PlantEnvironmentPlace.ETC -> PlantPlace.OTHER
+                    null -> null
                 }
                 (isSameName && isSameCategory && isSameLightAmount && isSamePlace).not() && textFieldText.isNotEmpty()
             }
@@ -99,7 +101,6 @@ class PlantAddViewModel @Inject constructor(
 
     fun onClickSave() {
         val inputState = state.value as? PlantAddState.Input ?: return
-        if (inputState.place == null) return
         when (val mode = inputState.mode) {
             PlantAddState.Input.Mode.Add -> savePlant(inputState)
             is PlantAddState.Input.Mode.Edit -> updatePlant(mode.plantId, inputState)
@@ -108,11 +109,10 @@ class PlantAddViewModel @Inject constructor(
 
     private fun savePlant(inputState: PlantAddState.Input) {
         viewModelScope.launch {
-            if (inputState.place == null) return@launch
             diaryRepository.saveNewPlant(
                 name = inputState.textFieldState.text.toString(),
                 category = inputState.plantCategory ?: "",
-                shine = inputState.lightAmount.value + 1,
+                shine = inputState.lightAmount.takeIf { it != LightAmount.NOT_SET }?.let { it.value + 1 },
                 place = when(inputState.place) {
                     PlantPlace.VERANDA -> PlantEnvironmentPlace.VERANDAH
                     PlantPlace.WINDOW -> PlantEnvironmentPlace.WINDOW
@@ -120,6 +120,7 @@ class PlantAddViewModel @Inject constructor(
                     PlantPlace.HALLWAY -> PlantEnvironmentPlace.HALLWAY
                     PlantPlace.ROOM -> PlantEnvironmentPlace.ROOM
                     PlantPlace.OTHER -> PlantEnvironmentPlace.ETC
+                    null -> null
                 }
             ).handle(
                 onSuccess = {

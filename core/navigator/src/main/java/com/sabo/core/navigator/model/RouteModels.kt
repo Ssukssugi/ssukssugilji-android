@@ -29,7 +29,7 @@ sealed interface PlantAddEdit : RouteModel {
         val name: String,
         val category: String,
         val shine: Int?,
-        val place: PlantEnvironmentPlace
+        val place: PlantEnvironmentPlace?
     ) : PlantAddEdit {
         companion object {
             const val EXTRA_PLANT_ID = "plant_Id"

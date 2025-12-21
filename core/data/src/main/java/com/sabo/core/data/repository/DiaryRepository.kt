@@ -12,7 +12,7 @@ import com.sabo.core.network.model.response.SaveNewPlant
 import java.time.LocalDate
 
 interface DiaryRepository {
-    suspend fun saveNewPlant(name: String, category: String, shine: Int, place: PlantEnvironmentPlace): Result<SaveNewPlant>
+    suspend fun saveNewPlant(name: String, category: String, shine: Int?, place: PlantEnvironmentPlace?): Result<SaveNewPlant>
 
     suspend fun updatePlant(plantId: Long, name: String, category: String, shine: Int, place: PlantEnvironmentPlace): Result<Unit>
 

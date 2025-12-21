@@ -26,8 +26,8 @@ class DefaultDiaryRepository @Inject constructor(
     override suspend fun saveNewPlant(
         name: String,
         category: String,
-        shine: Int,
-        place: PlantEnvironmentPlace
+        shine: Int?,
+        place: PlantEnvironmentPlace?
     ): Result<SaveNewPlant> = handleResult(
         execute = {
             val request = SaveNewPlantRequest(
@@ -42,6 +42,7 @@ class DefaultDiaryRepository @Inject constructor(
                         PlantEnvironmentPlace.LIVINGROOM -> SaveNewPlantRequest.PlantEnvironment.Place.LIVINGROOM
                         PlantEnvironmentPlace.HALLWAY -> SaveNewPlantRequest.PlantEnvironment.Place.HALLWAY
                         PlantEnvironmentPlace.ETC -> SaveNewPlantRequest.PlantEnvironment.Place.ETC
+                        null -> null
                     }
                 )
             )

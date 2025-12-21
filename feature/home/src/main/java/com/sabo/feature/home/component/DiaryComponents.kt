@@ -110,7 +110,7 @@ internal fun SelectedPlantContent(
 private fun PlantInfoMain(
     id: Long,
     image: String?,
-    place: PlantEnvironmentPlace,
+    place: PlantEnvironmentPlace?,
     name: String,
     category: String,
     onClickMore: (Long) -> Unit = {}
@@ -160,7 +160,7 @@ private fun PlantInfoMain(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "${place.display}에서 무럭무럭 자라는 중!",
+                    text = "${place?.display?.let { "${it}에서 " }.orEmpty()}무럭무럭 자라는 중!",
                     style = DiaryTypography.bodySmallRegular,
                     color = DiaryColorsPalette.current.gray600
                 )

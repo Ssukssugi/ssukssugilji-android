@@ -11,8 +11,8 @@ data class SaveNewPlantRequest(
 ) {
     @Serializable
     data class PlantEnvironment(
-        val shine: Int,
-        val place: Place
+        val shine: Int?,
+        val place: Place?
     ) {
         enum class Place {
             @SerialName("VERANDAH") VERANDAH,

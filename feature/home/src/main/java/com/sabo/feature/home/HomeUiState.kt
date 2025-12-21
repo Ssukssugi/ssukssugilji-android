@@ -27,7 +27,7 @@ sealed interface PlantContent {
     data object Empty : PlantContent
     data class PlantInfo(
         val id: Long,
-        val place: PlantEnvironmentPlace,
+        val place: PlantEnvironmentPlace?,
         val name: String,
         val category: String,
         val image: String?,
