@@ -1,5 +1,8 @@
 package com.sabo.feature.main.component
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
 import com.sabo.core.designsystem.R
@@ -35,6 +39,7 @@ import com.sabo.feature.town.mygrowth.main.myGrowthScreen
 import com.sabo.feature.town.mygrowth.posting.selectPlantScreen
 import com.sabo.feature.town.mygrowth.variation.growthVariationScreen
 import com.sabo.feature.web.navigation.webLinkScreen
+import androidx.core.net.toUri
 
 @Composable
 internal fun MainNavHost(
@@ -44,6 +49,8 @@ internal fun MainNavHost(
     onShowSuccessSnackBar: (SnackBarState) -> Unit,
     onSelectedPlantIdChange: (Long?) -> Unit = {}
 ) {
+    val context = LocalContext.current
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -162,7 +169,14 @@ internal fun MainNavHost(
             )
             profileNavGraph(
                 onClickSetting = navigator::navigateToSettings,
-                onClickFAQ = { navigator.navigateToWebLink(WebLink.Link.QNA) },
+                onClickFAQ = {
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW, WebLink.Link.QNA.url.toUri())
+                        context.startActivity(intent)
+                    } catch (e: ActivityNotFoundException) {
+                        navigator.navigateToWebLink(WebLink.Link.QNA)
+                    }
+                },
                 onClickPolicy = navigator::navigateToPolicy,
                 onClickProfile = navigator::navigateToChangeProfile
             )
