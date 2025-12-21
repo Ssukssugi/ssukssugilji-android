@@ -80,11 +80,9 @@ internal fun MainNavHost(
                 }
             )
             homeNavGraph(
-                navigateToGallery = navigator::navigateToGallery,
                 navigateToPlantAdd = navigator::navigateToPlantAdd,
                 navigateToDiaryDetail = navigator::navigateToDiaryDetail,
                 navigateToPlantEdit = navigator::navigateToPlantEdit,
-                navigateToTownWrite = navigator::navigateToSelectGrowthPlant,
                 onSelectedPlantIdChange = onSelectedPlantIdChange,
             )
             townScreen(

@@ -15,7 +15,7 @@ import com.sabo.feature.diary.write.DiaryWriteScreen
 import kotlin.reflect.typeOf
 
 
-fun NavController.navigateToDiaryWrite(plantId: Long, imageUri: Uri) {
+fun NavController.navigateToDiaryWrite(plantId: Long?, imageUri: Uri) {
     this.navigate(DiaryWrite(plantId = plantId, imageUri = imageUri.toString()))
 }
 

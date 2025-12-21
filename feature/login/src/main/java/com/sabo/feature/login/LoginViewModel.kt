@@ -122,7 +122,11 @@ class LoginViewModel @Inject constructor(
                 isMarketingAgree = state.termsState.marketingTerms
             ).handle(
                 onSuccess = {
-                    _uiState.value = LoginUiState.SuccessLogin(type = loginType)
+                    _uiState.value = LoginUiState.SuccessLogin(
+                        type = loginType,
+                        isMarketingReceiveAccepted = state.termsState.marketingTerms,
+                        isRegisteredUser = false
+                    )
                 },
                 onError = {
                 }

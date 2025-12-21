@@ -13,14 +13,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sabo.core.designsystem.R
-import com.sabo.core.designsystem.component.MainFAB
 import com.sabo.core.designsystem.component.TopSnackBar
 import com.sabo.core.designsystem.component.rememberSnackBarState
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
@@ -37,11 +35,9 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
-    navigateToGallery: (Long) -> Unit,
     navigateToPlantAdd: () -> Unit,
     navigateToDiaryDetail: (Long, Long) -> Unit,
     navigateToPlantEdit: (PlantAddEdit.PlantEdit) -> Unit,
-    navigateToTownWrite: () -> Unit = {},
     onSelectedPlantIdChange: (Long?) -> Unit = {},
 ) {
 
@@ -57,7 +53,6 @@ internal fun HomeScreen(
     var showPlantDeleteDialog by remember { mutableStateOf(false) }
 
     var snackBarState by rememberSnackBarState()
-
 
     viewModel.collectSideEffect {
         when (it) {
@@ -88,7 +83,6 @@ internal fun HomeScreen(
             modifier = Modifier.fillMaxSize(),
             plantList = state.plantList,
             plantContent = state.plantContent,
-            navigateToGallery = navigateToGallery,
             navigateToPlantAdd = navigateToPlantAdd,
             onClickDiaryDetail = viewModel::onClickDiaryDetail,
             onClickMore = viewModel::onClickMore,
@@ -130,7 +124,6 @@ private fun HomeContent(
     modifier: Modifier = Modifier,
     plantList: List<PlantListItem>,
     plantContent: PlantContent,
-    navigateToGallery: (Long) -> Unit = {},
     navigateToPlantAdd: () -> Unit = {},
     onClickDiaryDetail: (Long) -> Unit = {},
     onClickMore: (Long) -> Unit = {},

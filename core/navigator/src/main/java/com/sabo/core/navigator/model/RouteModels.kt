@@ -45,10 +45,10 @@ data class CategorySearch(val keyword: String) : RouteModel {
 }
 
 @Serializable
-data class Gallery(val plantId: Long) : RouteModel
+data class Gallery(val plantId: Long?) : RouteModel
 
 @Serializable
-data class DiaryWrite(val plantId: Long, val imageUri: String) : RouteModel
+data class DiaryWrite(val plantId: Long?, val imageUri: String) : RouteModel
 
 @Serializable
 data class DiaryEdit(

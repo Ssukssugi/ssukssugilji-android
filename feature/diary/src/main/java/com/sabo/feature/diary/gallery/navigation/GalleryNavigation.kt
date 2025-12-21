@@ -13,13 +13,13 @@ import com.sabo.core.navigator.toolkit.zoomIn
 import com.sabo.core.navigator.toolkit.zoomOut
 import com.sabo.feature.diary.gallery.GalleryScreen
 
-fun NavController.navigateToGallery(plantId: Long, navOptions: NavOptions? = null) {
+fun NavController.navigateToGallery(plantId: Long?, navOptions: NavOptions? = null) {
     navigate(Gallery(plantId = plantId), navOptions)
 }
 
 fun NavGraphBuilder.galleryScreen(
     onClickBack: () -> Unit,
-    onClickNext: (Long, Uri) -> Unit
+    onClickNext: (Long?, Uri) -> Unit
 ) {
     composable<Gallery>(
         enterTransition = slideInFromBottom(),

@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.sabo.core.data.Result
 import com.sabo.core.data.handle
 import com.sabo.core.data.repository.DiaryRepository
-import com.sabo.core.data.repository.TownRepository
 import com.sabo.core.mapper.DateMapper.toLocalDate
 import com.sabo.core.navigator.model.PlantAddEdit
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -49,6 +48,14 @@ class HomeViewModel @Inject constructor(
         val plants: List<PlantListItem> = when (val response = diaryRepository.getMyPlants(false)) {
             is Result.Success -> {
                 _selectedPlantId.update { response.data.firstOrNull()?.plantId }
+
+                if (response.data.isEmpty()) {
+                    reduce {
+                        state.copy(
+                            plantContent = PlantContent.Empty
+                        )
+                    }
+                }
 
                 response.data.map { plant ->
                     PlantListItem.Plant(

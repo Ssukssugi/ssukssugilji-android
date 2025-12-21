@@ -20,11 +20,9 @@ fun NavController.navigateToHome(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.homeNavGraph(
-    navigateToGallery: (Long) -> Unit,
     navigateToPlantAdd: () -> Unit,
     navigateToDiaryDetail: (Long, Long) -> Unit,
     navigateToPlantEdit: (PlantAddEdit.PlantEdit) -> Unit,
-    navigateToTownWrite: () -> Unit,
     onSelectedPlantIdChange: (Long?) -> Unit = {},
 ) {
     composable<Diary>(
@@ -46,11 +44,9 @@ fun NavGraphBuilder.homeNavGraph(
 
         HomeScreen(
             viewModel = viewModel,
-            navigateToGallery = navigateToGallery,
             navigateToPlantAdd = navigateToPlantAdd,
             navigateToDiaryDetail = navigateToDiaryDetail,
             navigateToPlantEdit = navigateToPlantEdit,
-            navigateToTownWrite = navigateToTownWrite,
             onSelectedPlantIdChange = onSelectedPlantIdChange,
         )
     }
