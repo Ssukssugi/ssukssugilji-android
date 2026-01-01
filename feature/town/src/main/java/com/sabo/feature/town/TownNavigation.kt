@@ -12,17 +12,11 @@ fun NavController.navigateToTown(navOptions: NavOptions? = null) {
     navigate(route = Town, navOptions = navOptions)
 }
 
-fun NavGraphBuilder.townScreen(
-    navigateToMyGrowths: () -> Unit,
-    navigateToDiaryWrite: () -> Unit,
-) {
+fun NavGraphBuilder.townScreen() {
     composable<Town>(
         enterTransition = tabFadeIn(),
         exitTransition = tabFadeOut()
     ) {
-        TownScreen(
-            navigateToMyGrowths = navigateToMyGrowths,
-            navigateToDiaryWrite = navigateToDiaryWrite,
-        )
+        TownScreen()
     }
 }

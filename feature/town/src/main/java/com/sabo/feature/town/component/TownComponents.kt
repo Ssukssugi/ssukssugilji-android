@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,30 +37,59 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sabo.core.designsystem.R
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
+import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
+import com.sabo.core.designsystem.toolkit.noRippleClickable
 import com.sabo.core.designsystem.toolkit.shimmer
 import com.sabo.feature.town.TownContent
 import com.sabo.feature.town.TownListItem
+import com.sabo.feature.town.TownTab
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlin.math.roundToInt
 
 @Composable
 internal fun TownListContent(
     state: TownContent,
+    selectedTab: TownTab,
+    onTabSelected: (TownTab) -> Unit = {},
     onLoadMore: (Long) -> Unit = {},
-    onClickMyPost: () -> Unit = {},
     onClickPostMore: (Long) -> Unit = {},
 ) {
     val listState = rememberLazyListState()
     var isLoadingMore by remember { mutableStateOf(false) }
+
+    val density = LocalDensity.current
+    var tabHeaderHeightPx by remember { mutableFloatStateOf(0f) }
+    var tabHeaderOffset by remember { mutableFloatStateOf(0f) }
+
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                val delta = available.y
+                val newOffset = tabHeaderOffset + delta
+                tabHeaderOffset = newOffset.coerceIn(-tabHeaderHeightPx, 0f)
+                return Offset.Zero
+            }
+        }
+    }
 
     LaunchedEffect(listState, state.dataList.size) {
         snapshotFlow {
@@ -82,29 +114,20 @@ internal fun TownListContent(
         isLoadingMore = false
     }
 
-    Column(
+    val tabHeaderHeightDp = with(density) { tabHeaderHeightPx.toDp() }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
+            .clipToBounds()
+            .nestedScroll(nestedScrollConnection)
     ) {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-                .padding(horizontal = 20.dp, vertical = 9.dp),
-            text = "쑥쑥자랑",
-            color = DiaryColorsPalette.current.gray900,
-            style = DiaryTypography.subtitleLargeBold,
-        )
-
         LazyColumn(
             state = listState,
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize(),
+            contentPadding = PaddingValues(top = tabHeaderHeightDp)
         ) {
-            item {
-                MyGrowthButton(onClickMyPost = onClickMyPost)
-            }
-
             if (state.isNewUser) {
                 item {
                     Box(
@@ -156,37 +179,59 @@ internal fun TownListContent(
                 }
             }
         }
+
+        TownTabHeader(
+            selectedTab = selectedTab,
+            onTabSelected = onTabSelected,
+            offsetY = tabHeaderOffset,
+            onHeightMeasured = { tabHeaderHeightPx = it }
+        )
     }
 }
 
 @Composable
-private fun MyGrowthButton(
-    onClickMyPost: () -> Unit = {}
+private fun TownTabHeader(
+    selectedTab: TownTab,
+    onTabSelected: (TownTab) -> Unit,
+    offsetY: Float,
+    onHeightMeasured: (Float) -> Unit
 ) {
     Row(
         modifier = Modifier
-            .padding(top = 9.dp, bottom = 9.dp, start = 24.dp, end = 20.dp)
             .fillMaxWidth()
+            .offset { IntOffset(0, offsetY.roundToInt()) }
+            .onGloballyPositioned { coordinates ->
+                onHeightMeasured(coordinates.size.height.toFloat())
+            }
+            .background(Color.White)
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Spacer(modifier = Modifier.weight(1f, fill = true))
-        Row(
-            modifier = Modifier.clickable { onClickMyPost() },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "나의 게시글",
-                style = DiaryTypography.bodySmallSemiBold,
-                color = DiaryColorsPalette.current.gray600,
-            )
-            Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.icon_arrow_right_24),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(24.dp),
-                tint = DiaryColorsPalette.current.gray600
-            )
-        }
+        TownTab(
+            text = "전체",
+            isSelected = selectedTab == TownTab.ALL,
+            onClick = { onTabSelected(TownTab.ALL) }
+        )
+        TownTab(
+            text = "나의 게시글",
+            isSelected = selectedTab == TownTab.MY_POSTS,
+            onClick = { onTabSelected(TownTab.MY_POSTS) }
+        )
     }
+}
+
+@Composable
+private fun TownTab(
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Text(
+        text = text,
+        style = DiaryTypography.subtitleMediumBold,
+        color = if (isSelected) DiaryColorsPalette.current.green400 else DiaryColorsPalette.current.gray500,
+        modifier = Modifier.noRippleClickable { onClick() }
+    )
 }
 
 @Composable
@@ -361,6 +406,21 @@ private fun SkeletonImages(shape: Shape) {
                 .aspectRatio(1f)
                 .clip(shape)
                 .shimmer()
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TownTabPreview() {
+    SsukssukDiaryTheme {
+        TownListContent(
+            state = TownContent(
+                isLoading = false,
+                dataList = emptyList(),
+                isNewUser = false
+            ),
+            selectedTab = TownTab.ALL
         )
     }
 }

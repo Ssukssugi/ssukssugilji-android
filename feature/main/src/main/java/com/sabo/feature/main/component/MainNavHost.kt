@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
 import com.sabo.core.designsystem.R
@@ -31,7 +30,6 @@ import com.sabo.feature.profile.navigation.profileNavGraph
 import com.sabo.feature.profile.navigation.settingsNavGraph
 import com.sabo.feature.profile.navigation.userDeleteNavGraph
 import com.sabo.feature.signup.signUpNavGraph
-import com.sabo.feature.town.mygrowth.main.myGrowthScreen
 import com.sabo.feature.town.mygrowth.posting.selectPlantScreen
 import com.sabo.feature.town.mygrowth.variation.growthVariationScreen
 import com.sabo.feature.town.townScreen
@@ -93,10 +91,7 @@ internal fun MainNavHost(
                 navigateToPlantEdit = navigator::navigateToPlantEdit,
                 onSelectedPlantIdChange = onSelectedPlantIdChange,
             )
-            townScreen(
-                navigateToMyGrowths = navigator::navigateToMyGrowths,
-                navigateToDiaryWrite = navigator::navigateToPlantAdd,
-            )
+            townScreen()
             plantAddNavGraph(
                 onClickCategory = navigator::navigateToCategorySearch,
                 onClickHome = navigator::navigateToHome,
@@ -140,10 +135,6 @@ internal fun MainNavHost(
                 onClickBack = navigator::popBackStack,
                 navigateToEditDiary = navigator::navigateToDiaryEdit,
                 popUpWithResult = navigator::navigateToHome
-            )
-            myGrowthScreen(
-                onClickBack = navigator::popBackStack,
-                onClickPosting = navigator::navigateToSelectGrowthPlant
             )
             selectPlantScreen(
                 onClickBack = navigator::popBackStack,

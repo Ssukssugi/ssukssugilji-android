@@ -112,4 +112,53 @@ class TownViewModel @Inject constructor(
             }
         )
     }
+
+    fun onTabSelected(tab: TownTab) = intent {
+        if (state.selectedTab == tab) return@intent
+
+        reduce { state.copy(selectedTab = tab) }
+
+        when (tab) {
+            TownTab.ALL -> fetchTownGrowth()
+            TownTab.MY_POSTS -> fetchMyGrowth()
+        }
+    }
+
+    private fun fetchMyGrowth() = intent {
+        viewModelScope.launch {
+            reduce {
+                state.copy(
+                    townContent = TownContent(isLoading = true, isNewUser = false, dataList = emptyList())
+                )
+            }
+
+            when (val result = townRepository.getMyGrowth()) {
+                is Result.Success -> {
+                    val townItems = result.data.growths.map { growth -> growth.toPresentation() }
+                    val isNewUser = townItems.isEmpty()
+
+                    reduce {
+                        state.copy(
+                            townContent = TownContent(
+                                isLoading = false,
+                                dataList = townItems,
+                                isNewUser = isNewUser
+                            )
+                        )
+                    }
+                }
+                is Result.Error -> {
+                    reduce {
+                        state.copy(
+                            townContent = TownContent(
+                                isLoading = false,
+                                dataList = emptyList(),
+                                isNewUser = true
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
 }

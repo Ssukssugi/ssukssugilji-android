@@ -27,7 +27,6 @@ import com.sabo.feature.profile.navigation.navigateToProfile
 import com.sabo.feature.profile.navigation.navigateToSettings
 import com.sabo.feature.profile.navigation.navigateToUserDelete
 import com.sabo.feature.signup.navigateToSignUp
-import com.sabo.feature.town.mygrowth.main.navigateToMyGrowth
 import com.sabo.feature.town.mygrowth.posting.navigateToGrowthSelectPlant
 import com.sabo.feature.town.mygrowth.variation.navigateToGrowthVariation
 import com.sabo.feature.town.navigateToTown
@@ -95,10 +94,6 @@ class MainNavigator(
 
     fun navigateToDiaryEdit(route: DiaryEdit, navOption: NavOptions? = null) {
         navController.navigateToDiaryEdit(route)
-    }
-
-    fun navigateToMyGrowths() {
-        navController.navigateToMyGrowth()
     }
 
     fun navigateToSelectGrowthPlant() {
