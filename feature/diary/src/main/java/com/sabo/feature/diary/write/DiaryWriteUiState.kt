@@ -13,7 +13,8 @@ data class DiaryWriteUiState(
     val careTypes: List<CareTypeItem> = CareType.entries.map { CareTypeItem(it) },
     val content: TextFieldState = TextFieldState(),
     val isSaveLoading: Boolean = false,
-    val isSaveSuccess: Boolean = false
+    val isSaveSuccess: Boolean = false,
+    val showImagePickerBottomSheet: Boolean = false
 )
 
 data class PlantListItem(

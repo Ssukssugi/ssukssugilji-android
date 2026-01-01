@@ -45,10 +45,7 @@ data class CategorySearch(val keyword: String) : RouteModel {
 }
 
 @Serializable
-data class Gallery(val plantId: Long?) : RouteModel
-
-@Serializable
-data class DiaryWrite(val plantId: Long?, val imageUri: String) : RouteModel
+data class DiaryWrite(val plantId: Long?, val imageUri: String? = null) : RouteModel
 
 @Serializable
 data class DiaryEdit(
@@ -62,9 +59,6 @@ data class DiaryEdit(
 
 @Serializable
 data class DiaryDetail(val plantId: Long, val diaryId: Long) : RouteModel
-
-@Serializable
-data object MyGrowth : RouteModel
 
 @Serializable
 data object SelectGrowthPlant : RouteModel

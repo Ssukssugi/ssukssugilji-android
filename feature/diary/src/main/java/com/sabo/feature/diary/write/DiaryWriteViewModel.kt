@@ -1,5 +1,6 @@
 package com.sabo.feature.diary.write
 
+import android.net.Uri
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
@@ -11,6 +12,7 @@ import com.sabo.core.data.repository.DiaryRepository
 import com.sabo.core.model.CareType
 import com.sabo.core.navigator.model.DiaryEdit
 import com.sabo.core.navigator.model.DiaryWrite
+import com.sabo.feature.diary.gallery.GalleryImageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -27,8 +29,9 @@ import javax.inject.Inject
 @HiltViewModel
 class DiaryWriteViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    imageDateLoader: ImageDateLoader,
-    private val diaryRepository: DiaryRepository
+    private val imageDateLoader: ImageDateLoader,
+    private val diaryRepository: DiaryRepository,
+    private val galleryImageManager: GalleryImageManager
 ) : ContainerHost<DiaryWriteUiState, DiaryWriteSideEffect>, ViewModel() {
 
     private val writeRoute = runCatching { savedStateHandle.toRoute<DiaryWrite>() }.getOrNull()
@@ -57,12 +60,18 @@ class DiaryWriteViewModel @Inject constructor(
                 state.content.setTextAndPlaceCursorAtEnd(editRoute.content)
                 state
             }
-            writeRoute != null -> DiaryWriteUiState(
+            writeRoute != null && !writeRoute.imageUri.isNullOrEmpty() -> {
+                val imageUri = writeRoute.imageUri!!
+                DiaryWriteUiState(
+                    isLoading = true,
+                    imageUri = imageUri.toUri(),
+                    date = imageDateLoader.getImageDateFromUri(imageUri.toUri())
+                )
+            }
+            else -> DiaryWriteUiState(
                 isLoading = true,
-                imageUri = writeRoute.imageUri.toUri(),
-                date = imageDateLoader.getImageDateFromUri(writeRoute.imageUri.toUri())
+                showImagePickerBottomSheet = true
             )
-            else -> DiaryWriteUiState(isLoading = true)
         },
         onCreate = { loadPlants(initialPlantId) }
     )
@@ -192,5 +201,27 @@ class DiaryWriteViewModel @Inject constructor(
     fun onClickGoToDiaryDetail() = intent {
         val plantId = state.plants.first { it.isSelected }.id
         postSideEffect(DiaryWriteSideEffect.NavigateToDetail(plantId = plantId))
+    }
+
+    fun showImagePickerBottomSheet() = intent {
+        reduce { state.copy(showImagePickerBottomSheet = true) }
+    }
+
+    fun hideImagePickerBottomSheet() = intent {
+        reduce { state.copy(showImagePickerBottomSheet = false) }
+    }
+
+    fun onImageSelected(uri: Uri) = intent {
+        reduce {
+            state.copy(
+                imageUri = uri,
+                date = imageDateLoader.getImageDateFromUri(uri),
+                showImagePickerBottomSheet = false
+            )
+        }
+    }
+
+    fun createImageUri(): Uri {
+        return galleryImageManager.createImageUri()
     }
 }

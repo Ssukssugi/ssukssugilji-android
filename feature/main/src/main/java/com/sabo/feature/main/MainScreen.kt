@@ -141,7 +141,7 @@ private fun MainScreenContent(
                                     isExpanded = isFabExpanded,
                                     onExpandedChange = { isFabExpanded = it },
                                     onTownWriteClick = navigator::navigateToSelectGrowthPlant,
-                                    onDiaryWriteClick = { navigator.navigateToGallery(selectedPlantId) }
+                                    onDiaryWriteClick = { navigator.navigateToDiaryWrite(selectedPlantId) }
                                 )
                             }
 

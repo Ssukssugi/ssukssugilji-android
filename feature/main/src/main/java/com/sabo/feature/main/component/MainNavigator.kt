@@ -14,7 +14,7 @@ import com.sabo.core.navigator.model.Login
 import com.sabo.core.navigator.model.PlantAddEdit
 import com.sabo.core.navigator.model.WebLink
 import com.sabo.feature.diary.detail.navigation.navigateToDiaryDetail
-import com.sabo.feature.diary.gallery.navigation.navigateToGallery
+
 import com.sabo.feature.diary.plantadd.categorySearch.navigation.navigateToCategorySearch
 import com.sabo.feature.diary.plantadd.navigation.navigateToPlantAdd
 import com.sabo.feature.diary.plantadd.navigation.navigateToPlantEdit
@@ -80,11 +80,7 @@ class MainNavigator(
         navController.navigateToCategorySearch(keyword)
     }
 
-    fun navigateToGallery(plantId: Long?, navOption: NavOptions? = null) {
-        navController.navigateToGallery(plantId = plantId, navOptions = navOption)
-    }
-
-    fun navigateToDiaryWrite(plantId: Long?, imageUri: Uri) {
+    fun navigateToDiaryWrite(plantId: Long?, imageUri: Uri? = null) {
         navController.navigateToDiaryWrite(plantId = plantId, imageUri = imageUri)
     }
 

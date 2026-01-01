@@ -1,6 +1,10 @@
 package com.sabo.feature.diary.write
 
+import android.Manifest
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,10 +34,13 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +60,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.sabo.core.designsystem.R
 import com.sabo.core.designsystem.component.DatePickerDialog
 import com.sabo.core.designsystem.component.NavigationType
@@ -68,6 +78,7 @@ import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 internal fun DiaryWriteScreen(
     viewModel: DiaryWriteViewModel = hiltViewModel(),
@@ -80,6 +91,29 @@ internal fun DiaryWriteScreen(
 
     var isShownDatePicker by remember { mutableStateOf(false) }
     var snackBarState by rememberSnackBarState()
+
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+    var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let {
+            viewModel.onImageSelected(it)
+        }
+    }
+
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { isSuccess ->
+        if (isSuccess) {
+            capturedImageUri?.let { uri ->
+                viewModel.onImageSelected(uri)
+            }
+        }
+    }
+
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     viewModel.collectSideEffect {
         when (it) {
@@ -121,7 +155,8 @@ internal fun DiaryWriteScreen(
                 onClickPlant = viewModel::onClickPlant,
                 onClickCalendar = { isShownDatePicker = true },
                 onSelectCareType = viewModel::onClickCareType,
-                onClickSave = viewModel::onClickSave
+                onClickSave = viewModel::onClickSave,
+                onClickImage = viewModel::showImagePickerBottomSheet
             )
         }
     }
@@ -142,6 +177,42 @@ internal fun DiaryWriteScreen(
             onDismiss = { snackBarState = snackBarState.copy(isVisible = false) }
         )
     }
+
+    if (uiState.showImagePickerBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = viewModel::hideImagePickerBottomSheet,
+            sheetState = bottomSheetState,
+            containerColor = Color.White,
+            dragHandle = {
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .size(width = 56.dp, height = 4.dp)
+                        .background(
+                            color = Color(0xFFDDDDDD),
+                            shape = RoundedCornerShape(2.dp)
+                        )
+                )
+            }
+        ) {
+            ImagePickerBottomSheetContent(
+                onClickCamera = {
+                    if (cameraPermissionState.status.isGranted) {
+                        val uri = viewModel.createImageUri()
+                        capturedImageUri = uri
+                        takePictureLauncher.launch(uri)
+                    } else {
+                        cameraPermissionState.launchPermissionRequest()
+                    }
+                },
+                onClickGallery = {
+                    photoPickerLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -153,7 +224,8 @@ private fun DiaryWriteContent(
     onClickPlant: (Long) -> Unit = {},
     onClickCalendar: () -> Unit = {},
     onSelectCareType: (CareType) -> Unit = {},
-    onClickSave: () -> Unit = {}
+    onClickSave: () -> Unit = {},
+    onClickImage: () -> Unit = {}
 ) {
     val dateFormatter = remember { DateTimeFormatter.ofPattern("yyyy년 MM월 dd일") }
 
@@ -182,12 +254,13 @@ private fun DiaryWriteContent(
                 AsyncImage(
                     model = uiState.imageUri,
                     contentDescription = null,
+                    contentScale = ContentScale.Fit,
                     modifier = Modifier
-                        .padding(vertical = 20.dp)
-                        .height(290.dp)
-                        .aspectRatio(0.75f)
+                        .fillMaxWidth()
+                        .aspectRatio(4f / 3f, true)
+                        .background(color = Color.Black)
                         .align(Alignment.CenterHorizontally)
-                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { onClickImage() }
                 )
 
                 Row(
@@ -562,6 +635,60 @@ private fun DiarySaveSuccessContent(
                 style = DiaryTypography.subtitleMediumBold,
                 color = DiaryColorsPalette.current.green600,
                 modifier = Modifier.align(Alignment.Center)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ImagePickerBottomSheetContent(
+    onClickCamera: () -> Unit,
+    onClickGallery: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 24.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onClickCamera() }
+                .padding(vertical = 16.dp, horizontal = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.icon_photo_camera_32),
+                contentDescription = null,
+                tint = DiaryColorsPalette.current.gray700,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = "카메라",
+                style = DiaryTypography.bodyLargeBold,
+                color = DiaryColorsPalette.current.gray900
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onClickGallery() }
+                .padding(vertical = 16.dp, horizontal = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.icon_insert_photo_fill_24),
+                contentDescription = null,
+                tint = DiaryColorsPalette.current.gray700,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = "사진",
+                style = DiaryTypography.bodyLargeBold,
+                color = DiaryColorsPalette.current.gray900
             )
         }
     }
