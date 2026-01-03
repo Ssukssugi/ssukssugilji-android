@@ -25,13 +25,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sabo.core.designsystem.R
-import com.sabo.core.designsystem.component.NavigationType
-import com.sabo.core.designsystem.component.SsukssukTopAppBar
 import com.sabo.core.designsystem.component.TopSnackBar
 import com.sabo.core.designsystem.component.rememberSnackBarState
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
@@ -90,14 +87,13 @@ internal fun ProfileScreen(
         )
     }
 
-    if (snackBarState.isVisible) {
-        TopSnackBar(
-            message = snackBarState.message,
-            iconRes = snackBarState.iconRes,
-            iconTint = snackBarState.iconTint,
-            onDismiss = { snackBarState = snackBarState.copy(isVisible = false) }
-        )
-    }
+    TopSnackBar(
+        message = snackBarState.message,
+        iconRes = snackBarState.iconRes,
+        iconTint = snackBarState.iconTint,
+        visible = snackBarState.isVisible,
+        onDismiss = { snackBarState = snackBarState.copy(isVisible = false) }
+    )
 }
 
 @Composable

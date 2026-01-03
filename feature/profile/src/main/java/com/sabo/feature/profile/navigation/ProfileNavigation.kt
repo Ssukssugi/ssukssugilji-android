@@ -55,7 +55,10 @@ fun NavGraphBuilder.profileNavGraph(
             .collectAsStateWithLifecycle()
 
         LaunchedEffect(isProfileUpdated) {
-            if (isProfileUpdated) viewModel.reloadProfile()
+            if (isProfileUpdated) {
+                viewModel.reloadProfile()
+                backStackEntry.savedStateHandle.remove<Boolean>(ChangeProfile.RESULT_PROFILE_UPDATED)
+            }
         }
 
         ProfileScreen(

@@ -16,12 +16,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,21 +45,44 @@ fun TopSnackBar(
     iconRes: Int = -1,
     iconTint: Color = Color.Unspecified,
     visible: Boolean = true,
-    duration: Long = 2500L,
+    duration: Long = 1000L,
     backgroundTint : Color = Color(0xB3000000),
     textColor : Color = DiaryColorsPalette.current.gray50,
+    dismissOnLifecycleStop: Boolean = true,
     onDismiss: () -> Unit = {}
 ) {
-    var isVisible by remember(visible) { mutableStateOf(visible) }
+    var dismissed by remember { mutableStateOf(false) }
+    var isVisible by remember { mutableStateOf(false) }
+    var prevVisible by remember { mutableStateOf(false) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (dismissOnLifecycleStop && event == Lifecycle.Event.ON_STOP) {
+                dismissed = true
+                isVisible = false
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     LaunchedEffect(visible) {
-        if (visible) {
+        if (visible && !prevVisible) {
+            dismissed = false
             isVisible = true
             delay(duration)
+            if (!dismissed) {
+                isVisible = false
+                delay(300)
+                onDismiss()
+            }
+        } else if (!visible) {
             isVisible = false
-            delay(300)
-            onDismiss()
         }
+        prevVisible = visible
     }
 
     AnimatedVisibility(
