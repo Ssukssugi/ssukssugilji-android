@@ -125,11 +125,11 @@ private fun UserDeleteContent(
             )
             InfoItem(
                 icon = R.drawable.icon_recycle,
-                title = "등록한 쑥쑥일지는 전부 삭제돼요."
+                title = "등록한 쑥쑥일지, 쑥쑥자랑 등은 전부 삭제돼요."
             )
             InfoItem(
                 icon = R.drawable.icon_delete_image,
-                title = "삭제된 쑥쑥일지는 더이상 확인할 수 없어요."
+                title = "삭제된 쑥쑥일지, 쑥쑥자랑 등은 더이상 확인할 수 없어요."
             )
         }
 
@@ -240,7 +240,7 @@ private fun DeleteConfirmDialog(
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "쑥쑥일지를 떠난다니 너무 아쉬워요",
+                text = "쑥쑥이네를 떠난다니 너무 아쉬워요",
                 color = DiaryColorsPalette.current.gray600,
                 style = DiaryTypography.bodyLargeMedium
             )

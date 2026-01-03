@@ -562,7 +562,7 @@ private fun LoginSuccessScreen(
                         LoginType.NAVER -> "네이버"
                     }
                 }로 로그인했어요",
-                subTitle = "필수약관에 동의하고\n쑥쑥일지를 시작해보세요"
+                subTitle = "필수약관에 동의하고\n쑥쑥이네를 시작해보세요"
             )
             Spacer(modifier = Modifier.height(64.dp))
             Image(
