@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import com.sabo.core.datastore.di.LocalDataStore
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -15,6 +16,7 @@ class LocalDataStore @Inject constructor(
     object PreferencesKey {
         val SERVICE_NOTIFICATION_ENABLED = booleanPreferencesKey("SERVICE_NOTIFICATION_ENABLED")
         val MARKETING_NOTIFICATION_ENABLED = booleanPreferencesKey("MARKETING_NOTIFICATION_ENABLED")
+        val USER_ID = longPreferencesKey("USER_ID")
     }
 
     suspend fun getServiceNotificationEnabled(): Boolean? {
@@ -46,6 +48,18 @@ class LocalDataStore @Inject constructor(
             preferences[PreferencesKey.SERVICE_NOTIFICATION_ENABLED] = serviceNotificationEnabled
             preferences[PreferencesKey.MARKETING_NOTIFICATION_ENABLED] = marketingNotificationEnabled
         }
+    }
+
+    suspend fun saveUserId(userId: Long) {
+        dataStore.edit { preference ->
+            preference[PreferencesKey.USER_ID] = userId
+        }
+    }
+
+    suspend fun getUserId(): Long? {
+        return dataStore.data.map { preferences ->
+            preferences[PreferencesKey.USER_ID]
+        }.firstOrNull()
     }
 
     suspend fun clear() {

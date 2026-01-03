@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GetUserProfile(
+    val userId: Long,
     val nickname: String,
 )

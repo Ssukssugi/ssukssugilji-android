@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.sabo.core.data.Result
 import com.sabo.core.data.handle
 import com.sabo.core.data.repository.DiaryRepository
+import com.sabo.core.data.repository.ProfileRepository
 import com.sabo.core.mapper.DateMapper.toLocalDate
 import com.sabo.core.navigator.model.PlantAddEdit
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +24,8 @@ import javax.inject.Inject
 @OptIn(OrbitExperimental::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val diaryRepository: DiaryRepository
+    private val diaryRepository: DiaryRepository,
+    private val profileRepository: ProfileRepository
 ) : ContainerHost<HomeUiState, HomeEvent>, ViewModel() {
 
     override val container: Container<HomeUiState, HomeEvent> = container(
@@ -32,6 +34,7 @@ class HomeViewModel @Inject constructor(
             plantContent = PlantContent.Loading
         ),
         onCreate = {
+            profileRepository.getUserProfile()
             fetchPlantStory()
             subIntent {
                 selectedPlantId.collect { plantId ->

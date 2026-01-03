@@ -18,7 +18,13 @@ class DefaultProfileRepository @Inject constructor(
     private val authDataStore: AuthDataStore
 ) : ProfileRepository {
     override suspend fun getUserProfile() = handleResult(
-        execute = { profileService.getUserProfile() },
+        execute = {
+            profileService.getUserProfile().also {
+                it.body()?.let { response ->
+                    localDataStore.saveUserId(response.userId)
+                }
+            }
+        },
         transform = { it }
     )
 
@@ -35,6 +41,7 @@ class DefaultProfileRepository @Inject constructor(
                     marketingNotificationEnabled = result.data.agreeToReceiveMarketing
                 )
             }
+
             is Result.Error -> {
             }
         }

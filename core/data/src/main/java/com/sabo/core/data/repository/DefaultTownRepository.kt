@@ -2,13 +2,15 @@ package com.sabo.core.data.repository
 
 import com.sabo.core.data.Result
 import com.sabo.core.data.handleResult
+import com.sabo.core.datastore.LocalDataStore
 import com.sabo.core.network.model.request.SaveGrowthRequest
 import com.sabo.core.network.model.response.GetTownGrowth
 import com.sabo.core.network.service.TownService
 import javax.inject.Inject
 
 class DefaultTownRepository @Inject constructor(
-    private val townService: TownService
+    private val townService: TownService,
+    private val localDataStore: LocalDataStore
 ) : TownRepository {
 
     override suspend fun getTownGrowth(lastGrowthId: Long?): Result<GetTownGrowth> = handleResult(
@@ -47,4 +49,8 @@ class DefaultTownRepository @Inject constructor(
         },
         transform = {}
     )
+
+    override suspend fun getUserId(): Long {
+        return localDataStore.getUserId() ?: -1L
+    }
 }

@@ -71,7 +71,7 @@ internal fun TownListContent(
     selectedTab: TownTab,
     onTabSelected: (TownTab) -> Unit = {},
     onLoadMore: (Long) -> Unit = {},
-    onClickPostMore: (Long) -> Unit = {},
+    onClickPostMore: (TownListItem.Post) -> Unit = {},
 ) {
     val listState = rememberLazyListState()
     var isLoadingMore by remember { mutableStateOf(false) }
@@ -237,7 +237,7 @@ private fun TownTab(
 @Composable
 private fun TownListItem(
     data: TownListItem.Post,
-    onClickGrowthItemMore: (Long) -> Unit = {}
+    onClickGrowthItemMore: (TownListItem.Post) -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -283,7 +283,7 @@ private fun TownListItem(
                     modifier = Modifier
                         .size(24.dp)
                         .clip(CircleShape)
-                        .clickable { onClickGrowthItemMore(data.id) }
+                        .clickable { onClickGrowthItemMore(data) }
                 )
             }
 

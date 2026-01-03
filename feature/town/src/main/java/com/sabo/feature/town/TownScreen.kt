@@ -1,7 +1,6 @@
 package com.sabo.feature.town
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +20,7 @@ import com.sabo.core.designsystem.component.TopSnackBar
 import com.sabo.core.designsystem.component.rememberSnackBarState
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
+import com.sabo.feature.town.component.GrowthDeleteDialog
 import com.sabo.feature.town.component.TownListContent
 import com.sabo.feature.town.component.UserReportDialog
 import com.sabo.feature.town.component.UserReportOptionsBottomSheet
@@ -34,16 +34,17 @@ internal fun TownScreen(
 ) {
     val state = viewModel.collectAsState().value
 
-    var selectedGrowthId by remember { mutableStateOf<Long?>(null) }
+    var selectedGrowth by remember { mutableStateOf<SelectedGrowth?>(null) }
     var showPostOptionBottomSheet by remember { mutableStateOf(false) }
     var showUserReportDialog by remember { mutableStateOf(false) }
+    var showGrowthDeleteDialog by remember { mutableStateOf(false) }
 
     var snackBarState by rememberSnackBarState()
 
     viewModel.collectSideEffect {
         when (it) {
             is TownEvent.ShowPostOptions -> {
-                selectedGrowthId = it.growthId
+                selectedGrowth = it.data
                 showPostOptionBottomSheet = true
             }
 
@@ -51,6 +52,15 @@ internal fun TownScreen(
                 snackBarState = snackBarState.copy(isVisible = false)
                 snackBarState = snackBarState.copy(
                     message = "게시글 신고가 완료되었어요!",
+                    iconRes = R.drawable.icon_circle_check,
+                    isVisible = true
+                )
+            }
+
+            TownEvent.ShowSnackBarDeleteGrowth -> {
+                snackBarState = snackBarState.copy(isVisible = false)
+                snackBarState = snackBarState.copy(
+                    message = "게시글 삭제가 완료되었어요!",
                     iconRes = R.drawable.icon_circle_check,
                     isVisible = true
                 )
@@ -82,24 +92,41 @@ internal fun TownScreen(
     }
 
     if (showPostOptionBottomSheet) {
-        UserReportOptionsBottomSheet(
-            onDismissRequest = {
-                showPostOptionBottomSheet = false
-                selectedGrowthId = null
-            },
-            onReportClick = { showUserReportDialog = true }
-        )
+        selectedGrowth?.let { growth ->
+            UserReportOptionsBottomSheet(
+                isMine = growth.isMine,
+                onDismissRequest = {
+                    showPostOptionBottomSheet = false
+                    selectedGrowth = null
+                },
+                onReportClick = { showUserReportDialog = true },
+                onDeleteClick = { showGrowthDeleteDialog = true }
+            )
+        }
     }
 
     if (showUserReportDialog) {
         UserReportDialog(
             onDismiss = {
                 showUserReportDialog = false
-                selectedGrowthId = null
+                selectedGrowth = null
             },
             onConfirm = {
-                selectedGrowthId?.let { viewModel.reportGrowthPost(it) }
+                selectedGrowth?.let { viewModel.reportGrowthPost(it.growthId) }
                 showPostOptionBottomSheet = false
+            }
+        )
+    }
+
+    if (showGrowthDeleteDialog) {
+        GrowthDeleteDialog(
+            onDismiss = {
+                showGrowthDeleteDialog = false
+                selectedGrowth = null
+            },
+            onConfirm = {
+                selectedGrowth?.let { viewModel.deleteGrowthPost(it.growthId) }
+                showGrowthDeleteDialog = false
             }
         )
     }

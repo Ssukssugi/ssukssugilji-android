@@ -1,6 +1,5 @@
 package com.sabo.feature.town
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sabo.core.data.Result
@@ -11,11 +10,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
-import org.orbitmvi.orbit.annotation.OrbitExperimental
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
-@OptIn(OrbitExperimental::class)
 @HiltViewModel
 class TownViewModel @Inject constructor(
     private val townRepository: TownRepository
@@ -37,7 +34,7 @@ class TownViewModel @Inject constructor(
                     townContent = TownContent(isLoading = true, isNewUser = false, dataList = emptyList())
                 )
             }
-
+            val userIdDeferred = async { townRepository.getUserId() }
             val growthDeferred = async { townRepository.getTownGrowth(null) }
             val isNewUserDeferred = async { townRepository.getMyGrowth() }
 
@@ -45,7 +42,7 @@ class TownViewModel @Inject constructor(
             val isNewUserResult = isNewUserDeferred.await()
 
             if (growthResult is Result.Success && isNewUserResult is Result.Success) {
-                val townItems = growthResult.data.growths.map { growth -> growth.toPresentation() }
+                val townItems = growthResult.data.growths.map { growth -> growth.toPresentation(userId = userIdDeferred.await()) }
 
                 val newList = if (townItems.isNotEmpty()) {
                     townItems + TownListItem.LoadMore(lastId = townItems.last().id)
@@ -71,6 +68,8 @@ class TownViewModel @Inject constructor(
     fun loadMoreTownGrowth(lastId: Long) = intent {
         when (val result = townRepository.getTownGrowth(lastId)) {
             is Result.Success -> {
+                val userId = townRepository.getUserId()
+
                 val existingIds = state.townContent.dataList
                     .filterIsInstance<TownListItem.Post>()
                     .map { it.id }
@@ -80,7 +79,7 @@ class TownViewModel @Inject constructor(
 
                 val newTownItems = state.townContent.dataList.toMutableList().apply {
                     removeAt(lastIndex)
-                    addAll(newGrowths.map { it.toPresentation() })
+                    addAll(newGrowths.map { it.toPresentation(userId = userId) })
                     if (newGrowths.isNotEmpty()) add(TownListItem.LoadMore(lastId = newGrowths.last().growthId))
                 }
 
@@ -91,14 +90,12 @@ class TownViewModel @Inject constructor(
                 }
             }
 
-            is Result.Error -> {
-                Log.d("lololo", "${result.message}")
-            }
+            is Result.Error -> {}
         }
     }
 
-    fun onClickGrowthPostMore(id: Long) = intent {
-        postSideEffect(TownEvent.ShowPostOptions(growthId = id))
+    fun onClickGrowthPostMore(item: TownListItem.Post) = intent {
+        postSideEffect(TownEvent.ShowPostOptions(SelectedGrowth(growthId = item.id, isMine = item.isMine)))
     }
 
     fun reportGrowthPost(id: Long) = intent {
@@ -106,6 +103,22 @@ class TownViewModel @Inject constructor(
         townRepository.reportTown(growthId = id).handle(
             onSuccess = {
                 postSideEffect(TownEvent.ShowSnackBarReportGrowth)
+            },
+            onFinish = {
+                reduce { state.copy(isLoading = false) }
+            }
+        )
+    }
+
+    fun deleteGrowthPost(id: Long) = intent {
+        reduce { state.copy(isLoading = true) }
+        townRepository.deleteGrowth(growthId = id).handle(
+            onSuccess = {
+                when (state.selectedTab) {
+                    TownTab.ALL -> fetchTownGrowth()
+                    TownTab.MY_POSTS -> fetchMyGrowth()
+                }
+                postSideEffect(TownEvent.ShowSnackBarDeleteGrowth)
             },
             onFinish = {
                 reduce { state.copy(isLoading = false) }
@@ -134,7 +147,7 @@ class TownViewModel @Inject constructor(
 
             when (val result = townRepository.getMyGrowth()) {
                 is Result.Success -> {
-                    val townItems = result.data.growths.map { growth -> growth.toPresentation() }
+                    val townItems = result.data.growths.map { growth -> growth.toPresentation(isMine = true) }
                     val isNewUser = townItems.isEmpty()
 
                     reduce {

@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -34,8 +35,10 @@ import com.sabo.core.designsystem.theme.DiaryTypography
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun UserReportOptionsBottomSheet(
+    isMine: Boolean,
     onDismissRequest: () -> Unit,
-    onReportClick: () -> Unit
+    onReportClick: () -> Unit,
+    onDeleteClick: () -> Unit,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -58,12 +61,21 @@ internal fun UserReportOptionsBottomSheet(
                 .background(color = Color(0xFFFFFFFF))
                 .padding(vertical = 24.dp)
         ) {
-            ReportBottomSheetItem(
-                iconRes = R.drawable.icon_trash,
-                text = "신고하기",
-                tint = DiaryColorsPalette.current.red400,
-                onClick = { onReportClick() }
-            )
+            if (isMine) {
+                ReportBottomSheetItem(
+                    iconRes = R.drawable.icon_trash,
+                    text = "삭제하기",
+                    tint = DiaryColorsPalette.current.red400,
+                    onClick = { onDeleteClick() }
+                )
+            } else {
+                ReportBottomSheetItem(
+                    iconRes = R.drawable.icon_trash,
+                    text = "신고하기",
+                    tint = DiaryColorsPalette.current.red400,
+                    onClick = { onReportClick() }
+                )
+            }
         }
     }
 }
@@ -158,6 +170,94 @@ internal fun UserReportDialog(
                 ) {
                     Text(
                         text = "신고하기",
+                        color = DiaryColorsPalette.current.green600,
+                        style = DiaryTypography.subtitleMediumBold
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .wrapContentHeight()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(DiaryColorsPalette.current.green400)
+                        .clickable { onDismiss() }
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "돌아가기",
+                        color = DiaryColorsPalette.current.gray50,
+                        style = DiaryTypography.subtitleMediumBold
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+internal fun GrowthDeleteDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(24.dp))
+                .background(Color.White)
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(40.dp))
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.icon_notice_triangle),
+                contentDescription = null,
+                tint = DiaryColorsPalette.current.red400,
+                modifier = Modifier.size(64.dp)
+            )
+            Text(
+                text = "이 게시글을 정말 삭제할까요?",
+                style = DiaryTypography.subtitleLargeBold,
+                color = DiaryColorsPalette.current.gray900,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 24.dp, bottom = 8.dp)
+            )
+            Text(
+                text = "삭제한 게시글을 다시 복구할 수 없어요!\n신중하게 고민 후 삭제를 진행해주세요.",
+                style = DiaryTypography.bodyLargeMedium,
+                color = DiaryColorsPalette.current.gray600,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .wrapContentHeight()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(DiaryColorsPalette.current.green50)
+                        .clickable {
+                            onConfirm()
+                            onDismiss()
+                        }
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "삭제하기",
                         color = DiaryColorsPalette.current.green600,
                         style = DiaryTypography.subtitleMediumBold
                     )

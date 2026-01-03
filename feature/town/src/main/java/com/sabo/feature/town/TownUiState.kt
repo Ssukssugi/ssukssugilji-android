@@ -29,13 +29,14 @@ sealed interface TownListItem {
         val nickName: String,
         val oldImage: String,
         val newImage: String,
-        val dateDiff: Int
+        val dateDiff: Int,
+        val isMine: Boolean
     ): TownListItem
 
     data class LoadMore(val lastId: Long): TownListItem
 }
 
-fun GetTownGrowth.GrowthContent.toPresentation(): TownListItem.Post {
+fun GetTownGrowth.GrowthContent.toPresentation(userId: Long): TownListItem.Post {
     val beforeDate = LocalDate.parse(before.date)
     val afterDate = LocalDate.parse(after.date)
     val dateDiff = ChronoUnit.DAYS.between(beforeDate, afterDate).toInt()
@@ -47,11 +48,32 @@ fun GetTownGrowth.GrowthContent.toPresentation(): TownListItem.Post {
         nickName = owner.nickname,
         oldImage = before.imageUrl,
         newImage = after.imageUrl,
-        dateDiff = dateDiff
+        dateDiff = dateDiff,
+        isMine = owner.userId == userId
+    )
+}
+
+fun GetTownGrowth.GrowthContent.toPresentation(isMine: Boolean): TownListItem.Post {
+    val beforeDate = LocalDate.parse(before.date)
+    val afterDate = LocalDate.parse(after.date)
+    val dateDiff = ChronoUnit.DAYS.between(beforeDate, afterDate).toInt()
+
+    return TownListItem.Post(
+        id = growthId,
+        profile = plant.plantImage,
+        plantName = plant.name,
+        nickName = owner.nickname,
+        oldImage = before.imageUrl,
+        newImage = after.imageUrl,
+        dateDiff = dateDiff,
+        isMine = isMine
     )
 }
 
 sealed interface TownEvent {
-    data class ShowPostOptions(val growthId: Long) : TownEvent
+    data class ShowPostOptions(val data: SelectedGrowth) : TownEvent
     data object ShowSnackBarReportGrowth: TownEvent
+    data object ShowSnackBarDeleteGrowth: TownEvent
 }
+
+data class SelectedGrowth(val growthId: Long, val isMine: Boolean)
