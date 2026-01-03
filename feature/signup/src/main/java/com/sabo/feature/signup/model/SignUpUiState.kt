@@ -13,8 +13,10 @@ data class SignUpUiState(
     val plantReason: Set<PlantReason> = emptySet(),
     val howKnown: Set<HowKnown> = emptySet()
 ) {
-    enum class NicknameErrorState {
-        NONE, INVALID_FORMAT, DUPLICATED
+    enum class NicknameErrorState(val helper: String) {
+        NONE(""),
+        INVALID_FORMAT("한글, 숫자, 영문 포함 12글자까지 입력할 수 있어요"),
+        DUPLICATED("이미 사용 중인 닉네임이에요")
     }
 
     enum class Age {

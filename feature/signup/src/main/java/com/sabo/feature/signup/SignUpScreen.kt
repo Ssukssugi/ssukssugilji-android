@@ -136,15 +136,7 @@ private fun NicknameCreate(
     errorState: SignUpUiState.NicknameErrorState,
     onClickNextButton: () -> Unit = {}
 ) {
-    val regex = remember { "^[가-힣A-Za-z0-9]{1,12}$".toRegex() }
-    var isValid by remember { mutableStateOf(false) }
-
-    LaunchedEffect(nicknameState) {
-        snapshotFlow { nicknameState.text }
-            .map { input -> regex.matches(input) }
-            .distinctUntilChanged()
-            .collect { isValid = it }
-    }
+    val isValid = errorState == SignUpUiState.NicknameErrorState.NONE && nicknameState.text.isNotEmpty()
 
     Column(
         modifier = modifier
@@ -168,8 +160,7 @@ private fun NicknameCreate(
         Spacer(modifier = modifier.weight(1f))
 
         NextButton(
-            modifier = modifier
-                .fillMaxWidth(),
+            modifier = modifier.fillMaxWidth(),
             isActive = isValid,
             text = "확인",
             onClicked = onClickNextButton
@@ -206,7 +197,7 @@ private fun NickNameInput(
                     modifier = modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
-                        .padding(vertical = 18.dp),
+                        .padding(vertical = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (nicknameState.text.isEmpty()) {
@@ -236,7 +227,18 @@ private fun NickNameInput(
                     modifier = modifier
                         .fillMaxWidth()
                         .height(1.dp)
-                        .background(color = DiaryColorsPalette.current.green400)
+                        .background(
+                            color = when (errorState) {
+                                SignUpUiState.NicknameErrorState.NONE -> DiaryColorsPalette.current.green400
+                                else -> DiaryColorsPalette.current.red500
+                            }
+                        )
+                )
+                Text(
+                    text = errorState.helper,
+                    color = DiaryColorsPalette.current.red500,
+                    style = DiaryTypography.captionLargeMedium,
+                    modifier = modifier.padding(top = 4.dp)
                 )
             }
         }
@@ -331,11 +333,13 @@ private fun SignUpExtraInfoScreen(
                         selectedAge = uiState.age,
                         onClickItem = { onClickAgeChip(it) }
                     )
+
                     1 -> SignUpPlantReasonContent(
                         modifier = modifier,
                         selectedItems = uiState.plantReason,
                         onClickItem = { onClickPlantReasonChip(it) }
                     )
+
                     2 -> SignUpHowKnowContent(
                         modifier = modifier,
                         selectedItems = uiState.howKnown,
@@ -429,7 +433,7 @@ private fun CreateNicknamePreview() {
     SsukssukDiaryTheme {
         NicknameCreate(
             nicknameState = TextFieldState("씩씩한몬스테라"),
-            errorState = SignUpUiState.NicknameErrorState.NONE,
+            errorState = SignUpUiState.NicknameErrorState.DUPLICATED,
         )
     }
 }

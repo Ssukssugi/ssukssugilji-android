@@ -1,8 +1,11 @@
 package com.sabo.feature.signup
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import com.sabo.core.data.handle
 import com.sabo.core.data.repository.SignUpRepository
 import com.sabo.feature.signup.model.AgeChip
@@ -25,9 +28,27 @@ class SignUpViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val nickname = TextFieldState()
+    private val nicknameRegex = "^[가-힣A-Za-z0-9]{1,12}$".toRegex()
 
     private val _uiState = MutableStateFlow(SignUpUiState(nickname = nickname))
     val uiState = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            snapshotFlow { nickname.text }
+                .map { input -> nicknameRegex.matches(input) }
+                .distinctUntilChanged()
+                .collect { isValid ->
+                    _uiState.value = uiState.value.copy(
+                        nicknameErrorState = if (isValid || nickname.text.isEmpty()) {
+                            SignUpUiState.NicknameErrorState.NONE
+                        } else {
+                            SignUpUiState.NicknameErrorState.INVALID_FORMAT
+                        }
+                    )
+                }
+        }
+    }
 
     private val _event = Channel<SignUpEvent>(Channel.RENDEZVOUS)
     val event = _event.receiveAsFlow()
@@ -38,9 +59,11 @@ class SignUpViewModel @Inject constructor(
                 onSuccess = {
                     if (it.available) {
                         moveToNextStep()
+                    } else {
+                        _uiState.value = uiState.value.copy(
+                            nicknameErrorState = SignUpUiState.NicknameErrorState.DUPLICATED
+                        )
                     }
-                },
-                onError = {
                 }
             )
         }

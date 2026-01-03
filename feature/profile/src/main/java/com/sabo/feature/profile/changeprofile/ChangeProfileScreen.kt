@@ -93,6 +93,7 @@ internal fun ChangeProfileScreen(
             } else {
                 ChangeProfileScreenContent(
                     textFieldState = state.textFieldState,
+                    errorState = state.errorState,
                     onClickSave = viewModel::changeNickname,
                     isSavable = isSaveEnabled
                 )
@@ -104,6 +105,7 @@ internal fun ChangeProfileScreen(
 @Composable
 private fun ChangeProfileScreenContent(
     textFieldState: TextFieldState = TextFieldState(),
+    errorState: ChangeProfileUiState.ErrorType = ChangeProfileUiState.ErrorType.NONE,
     onClickSave: () -> Unit = {},
     isSavable: Boolean = false
 ) {
@@ -183,6 +185,12 @@ private fun ChangeProfileScreenContent(
                             .fillMaxWidth()
                             .height(1.dp)
                             .background(color = DiaryColorsPalette.current.gray600)
+                    )
+                    Text(
+                        text = errorState.helper,
+                        color = DiaryColorsPalette.current.red500,
+                        style = DiaryTypography.captionLargeMedium,
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                 }
             }

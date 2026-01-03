@@ -53,6 +53,9 @@ class ChangeProfileViewModel @Inject constructor(
             onSuccess = {
                 postSideEffect(ChangeProfileSideEffect.FinishWithResult)
             },
+            onError = {
+                reduce { state.copy(errorState = ChangeProfileUiState.ErrorType.DUPLICATED) }
+            },
             onFinish = {
                 reduce { state.copy(isLoading = false) }
             }
