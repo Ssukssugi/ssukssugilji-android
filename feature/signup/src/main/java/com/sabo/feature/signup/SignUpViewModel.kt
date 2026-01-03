@@ -162,7 +162,17 @@ class SignUpViewModel @Inject constructor(
 
     fun skipSignUp() {
         viewModelScope.launch {
-            _event.send(SignUpEvent.OnCompletedSignUp)
+            val state = uiState.value
+            signUpRepository.applyUserDetails(
+                nickname = state.nickname.text.toString(),
+                ageGroup = null,
+                plantReason = null,
+                signUpPath = null
+            ).handle(
+                onSuccess = {
+                    _event.send(SignUpEvent.OnCompletedSignUp)
+                }
+            )
         }
     }
 }
