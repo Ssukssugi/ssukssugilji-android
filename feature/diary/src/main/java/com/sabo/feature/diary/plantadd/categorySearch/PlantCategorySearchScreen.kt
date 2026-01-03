@@ -1,5 +1,6 @@
 package com.sabo.feature.diary.plantadd.categorySearch
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -37,15 +38,18 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.sabo.core.designsystem.R
 import com.sabo.core.designsystem.component.NavigationType
 import com.sabo.core.designsystem.component.SsukssukTopAppBar
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
@@ -163,11 +167,17 @@ private fun PlantCategorySearchContent(
             }
         )
 
-        SearchResultListContent(
-            keyword = state.textFieldState.text.toString(),
-            results = state.searchResult,
-            onClickCategory = onClickCategory
-        )
+        if (state.isLoading.not() && state.hasSearched) {
+            SearchResultListContent(
+                keyword = state.textFieldState.text.toString(),
+                results = state.searchResult,
+                onClickCategory = onClickCategory
+            )
+        } else {
+            Spacer(
+                modifier = Modifier.weight(1f, true)
+            )
+        }
 
         CompleteButton(
             onClick = { onClickCategory(state.textFieldState.text.toString()) }
@@ -208,59 +218,123 @@ private fun ColumnScope.SearchResultListContent(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
         )
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f, fill = true),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            items(
-                items = results,
-                key = { it.category }
-            ) { result ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onClickCategory(result.category) }
-                        .padding(horizontal = 8.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AsyncImage(
-                        model = result.imageUrl,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
+        if (keyword.isNotEmpty() && count == 0) {
+            EmptyScreen(
+                category = keyword,
+                onClickCompleteButton = onClickCategory
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f, fill = true),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                items(
+                    items = results,
+                    key = { it.category }
+                ) { result ->
+                    Row(
                         modifier = Modifier
-                            .size(56.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(color = DiaryColorsPalette.current.gray200)
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = buildAnnotatedString {
-                            val name = result.category
+                            .fillMaxWidth()
+                            .clickable { onClickCategory(result.category) }
+                            .padding(horizontal = 8.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AsyncImage(
+                            model = result.imageUrl,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(56.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(color = DiaryColorsPalette.current.gray200)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = buildAnnotatedString {
+                                val name = result.category
 
-                            if (keyword.isNotEmpty()) {
-                                val startIndex = name.indexOf(keyword, ignoreCase = true)
-                                if (startIndex >= 0) {
-                                    append(name.substring(0, startIndex))
-                                    withStyle(style = SpanStyle(color = DiaryColorsPalette.current.green400)) {
-                                        append(name.substring(startIndex, startIndex + keyword.length))
+                                if (keyword.isNotEmpty()) {
+                                    val startIndex = name.indexOf(keyword, ignoreCase = true)
+                                    if (startIndex >= 0) {
+                                        append(name.substring(0, startIndex))
+                                        withStyle(style = SpanStyle(color = DiaryColorsPalette.current.green400)) {
+                                            append(name.substring(startIndex, startIndex + keyword.length))
+                                        }
+                                        append(name.substring(startIndex + keyword.length))
+                                    } else {
+                                        append(name)
                                     }
-                                    append(name.substring(startIndex + keyword.length))
                                 } else {
                                     append(name)
                                 }
-                            } else {
-                                append(name)
-                            }
-                        },
-                        style = DiaryTypography.bodySmallSemiBold,
-                        color = DiaryColorsPalette.current.gray800,
-                        modifier = Modifier.weight(1f),
-                        maxLines = 1,
-                    )
+                            },
+                            style = DiaryTypography.bodySmallSemiBold,
+                            color = DiaryColorsPalette.current.gray800,
+                            modifier = Modifier.weight(1f),
+                            maxLines = 1,
+                        )
+                    }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun EmptyScreen(
+    category: String,
+    onClickCompleteButton: (String) -> Unit = {}
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(R.drawable.img_plant_category_empty),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(top = 24.dp)
+                .size(80.dp)
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        Text(
+            text = "'${category}'\n검색결과가 없어요",
+            style = DiaryTypography.headlineSmallBold,
+            color = DiaryColorsPalette.current.gray900,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        )
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = "새로운 식물로 입력할까요?",
+            style = DiaryTypography.subtitleMediumRegular,
+            color = DiaryColorsPalette.current.gray600,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 20.dp, vertical = 16.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(color = DiaryColorsPalette.current.green500)
+                .clickable { onClickCompleteButton(category) }
+                .padding(vertical = 16.dp)
+        ) {
+            Text(
+                text = "'${category}'로 입력하기",
+                style = DiaryTypography.subtitleMediumBold,
+                color = DiaryColorsPalette.current.gray50,
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
     }
 }
@@ -294,5 +368,14 @@ private fun PlantCategorySearchContentPreview() {
             state = PlantSearchState()
         )
     }
+}
 
+@Preview(showBackground = true)
+@Composable
+private fun EmptyScreenPreview() {
+    SsukssukDiaryTheme {
+        EmptyScreen(
+            category = "방울토마토"
+        )
+    }
 }

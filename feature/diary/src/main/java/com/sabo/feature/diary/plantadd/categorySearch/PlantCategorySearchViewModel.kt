@@ -41,6 +41,13 @@ class PlantCategorySearchViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch {
             snapshotFlow { searchState.text }
+                .distinctUntilChanged()
+                .collect {
+                    _state.value = _state.value.copy(hasSearched = false)
+                }
+        }
+        viewModelScope.launch {
+            snapshotFlow { searchState.text }
                 .filter { it.isNotEmpty() }
                 .distinctUntilChanged()
                 .debounce(500L)
@@ -49,6 +56,7 @@ class PlantCategorySearchViewModel @AssistedInject constructor(
     }
 
     private suspend fun onSearchedCategory(keyword: String) {
+        _state.value = state.value.copy(isLoading = true)
         diaryRepository.getPlantCategories(keyword).handle(
             onSuccess = { response ->
                 _state.value = _state.value.copy(
@@ -57,6 +65,9 @@ class PlantCategorySearchViewModel @AssistedInject constructor(
             },
             onError = {
                 _state.value = _state.value.copy(searchResult = emptyList())
+            },
+            onFinish = {
+                _state.value = _state.value.copy(isLoading = false, hasSearched = true)
             }
         )
     }
