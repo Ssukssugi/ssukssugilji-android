@@ -17,12 +17,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.sabo.core.designsystem.R
+import com.sabo.core.designsystem.component.NetworkErrorDialog
 import com.sabo.core.designsystem.component.TopSnackBar
 import com.sabo.core.designsystem.component.rememberSnackBarState
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
+import com.sabo.core.model.NetworkErrorEvent
 import com.sabo.core.navigator.model.PlantAddEdit
 import com.sabo.feature.home.component.PlantDeleteDialog
 import com.sabo.feature.home.component.PlantOptionsModalBottomSheet
@@ -40,7 +45,7 @@ internal fun HomeScreen(
     navigateToPlantEdit: (PlantAddEdit.PlantEdit) -> Unit,
     onSelectedPlantIdChange: (Long?) -> Unit = {},
 ) {
-
+    val lifecycleOwner = LocalLifecycleOwner.current
     val state = viewModel.collectAsState().value
     val selectedPlantId by viewModel.selectedPlantId.collectAsStateWithLifecycle()
 
@@ -51,6 +56,7 @@ internal fun HomeScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedPlant by remember { mutableStateOf<PlantListItem.Plant?>(null) }
     var showPlantDeleteDialog by remember { mutableStateOf(false) }
+    var showNetworkErrorDialog by remember { mutableStateOf(false) }
 
     var snackBarState by rememberSnackBarState()
 
@@ -74,6 +80,14 @@ internal fun HomeScreen(
                     iconRes = R.drawable.icon_circle_check,
                     isVisible = true
                 )
+            }
+        }
+    }
+
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.showNetworkErrorDialog.collect {
+                showNetworkErrorDialog = true
             }
         }
     }
@@ -115,6 +129,14 @@ internal fun HomeScreen(
             iconRes = snackBarState.iconRes,
             iconTint = snackBarState.iconTint,
             onDismiss = { snackBarState = snackBarState.copy(isVisible = false) }
+        )
+    }
+
+    if (showNetworkErrorDialog) {
+        NetworkErrorDialog(
+            event = NetworkErrorEvent.NoInternet,
+            onDismiss = { showNetworkErrorDialog = false },
+            onRetry = viewModel::initDataLoad
         )
     }
 }

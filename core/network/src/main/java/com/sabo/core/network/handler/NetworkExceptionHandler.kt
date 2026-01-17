@@ -23,7 +23,6 @@ object NetworkExceptionHandler {
                 }
             }
 
-            // 기타 예외
             else -> NetworkError.Unknown(cause = throwable)
         }
     }
@@ -34,10 +33,12 @@ object NetworkExceptionHandler {
                 code = code,
                 message = "Internal Server Error"
             )
+
             in 400..499 -> NetworkError.ServerError(
                 code = code,
                 message = exception.message() ?: "Request Error"
             )
+
             else -> NetworkError.Unknown(cause = exception)
         }
     }
@@ -45,10 +46,10 @@ object NetworkExceptionHandler {
     private fun isNetworkRelated(exception: IOException): Boolean {
         val message = exception.message?.lowercase() ?: return false
         return message.contains("network") ||
-            message.contains("connection") ||
-            message.contains("timeout") ||
-            message.contains("unreachable") ||
-            message.contains("reset") ||
-            message.contains("closed")
+                message.contains("connection") ||
+                message.contains("timeout") ||
+                message.contains("unreachable") ||
+                message.contains("reset") ||
+                message.contains("closed")
     }
 }

@@ -8,3 +8,7 @@ plugins {
 android {
     setNameSpace("core.toolkit")
 }
+
+dependencies {
+    implementation(projects.core.model)
+}

@@ -36,8 +36,8 @@ import com.sabo.core.navigator.MainTabRoute
 import com.sabo.core.navigator.model.Diary
 import com.sabo.core.navigator.model.Profile
 import com.sabo.core.navigator.model.Town
-import com.sabo.feature.main.component.MainNavigationSuite
 import com.sabo.feature.main.component.MainNavHost
+import com.sabo.feature.main.component.MainNavigationSuite
 import com.sabo.feature.main.component.MainNavigator
 import com.sabo.feature.main.component.rememberMainNavigator
 import kotlinx.coroutines.flow.collectLatest
@@ -49,7 +49,7 @@ fun MainScreen(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.navigationEvent.collectLatest {
                 navigator.navigateToLoginAndClearBackStack()

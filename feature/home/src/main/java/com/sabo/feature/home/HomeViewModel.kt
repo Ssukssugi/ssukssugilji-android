@@ -7,7 +7,9 @@ import com.sabo.core.data.handle
 import com.sabo.core.data.repository.DiaryRepository
 import com.sabo.core.data.repository.ProfileRepository
 import com.sabo.core.mapper.DateMapper.toLocalDate
+import com.sabo.core.model.NetworkErrorEvent
 import com.sabo.core.navigator.model.PlantAddEdit
+import com.sabo.core.toolkit.NetworkErrorManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +27,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val diaryRepository: DiaryRepository,
-    private val profileRepository: ProfileRepository
+    private val profileRepository: ProfileRepository,
+    private val networkErrorManager: NetworkErrorManager
 ) : ContainerHost<HomeUiState, HomeEvent>, ViewModel() {
 
     override val container: Container<HomeUiState, HomeEvent> = container(
@@ -34,8 +37,7 @@ class HomeViewModel @Inject constructor(
             plantContent = PlantContent.Loading
         ),
         onCreate = {
-            profileRepository.getUserProfile()
-            fetchPlantStory()
+            initDataLoad()
             subIntent {
                 selectedPlantId.collect { plantId ->
                     plantId?.let { fetchPlantContent(it) }
@@ -46,6 +48,51 @@ class HomeViewModel @Inject constructor(
 
     private val _selectedPlantId = MutableStateFlow<Long?>(null)
     val selectedPlantId: StateFlow<Long?> = _selectedPlantId.asStateFlow()
+
+    val showNetworkErrorDialog = networkErrorManager.showDialog
+
+    fun initDataLoad() = intent {
+        viewModelScope.launch {
+            val profileDeferred = async { profileRepository.getUserProfile() }
+            val storyDeferred = async { diaryRepository.getMyPlants(false) }
+
+            val profileResult = profileDeferred.await()
+            val storyResult = storyDeferred.await()
+
+            when {
+                profileResult is Result.Error -> {
+                    if (profileResult.isNetworkError) {
+                        networkErrorManager.sendDialogEvent(NetworkErrorEvent.NoInternet)
+                    }
+                }
+
+                storyResult is Result.Error -> {
+                    if (storyResult.isNetworkError) {
+                        networkErrorManager.sendDialogEvent(NetworkErrorEvent.NoInternet)
+                    }
+                    reduce { state.copy(plantList = listOf(PlantListItem.AddPlant)) }
+                }
+
+                storyResult is Result.Success -> {
+                    _selectedPlantId.update { storyResult.data.firstOrNull()?.plantId }
+
+                    reduce {
+                        state.copy(
+                            plantList = listOf(PlantListItem.AddPlant) + storyResult.data.map { plant ->
+                                PlantListItem.Plant(
+                                    id = plant.plantId,
+                                    name = plant.name,
+                                    image = plant.image,
+                                    isSelected = plant.plantId == _selectedPlantId.value
+                                )
+                            },
+                            plantContent = if (storyResult.data.isEmpty()) PlantContent.Empty else PlantContent.Loading
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     private fun fetchPlantStory() = intent {
         val plants: List<PlantListItem> = when (val response = diaryRepository.getMyPlants(false)) {
