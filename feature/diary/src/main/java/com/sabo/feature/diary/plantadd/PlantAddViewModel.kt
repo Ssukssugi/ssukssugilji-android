@@ -68,7 +68,7 @@ class PlantAddViewModel @Inject constructor(
         val inputState = state as? PlantAddState.Input
         when (route) {
             PlantAddEdit.PlantAdd -> {
-                val isTextNotEmpty = textFieldText.isNotEmpty()
+                val isTextNotEmpty = textFieldText.trim().isNotBlank()
                 val isCategorySelected = inputState?.plantCategory != null
                 isTextNotEmpty && isCategorySelected
             }

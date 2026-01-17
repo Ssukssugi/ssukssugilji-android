@@ -10,5 +10,6 @@ android {
 
 dependencies {
     implementation(projects.core.data)
+    implementation(projects.core.toolkit)
     implementation(libs.accompanist.permissions)
 }

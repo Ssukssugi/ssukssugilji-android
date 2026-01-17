@@ -31,6 +31,8 @@ import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.maxLength
+import androidx.compose.foundation.text.input.then
+import com.sabo.core.toolkit.EmojiFilter
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -243,7 +245,7 @@ private fun NicknameSection(
                     isFocused = it.isFocused
                 },
             lineLimits = TextFieldLineLimits.SingleLine,
-            inputTransformation = InputTransformation.maxLength(12),
+            inputTransformation = InputTransformation.maxLength(12).then(EmojiFilter),
             decorator = { innerTextField ->
                 Column(
                     modifier = modifier
