@@ -128,27 +128,6 @@ internal fun TownListContent(
                 .fillMaxSize(),
             contentPadding = PaddingValues(top = tabHeaderHeightDp)
         ) {
-            if (state.isNewUser) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .padding(horizontal = 27.dp, vertical = 16.dp)
-                            .fillMaxWidth()
-                            .background(color = DiaryColorsPalette.current.gray100, shape = CircleShape)
-                            .clip(CircleShape)
-                            .clickable { }
-                            .padding(vertical = 12.dp)
-                    ) {
-                        Text(
-                            text = "쑥쑥성장 소개하기",
-                            style = DiaryTypography.bodyLargeBold,
-                            color = DiaryColorsPalette.current.green400,
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                        )
-                    }
-                }
-            }
 
             if (state.isLoading) {
                 items(
@@ -417,8 +396,7 @@ private fun TownTabPreview() {
         TownListContent(
             state = TownContent(
                 isLoading = false,
-                dataList = emptyList(),
-                isNewUser = false
+                dataList = emptyList()
             ),
             selectedTab = TownTab.ALL
         )

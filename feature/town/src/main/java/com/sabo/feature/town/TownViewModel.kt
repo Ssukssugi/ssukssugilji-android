@@ -20,7 +20,7 @@ class TownViewModel @Inject constructor(
 
     override val container: Container<TownUiState, TownEvent> = container(
         initialState = TownUiState(
-            townContent = TownContent(isLoading = true, isNewUser = false, dataList = emptyList())
+            townContent = TownContent(isLoading = true, dataList = emptyList())
         ),
         onCreate = {
             fetchTownGrowth()
@@ -31,7 +31,7 @@ class TownViewModel @Inject constructor(
         viewModelScope.launch {
             reduce {
                 state.copy(
-                    townContent = TownContent(isLoading = true, isNewUser = false, dataList = emptyList())
+                    townContent = TownContent(isLoading = true, dataList = emptyList())
                 )
             }
             val userIdDeferred = async { townRepository.getUserId() }
@@ -50,14 +50,11 @@ class TownViewModel @Inject constructor(
                     townItems
                 }
 
-                val isNewUser = isNewUserResult.data.growths.isEmpty()
-
                 reduce {
                     state.copy(
                         townContent = TownContent(
                             isLoading = false,
-                            dataList = newList,
-                            isNewUser = isNewUser
+                            dataList = newList
                         )
                     )
                 }
@@ -141,21 +138,19 @@ class TownViewModel @Inject constructor(
         viewModelScope.launch {
             reduce {
                 state.copy(
-                    townContent = TownContent(isLoading = true, isNewUser = false, dataList = emptyList())
+                    townContent = TownContent(isLoading = true, dataList = emptyList())
                 )
             }
 
             when (val result = townRepository.getMyGrowth()) {
                 is Result.Success -> {
                     val townItems = result.data.growths.map { growth -> growth.toPresentation(isMine = true) }
-                    val isNewUser = townItems.isEmpty()
 
                     reduce {
                         state.copy(
                             townContent = TownContent(
                                 isLoading = false,
-                                dataList = townItems,
-                                isNewUser = isNewUser
+                                dataList = townItems
                             )
                         )
                     }
@@ -165,8 +160,7 @@ class TownViewModel @Inject constructor(
                         state.copy(
                             townContent = TownContent(
                                 isLoading = false,
-                                dataList = emptyList(),
-                                isNewUser = true
+                                dataList = emptyList()
                             )
                         )
                     }

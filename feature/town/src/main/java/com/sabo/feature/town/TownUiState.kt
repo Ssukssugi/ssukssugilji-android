@@ -7,7 +7,7 @@ import java.time.temporal.ChronoUnit
 data class TownUiState(
     val isLoading: Boolean = false,
     val selectedTab: TownTab = TownTab.ALL,
-    val townContent: TownContent = TownContent(isLoading = true, isNewUser = false, dataList = emptyList())
+    val townContent: TownContent = TownContent(isLoading = true, dataList = emptyList())
 )
 
 enum class TownTab {
@@ -17,7 +17,6 @@ enum class TownTab {
 
 data class TownContent(
     val isLoading: Boolean,
-    val isNewUser: Boolean = false,
     val dataList: List<TownListItem>
 )
 
