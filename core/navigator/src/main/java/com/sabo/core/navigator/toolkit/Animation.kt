@@ -13,9 +13,9 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.navigation.NavBackStackEntry
 
-private const val ANIMATION_DURATION_MILLIS = 300
+private const val ANIMATION_DURATION_MILLIS = 200
 
-fun zoomOut(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> ExitTransition = {
+fun zoomOut(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
     scaleOut(
         animationSpec = tween(
             durationMillis = ANIMATION_DURATION_MILLIS,
@@ -32,7 +32,7 @@ fun zoomOut(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> ExitTransi
     )
 }
 
-fun zoomIn(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> EnterTransition = {
+fun zoomIn(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
     scaleIn(
         animationSpec = tween(
             durationMillis = ANIMATION_DURATION_MILLIS,
@@ -49,8 +49,8 @@ fun zoomIn(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> EnterTransi
     )
 }
 
-fun slideInFromEnd(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> EnterTransition = { scope ->
-    scope.slideIntoContainer(
+fun slideInFromEnd(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+    slideIntoContainer(
         towards = SlideDirection.Left,
         animationSpec = tween(
             durationMillis = ANIMATION_DURATION_MILLIS,
@@ -59,8 +59,8 @@ fun slideInFromEnd(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> Ent
     )
 }
 
-fun slideOutToEnd(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> ExitTransition = { scope ->
-    scope.slideOutOfContainer(
+fun slideOutToEnd(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+    slideOutOfContainer(
         towards = SlideDirection.Right,
         animationSpec = tween(
             durationMillis = ANIMATION_DURATION_MILLIS,
@@ -69,8 +69,8 @@ fun slideOutToEnd(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> Exit
     )
 }
 
-fun slideInFromBottom(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> EnterTransition = { scope ->
-    scope.slideIntoContainer(
+fun slideInFromBottom(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+    slideIntoContainer(
         towards = SlideDirection.Up,
         animationSpec = tween(
             durationMillis = ANIMATION_DURATION_MILLIS,
@@ -79,8 +79,8 @@ fun slideInFromBottom(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> 
     )
 }
 
-fun slideOutToBottom(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> ExitTransition = { scope ->
-    scope.slideOutOfContainer(
+fun slideOutToBottom(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+    slideOutOfContainer(
         towards = SlideDirection.Down,
         animationSpec = tween(
             durationMillis = ANIMATION_DURATION_MILLIS,
@@ -89,7 +89,7 @@ fun slideOutToBottom(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> E
     )
 }
 
-fun tabFadeIn(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> EnterTransition = {
+fun tabFadeIn(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
     fadeIn(
         animationSpec = tween(
             durationMillis = 200,
@@ -98,7 +98,7 @@ fun tabFadeIn(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> EnterTra
     )
 }
 
-fun tabFadeOut(): (AnimatedContentTransitionScope<NavBackStackEntry>) -> ExitTransition = {
+fun tabFadeOut(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
     fadeOut(
         animationSpec = tween(
             durationMillis = 200,
