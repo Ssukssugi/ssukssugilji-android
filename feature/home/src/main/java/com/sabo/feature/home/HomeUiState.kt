@@ -2,6 +2,7 @@ package com.sabo.feature.home
 
 import androidx.annotation.DrawableRes
 import com.sabo.core.designsystem.R
+import com.sabo.core.model.NetworkErrorEvent
 import com.sabo.core.model.PlantEnvironmentPlace
 import com.sabo.core.navigator.model.PlantAddEdit
 import java.time.LocalDate
@@ -34,6 +35,7 @@ sealed interface PlantContent {
         val shine: Int?,
         val historyList: List<PlantHistory>
     ) : PlantContent
+    data class NetworkError(val error: NetworkErrorEvent) : PlantContent
 }
 
 data class PlantHistory(

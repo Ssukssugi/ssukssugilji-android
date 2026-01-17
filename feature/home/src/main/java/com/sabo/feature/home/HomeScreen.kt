@@ -100,7 +100,8 @@ internal fun HomeScreen(
             navigateToPlantAdd = navigateToPlantAdd,
             onClickDiaryDetail = viewModel::onClickDiaryDetail,
             onClickMore = viewModel::onClickMore,
-            onClickOtherPlant = viewModel::onSelectPlant
+            onClickOtherPlant = viewModel::onSelectPlant,
+            onClickNetworkRetry = viewModel::initDataLoad
         )
     }
 
@@ -149,7 +150,8 @@ private fun HomeContent(
     navigateToPlantAdd: () -> Unit = {},
     onClickDiaryDetail: (Long) -> Unit = {},
     onClickMore: (Long) -> Unit = {},
-    onClickOtherPlant: (Long) -> Unit = {}
+    onClickOtherPlant: (Long) -> Unit = {},
+    onClickNetworkRetry: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -178,7 +180,8 @@ private fun HomeContent(
                 .weight(1f, fill = true),
             data = plantContent,
             onClickDiaryDetail = onClickDiaryDetail,
-            onClickMore = onClickMore
+            onClickMore = onClickMore,
+            onClickNetworkRetry = onClickNetworkRetry
         )
     }
 }

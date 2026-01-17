@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sabo.core.designsystem.R
+import com.sabo.core.designsystem.component.NetworkErrorScreen
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.mapper.DateMapper.toDisplayDayOfWeek
@@ -54,7 +56,8 @@ internal fun SelectedPlantContent(
     scrollState: LazyListState = rememberLazyListState(),
     data: PlantContent,
     onClickMore: (Long) -> Unit = {},
-    onClickDiaryDetail: (Long) -> Unit = {}
+    onClickDiaryDetail: (Long) -> Unit = {},
+    onClickNetworkRetry: () -> Unit = {}
 ) {
     when (data) {
         PlantContent.Loading -> {
@@ -101,6 +104,19 @@ internal fun SelectedPlantContent(
                         onClickDiaryDetail = onClickDiaryDetail
                     )
                 }
+            }
+        }
+
+        is PlantContent.NetworkError -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                NetworkErrorScreen(
+                    event = data.error,
+                    onRetry = onClickNetworkRetry
+                )
             }
         }
     }

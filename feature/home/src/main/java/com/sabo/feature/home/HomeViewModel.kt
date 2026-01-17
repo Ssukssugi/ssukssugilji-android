@@ -15,6 +15,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
@@ -38,9 +39,25 @@ class HomeViewModel @Inject constructor(
         ),
         onCreate = {
             initDataLoad()
-            subIntent {
-                selectedPlantId.collect { plantId ->
-                    plantId?.let { fetchPlantContent(it) }
+            viewModelScope.launch {
+                launch {
+                    subIntent {
+                        selectedPlantId.collect { plantId ->
+                            plantId?.let { fetchPlantContent(it) }
+                        }
+                    }
+                }
+                launch {
+                    subIntent {
+                        networkErrorManager.showScreen.collect {
+                            reduce {
+                                state.copy(
+                                    plantContent = PlantContent.NetworkError(it),
+                                    plantList = listOf(PlantListItem.AddPlant)
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -154,38 +171,50 @@ class HomeViewModel @Inject constructor(
             val profileDeferred = async { diaryRepository.getPlantProfile(plantId) }
             val plantContentDeferred = async { diaryRepository.getPlantDiaries(plantId) }
 
-            val profile = (profileDeferred.await() as? Result.Success)?.data
-            val plantContent = (plantContentDeferred.await() as? Result.Success)?.data
+            val profileResult = profileDeferred.await()
+            val plantContentResult = plantContentDeferred.await()
 
-            if (profile != null && plantContent != null) {
-                reduce {
-                    state.copy(
-                        plantContent = PlantContent.PlantInfo(
-                            id = plantId,
-                            place = profile.place,
-                            name = profile.name,
-                            image = profile.plantImage,
-                            category = profile.plantCategory,
-                            shine = profile.shine,
-                            historyList = plantContent.byMonth.map { content ->
-                                PlantHistory(
-                                    month = content.month,
-                                    year = content.year,
-                                    diaryList = content.diaries.map { diary ->
-                                        Diary(
-                                            id = diary.diaryId,
-                                            date = diary.date.toLocalDate(),
-                                            image = diary.image,
-                                            content = diary.content,
-                                            cares = diary.cares.map { care ->
-                                                CareType.valueOf(care.name)
-                                            }
-                                        )
-                                    }
-                                )
-                            }
+            when {
+                profileResult is Result.Error -> {
+                    if (profileResult.isNetworkError) {
+                        networkErrorManager.sendScreenEvent(NetworkErrorEvent.NoInternet)
+                    }
+                }
+                plantContentResult is Result.Error -> {
+                    if (plantContentResult.isNetworkError) {
+                        networkErrorManager.sendScreenEvent(NetworkErrorEvent.NoInternet)
+                    }
+                }
+                profileResult is Result.Success && plantContentResult is Result.Success -> {
+                    reduce {
+                        state.copy(
+                            plantContent = PlantContent.PlantInfo(
+                                id = plantId,
+                                place = profileResult.data.place,
+                                name = profileResult.data.name,
+                                image = profileResult.data.plantImage,
+                                category = profileResult.data.plantCategory,
+                                shine = profileResult.data.shine,
+                                historyList = plantContentResult.data.byMonth.map { content ->
+                                    PlantHistory(
+                                        month = content.month,
+                                        year = content.year,
+                                        diaryList = content.diaries.map { diary ->
+                                            Diary(
+                                                id = diary.diaryId,
+                                                date = diary.date.toLocalDate(),
+                                                image = diary.image,
+                                                content = diary.content,
+                                                cares = diary.cares.map { care ->
+                                                    CareType.valueOf(care.name)
+                                                }
+                                            )
+                                        }
+                                    )
+                                }
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
