@@ -84,7 +84,8 @@ internal fun DiaryWriteScreen(
     viewModel: DiaryWriteViewModel = hiltViewModel(),
     onClickBack: () -> Unit,
     navigateToDiaryDetail: (Long) -> Unit,
-    navigateToHome: () -> Unit
+    navigateToHome: () -> Unit,
+    navigateToAddPlant: () -> Unit
 ) {
     val uiState = viewModel.collectAsState().value
     val isSaveEnabled by viewModel.isSaveEnabled.collectAsStateWithLifecycle()
@@ -156,7 +157,8 @@ internal fun DiaryWriteScreen(
                 onClickCalendar = { isShownDatePicker = true },
                 onSelectCareType = viewModel::onClickCareType,
                 onClickSave = viewModel::onClickSave,
-                onClickImage = viewModel::showImagePickerBottomSheet
+                onClickImage = viewModel::showImagePickerBottomSheet,
+                onClickAddPlant = navigateToAddPlant
             )
         }
     }
@@ -225,7 +227,8 @@ private fun DiaryWriteContent(
     onClickCalendar: () -> Unit = {},
     onSelectCareType: (CareType) -> Unit = {},
     onClickSave: () -> Unit = {},
-    onClickImage: () -> Unit = {}
+    onClickImage: () -> Unit = {},
+    onClickAddPlant: () -> Unit = {}
 ) {
     val dateFormatter = remember { DateTimeFormatter.ofPattern("yyyy년 MM월 dd일") }
 
@@ -289,7 +292,7 @@ private fun DiaryWriteContent(
                                 modifier = Modifier
                                     .size(60.dp)
                                     .background(color = DiaryColorsPalette.current.gray400, shape = CircleShape)
-                                    .noRippleClickable { /* TODO: 식물 추가 */ },
+                                    .noRippleClickable { onClickAddPlant() },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(

@@ -16,7 +16,6 @@ import com.sabo.core.navigator.model.Diary
 import com.sabo.core.navigator.model.Login
 import com.sabo.core.navigator.model.WebLink
 import com.sabo.feature.diary.detail.navigation.diaryDetailScreen
-
 import com.sabo.feature.diary.plantadd.categorySearch.navigation.categorySearchScreen
 import com.sabo.feature.diary.plantadd.categorySearch.navigation.popBackStackWithResult
 import com.sabo.feature.diary.plantadd.navigation.plantAddNavGraph
@@ -96,6 +95,7 @@ internal fun MainNavHost(
                 onClickCategory = navigator::navigateToCategorySearch,
                 onClickHome = navigator::navigateToHome,
                 onClickDiary = {
+                    navigator.popBackStack()
                     navigator.navigateToDiaryWrite(
                         plantId = it,
                         imageUri = null
@@ -121,7 +121,8 @@ internal fun MainNavHost(
                             }
                         }
                     )
-                }
+                },
+                navigateToAddPlant = navigator::navigateToPlantAdd
             )
             diaryDetailScreen(
                 onClickBack = navigator::popBackStack,

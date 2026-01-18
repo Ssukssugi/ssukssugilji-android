@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.navOptions
 import com.sabo.core.navigator.model.DiaryEdit
 import com.sabo.core.navigator.model.DiaryWrite
 import com.sabo.core.navigator.toolkit.navTypeOf
@@ -16,7 +17,16 @@ import kotlin.reflect.typeOf
 
 
 fun NavController.navigateToDiaryWrite(plantId: Long?, imageUri: Uri? = null) {
-    this.navigate(DiaryWrite(plantId = plantId, imageUri = imageUri?.toString()))
+    val navOptions = navOptions {
+        popUpTo<DiaryWrite> {
+            inclusive = true
+        }
+        launchSingleTop = true
+    }
+    this.navigate(
+        route = DiaryWrite(plantId = plantId, imageUri = imageUri?.toString()),
+        navOptions = navOptions
+    )
 }
 
 fun NavController.navigateToDiaryEdit(route: DiaryEdit) {
@@ -26,7 +36,8 @@ fun NavController.navigateToDiaryEdit(route: DiaryEdit) {
 fun NavGraphBuilder.diaryWriteScreen(
     onClickBack: () -> Unit,
     navigateToDiaryDetail: (Long) -> Unit,
-    navigateToHome: () -> Unit
+    navigateToHome: () -> Unit,
+    navigateToAddPlant: () -> Unit
 ) {
     composable<DiaryWrite>(
         enterTransition = slideInFromEnd(),
@@ -37,7 +48,8 @@ fun NavGraphBuilder.diaryWriteScreen(
         DiaryWriteScreen(
             onClickBack = onClickBack,
             navigateToDiaryDetail = navigateToDiaryDetail,
-            navigateToHome = navigateToHome
+            navigateToHome = navigateToHome,
+            navigateToAddPlant = navigateToAddPlant
         )
     }
 
@@ -53,7 +65,8 @@ fun NavGraphBuilder.diaryWriteScreen(
         DiaryWriteScreen(
             onClickBack = onClickBack,
             navigateToDiaryDetail = navigateToDiaryDetail,
-            navigateToHome = navigateToHome
+            navigateToHome = navigateToHome,
+            navigateToAddPlant = navigateToAddPlant
         )
     }
 }
