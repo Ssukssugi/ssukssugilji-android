@@ -8,10 +8,12 @@ import com.sabo.core.model.TokenProvider
 import com.sabo.core.network.model.request.ApplyTermsAgreementRequest
 import com.sabo.core.network.model.request.SocialLoginRequest
 import com.sabo.core.network.service.LoginService
+import com.sabo.core.network.service.ProfileService
 import javax.inject.Inject
 
 class DefaultLoginRepository @Inject constructor(
     private val loginService: LoginService,
+    private val profileService: ProfileService,
     private val tokenProvider: TokenProvider
 ) : LoginRepository {
     override suspend fun requestNaverLogin(token: String): Result<SocialLogin> = handleResult(
@@ -94,5 +96,19 @@ class DefaultLoginRepository @Inject constructor(
 
     override suspend fun checkUserAuthentication(): Boolean {
         return tokenProvider.getAccessToken() != null
+    }
+
+    override suspend fun isUserProfileComplete(): Boolean {
+        return try {
+            val response = profileService.getUserProfile()
+            if (response.isSuccessful) {
+                val profile = response.body()
+                profile?.nickname?.isNotBlank() == true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            false
+        }
     }
 }

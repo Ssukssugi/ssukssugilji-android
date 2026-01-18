@@ -16,4 +16,5 @@ interface LoginRepository {
     ): Result<Unit>
 
     suspend fun checkUserAuthentication(): Boolean
+    suspend fun isUserProfileComplete(): Boolean
 }

@@ -35,7 +35,11 @@ class LoginViewModel @Inject constructor(
     private fun checkInitialAuthentication() {
         viewModelScope.launch {
             if (loginRepository.checkUserAuthentication()) {
-                _loginEvent.send(LoginEvent.GoToMain)
+                if (loginRepository.isUserProfileComplete()) {
+                    _loginEvent.send(LoginEvent.GoToMain)
+                } else {
+                    _loginEvent.send(LoginEvent.GoToSignUp)
+                }
             } else {
                 val state = uiState.value as? LoginUiState.BeforeLogin ?: return@launch
                 _uiState.value = state.copy(isInitializing = false)
