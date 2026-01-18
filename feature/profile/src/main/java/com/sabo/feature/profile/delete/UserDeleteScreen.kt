@@ -258,14 +258,14 @@ private fun DeleteConfirmDialog(
                         .weight(1f)
                         .wrapContentHeight()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(color = DiaryColorsPalette.current.green50)
+                        .background(color = DiaryColorsPalette.current.red400)
                         .clickable { onConfirm() }
                         .padding(vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "네, 할게요",
-                        color = DiaryColorsPalette.current.green600,
+                        color = DiaryColorsPalette.current.gray50,
                         style = DiaryTypography.subtitleMediumBold
                     )
                 }
@@ -275,14 +275,14 @@ private fun DeleteConfirmDialog(
                         .weight(1f)
                         .wrapContentHeight()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(DiaryColorsPalette.current.green400)
+                        .background(DiaryColorsPalette.current.gray200)
                         .clickable { onDismiss() }
                         .padding(vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "아니요",
-                        color = Color.White,
+                        color = DiaryColorsPalette.current.gray700,
                         style = DiaryTypography.subtitleMediumBold
                     )
                 }

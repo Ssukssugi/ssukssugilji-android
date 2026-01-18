@@ -536,7 +536,7 @@ private fun DiaryDeleteDialog(
                         .weight(1f)
                         .wrapContentHeight()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(DiaryColorsPalette.current.green50)
+                        .background(DiaryColorsPalette.current.red400)
                         .clickable {
                             onConfirm()
                             onDismiss()
@@ -546,7 +546,7 @@ private fun DiaryDeleteDialog(
                 ) {
                     Text(
                         text = "삭제하기",
-                        color = DiaryColorsPalette.current.green600,
+                        color = DiaryColorsPalette.current.gray50,
                         style = DiaryTypography.subtitleMediumBold
                     )
                 }
@@ -556,14 +556,14 @@ private fun DiaryDeleteDialog(
                         .weight(1f)
                         .wrapContentHeight()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(DiaryColorsPalette.current.green400)
+                        .background(DiaryColorsPalette.current.gray200)
                         .clickable { onDismiss() }
                         .padding(vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "돌아가기",
-                        color = DiaryColorsPalette.current.gray50,
+                        color = DiaryColorsPalette.current.gray700,
                         style = DiaryTypography.subtitleMediumBold
                     )
                 }
