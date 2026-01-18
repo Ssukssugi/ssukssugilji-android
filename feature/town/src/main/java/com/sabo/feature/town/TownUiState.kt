@@ -1,5 +1,6 @@
 package com.sabo.feature.town
 
+import com.sabo.core.model.NetworkErrorEvent
 import com.sabo.core.network.model.response.GetTownGrowth
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -7,7 +8,7 @@ import java.time.temporal.ChronoUnit
 data class TownUiState(
     val isLoading: Boolean = false,
     val selectedTab: TownTab = TownTab.ALL,
-    val townContent: TownContent = TownContent(isLoading = true, dataList = emptyList())
+    val townContent: TownContent = TownContent.Loading
 )
 
 enum class TownTab {
@@ -15,10 +16,12 @@ enum class TownTab {
     MY_POSTS
 }
 
-data class TownContent(
-    val isLoading: Boolean,
-    val dataList: List<TownListItem>
-)
+sealed interface TownContent {
+    data object Loading : TownContent
+    data object Empty : TownContent
+    data class Data(val dataList: List<TownListItem>) : TownContent
+    data class NetworkError(val error: NetworkErrorEvent) : TownContent
+}
 
 sealed interface TownListItem {
     data class Post(

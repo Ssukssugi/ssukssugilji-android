@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.sabo.core.data.Result
 import com.sabo.core.data.handle
 import com.sabo.core.data.repository.TownRepository
+import com.sabo.core.model.NetworkErrorEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -20,7 +21,7 @@ class TownViewModel @Inject constructor(
 
     override val container: Container<TownUiState, TownEvent> = container(
         initialState = TownUiState(
-            townContent = TownContent(isLoading = true, dataList = emptyList())
+            townContent = TownContent.Loading
         ),
         onCreate = {
             fetchTownGrowth()
@@ -30,9 +31,7 @@ class TownViewModel @Inject constructor(
     private fun fetchTownGrowth() = intent {
         viewModelScope.launch {
             reduce {
-                state.copy(
-                    townContent = TownContent(isLoading = true, dataList = emptyList())
-                )
+                state.copy(townContent = TownContent.Loading)
             }
             val userIdDeferred = async { townRepository.getUserId() }
             val growthDeferred = async { townRepository.getTownGrowth(null) }
@@ -52,38 +51,40 @@ class TownViewModel @Inject constructor(
 
                 reduce {
                     state.copy(
-                        townContent = TownContent(
-                            isLoading = false,
-                            dataList = newList
-                        )
+                        townContent = if (newList.isEmpty()) TownContent.Empty else TownContent.Data(dataList = newList)
                     )
+                }
+            } else {
+                reduce {
+                    state.copy(townContent = TownContent.NetworkError(NetworkErrorEvent.NoInternet))
                 }
             }
         }
     }
 
     fun loadMoreTownGrowth(lastId: Long) = intent {
+        val currentContent = state.townContent
+        if (currentContent !is TownContent.Data) return@intent
+
         when (val result = townRepository.getTownGrowth(lastId)) {
             is Result.Success -> {
                 val userId = townRepository.getUserId()
 
-                val existingIds = state.townContent.dataList
+                val existingIds = currentContent.dataList
                     .filterIsInstance<TownListItem.Post>()
                     .map { it.id }
                     .toSet()
 
                 val newGrowths = result.data.growths.filter { it.growthId !in existingIds }
 
-                val newTownItems = state.townContent.dataList.toMutableList().apply {
+                val newTownItems = currentContent.dataList.toMutableList().apply {
                     removeAt(lastIndex)
                     addAll(newGrowths.map { it.toPresentation(userId = userId) })
                     if (newGrowths.isNotEmpty()) add(TownListItem.LoadMore(lastId = newGrowths.last().growthId))
                 }
 
                 reduce {
-                    state.copy(
-                        townContent = state.townContent.copy(dataList = newTownItems)
-                    )
+                    state.copy(townContent = TownContent.Data(dataList = newTownItems))
                 }
             }
 
@@ -137,9 +138,7 @@ class TownViewModel @Inject constructor(
     private fun fetchMyGrowth() = intent {
         viewModelScope.launch {
             reduce {
-                state.copy(
-                    townContent = TownContent(isLoading = true, dataList = emptyList())
-                )
+                state.copy(townContent = TownContent.Loading)
             }
 
             when (val result = townRepository.getMyGrowth()) {
@@ -148,24 +147,23 @@ class TownViewModel @Inject constructor(
 
                     reduce {
                         state.copy(
-                            townContent = TownContent(
-                                isLoading = false,
-                                dataList = townItems
-                            )
+                            townContent = if (townItems.isEmpty()) TownContent.Empty else TownContent.Data(dataList = townItems)
                         )
                     }
                 }
                 is Result.Error -> {
                     reduce {
-                        state.copy(
-                            townContent = TownContent(
-                                isLoading = false,
-                                dataList = emptyList()
-                            )
-                        )
+                        state.copy(townContent = TownContent.NetworkError(NetworkErrorEvent.NoInternet))
                     }
                 }
             }
+        }
+    }
+
+    fun onRetryClicked() = intent {
+        when (state.selectedTab) {
+            TownTab.ALL -> fetchTownGrowth()
+            TownTab.MY_POSTS -> fetchMyGrowth()
         }
     }
 }

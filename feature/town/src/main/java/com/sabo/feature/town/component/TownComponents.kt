@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.sabo.core.designsystem.R
+import com.sabo.core.designsystem.component.NetworkErrorScreen
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
 import com.sabo.core.designsystem.theme.DiaryTypography
 import com.sabo.core.designsystem.theme.SsukssukDiaryTheme
@@ -72,6 +73,7 @@ internal fun TownListContent(
     onTabSelected: (TownTab) -> Unit = {},
     onLoadMore: (Long) -> Unit = {},
     onClickPostMore: (TownListItem.Post) -> Unit = {},
+    onClickNetworkRetry: () -> Unit = {},
 ) {
     val listState = rememberLazyListState()
     var isLoadingMore by remember { mutableStateOf(false) }
@@ -80,18 +82,31 @@ internal fun TownListContent(
     var tabHeaderHeightPx by remember { mutableFloatStateOf(0f) }
     var tabHeaderOffset by remember { mutableFloatStateOf(0f) }
 
-    val nestedScrollConnection = remember {
+    val nestedScrollConnection = remember(listState) {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 val delta = available.y
-                val newOffset = tabHeaderOffset + delta
-                tabHeaderOffset = newOffset.coerceIn(-tabHeaderHeightPx, 0f)
+                val isScrollingUp = delta > 0
+                val isScrollingDown = delta < 0
+
+                val canApplyOffset = when {
+                    isScrollingDown -> listState.canScrollForward
+                    isScrollingUp -> listState.canScrollBackward || tabHeaderOffset < 0f
+                    else -> false
+                }
+
+                if (canApplyOffset) {
+                    val newOffset = tabHeaderOffset + delta
+                    tabHeaderOffset = newOffset.coerceIn(-tabHeaderHeightPx, 0f)
+                }
                 return Offset.Zero
             }
         }
     }
 
-    LaunchedEffect(listState, state.dataList.size) {
+    val dataList = (state as? TownContent.Data)?.dataList ?: emptyList()
+
+    LaunchedEffect(listState, dataList.size) {
         snapshotFlow {
             listState.layoutInfo.visibleItemsInfo.lastOrNull()?.let {
                 val totalItemsCount = listState.layoutInfo.totalItemsCount
@@ -100,8 +115,8 @@ internal fun TownListContent(
         }
             .distinctUntilChanged()
             .collect { shouldLoadMore ->
-                if (shouldLoadMore && !isLoadingMore && !state.isLoading) {
-                    val loadMoreItem = state.dataList.lastOrNull()
+                if (shouldLoadMore && !isLoadingMore && state is TownContent.Data) {
+                    val loadMoreItem = dataList.lastOrNull()
                     if (loadMoreItem is TownListItem.LoadMore) {
                         isLoadingMore = true
                         onLoadMore(loadMoreItem.lastId)
@@ -110,7 +125,7 @@ internal fun TownListContent(
             }
     }
 
-    LaunchedEffect(state.dataList.size) {
+    LaunchedEffect(dataList.size) {
         isLoadingMore = false
     }
 
@@ -122,39 +137,67 @@ internal fun TownListContent(
             .clipToBounds()
             .nestedScroll(nestedScrollConnection)
     ) {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier
-                .fillMaxSize(),
-            contentPadding = PaddingValues(top = tabHeaderHeightDp)
-        ) {
-
-            if (state.isLoading) {
-                items(
-                    count = 3
+        when (state) {
+            is TownContent.Loading -> {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(top = tabHeaderHeightDp)
                 ) {
-                    TownListItemSkeleton()
+                    items(count = 3) {
+                        TownListItemSkeleton()
+                    }
                 }
-            } else {
-                items(
-                    items = state.dataList,
-                    key = {
-                        when (it) {
-                            is TownListItem.Post -> it.id
-                            is TownListItem.LoadMore -> "load_more_${it.lastId}"
-                        }
-                    }
-                ) { data ->
-                    when (data) {
-                        is TownListItem.Post -> TownListItem(
-                            data = data,
-                            onClickGrowthItemMore = onClickPostMore
-                        )
+            }
 
-                        is TownListItem.LoadMore -> {
-                            TownListItemSkeleton()
+            is TownContent.Empty -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = tabHeaderHeightDp)
+                )
+            }
+
+            is TownContent.Data -> {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(top = tabHeaderHeightDp)
+                ) {
+                    items(
+                        items = state.dataList,
+                        key = {
+                            when (it) {
+                                is TownListItem.Post -> it.id
+                                is TownListItem.LoadMore -> "load_more_${it.lastId}"
+                            }
+                        }
+                    ) { data ->
+                        when (data) {
+                            is TownListItem.Post -> TownListItem(
+                                data = data,
+                                onClickGrowthItemMore = onClickPostMore
+                            )
+
+                            is TownListItem.LoadMore -> {
+                                TownListItemSkeleton()
+                            }
                         }
                     }
+                }
+            }
+
+            is TownContent.NetworkError -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = tabHeaderHeightDp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    NetworkErrorScreen(
+                        event = state.error,
+                        onRetry = onClickNetworkRetry
+                    )
                 }
             }
         }
@@ -394,10 +437,7 @@ private fun SkeletonImages(shape: Shape) {
 private fun TownTabPreview() {
     SsukssukDiaryTheme {
         TownListContent(
-            state = TownContent(
-                isLoading = false,
-                dataList = emptyList()
-            ),
+            state = TownContent.Empty,
             selectedTab = TownTab.ALL
         )
     }

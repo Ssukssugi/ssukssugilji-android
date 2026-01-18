@@ -88,6 +88,7 @@ internal fun TownScreen(
             onTabSelected = viewModel::onTabSelected,
             onLoadMore = viewModel::loadMoreTownGrowth,
             onClickPostMore = viewModel::onClickGrowthPostMore,
+            onClickNetworkRetry = viewModel::onRetryClicked,
         )
     }
 

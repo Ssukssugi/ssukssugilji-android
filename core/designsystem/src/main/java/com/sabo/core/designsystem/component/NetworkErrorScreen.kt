@@ -74,7 +74,7 @@ fun NetworkErrorScreen(
 
         Text(
             text = event.screenMessage,
-            style = DiaryTypography.subtitleMediumBold,
+            style = DiaryTypography.subtitleMediumMedium,
             color = DiaryColorsPalette.current.gray600,
             textAlign = TextAlign.Center
         )
