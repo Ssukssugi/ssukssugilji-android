@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,8 +31,10 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.sabo.core.designsystem.component.MainFAB
+import com.sabo.core.designsystem.component.NetworkErrorDialog
 import com.sabo.core.designsystem.component.TopSnackBar
 import com.sabo.core.designsystem.component.rememberSnackBarState
+import com.sabo.core.model.NetworkErrorEvent
 import com.sabo.core.navigator.MainTabRoute
 import com.sabo.core.navigator.model.Diary
 import com.sabo.core.navigator.model.Profile
@@ -48,18 +51,38 @@ fun MainScreen(
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    var networkErrorEvent by remember { mutableStateOf<NetworkErrorEvent?>(null) }
+    val isNetworkConnected by viewModel.isNetworkConnected.collectAsState()
 
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             viewModel.navigationEvent.collectLatest {
                 navigator.navigateToLoginAndClearBackStack()
             }
+            viewModel.showNetworkErrorDialog.collect { event ->
+                networkErrorEvent = event
+            }
         }
     }
 
-    MainScreenContent(
-        navigator = navigator
-    )
+    if (isNetworkConnected) {
+        MainScreenContent(
+            navigator = navigator
+        )
+    } else {
+        Box(modifier = Modifier.fillMaxSize())
+    }
+
+    networkErrorEvent?.let { event ->
+        NetworkErrorDialog(
+            event = event,
+            onDismiss = { networkErrorEvent = null },
+            onRetry = {
+                networkErrorEvent = null
+                viewModel.onRetryClicked()
+            }
+        )
+    }
 }
 
 @Composable

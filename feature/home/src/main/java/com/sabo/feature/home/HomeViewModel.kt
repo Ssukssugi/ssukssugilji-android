@@ -59,14 +59,17 @@ class HomeViewModel @Inject constructor(
                         }
                     }
                 }
+                launch {
+                    networkErrorManager.retryRequested.collect {
+                        initDataLoad()
+                    }
+                }
             }
         }
     )
 
     private val _selectedPlantId = MutableStateFlow<Long?>(null)
     val selectedPlantId: StateFlow<Long?> = _selectedPlantId.asStateFlow()
-
-    val showNetworkErrorDialog = networkErrorManager.showDialog
 
     fun initDataLoad() = intent {
         viewModelScope.launch {
@@ -77,16 +80,7 @@ class HomeViewModel @Inject constructor(
             val storyResult = storyDeferred.await()
 
             when {
-                profileResult is Result.Error -> {
-                    if (profileResult.isNetworkError) {
-                        networkErrorManager.sendDialogEvent(NetworkErrorEvent.NoInternet)
-                    }
-                }
-
-                storyResult is Result.Error -> {
-                    if (storyResult.isNetworkError) {
-                        networkErrorManager.sendDialogEvent(NetworkErrorEvent.NoInternet)
-                    }
+                profileResult is Result.Error || storyResult is Result.Error -> {
                     reduce { state.copy(plantList = listOf(PlantListItem.AddPlant)) }
                 }
 

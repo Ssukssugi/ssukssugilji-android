@@ -9,6 +9,8 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.model)
+    implementation(projects.core.toolkit)
     implementation(projects.feature.login)
     implementation(projects.feature.signup)
     implementation(projects.feature.home)
