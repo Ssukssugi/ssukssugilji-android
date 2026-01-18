@@ -42,6 +42,8 @@ internal fun Project.configureComposeAndroid() {
             implementation(libs.findLibrary("coil").get())
             implementation(libs.findLibrary("coil.network").get())
 
+            implementation(libs.findLibrary("lottie.compose").get())
+
             debugImplementation(libs.findLibrary("androidx.ui.tooling").get())
             debugImplementation(libs.findLibrary("androidx.ui.test.manifest").get())
 

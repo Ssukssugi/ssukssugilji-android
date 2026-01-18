@@ -27,9 +27,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +50,10 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
@@ -97,6 +103,7 @@ internal fun LoginRoute(
             onSuccessNaverLogin = viewModel::onSuccessNaverLogin,
             onClickTermAgreeItem = { viewModel.changeAgreeTermState(it) },
             onClickNextButton = viewModel::applyTermsAgreement,
+            onAnimationCompleted = viewModel::onAnimationCompleted,
             navigateToHome = navigateToHome,
             navigateToSignUp = navigateToSignUp,
             navigateToPolicy = navigateToPolicy,
@@ -114,6 +121,7 @@ private fun LoginContent(
     onSuccessNaverLogin: (String) -> Unit,
     onClickTermAgreeItem: (TermsAgreeState) -> Unit,
     onClickNextButton: () -> Unit,
+    onAnimationCompleted: () -> Unit,
     navigateToHome: () -> Unit,
     navigateToSignUp: () -> Unit,
     navigateToPolicy: () -> Unit,
@@ -134,7 +142,10 @@ private fun LoginContent(
             navigateToPrivacy = navigateToPrivacy
         )
 
-        LoginUiState.SignUpLoading -> RedirectLoadingScreen()
+        is LoginUiState.SignUpLoading -> RedirectLoadingScreen(
+            state = uiState,
+            onAnimationCompleted = onAnimationCompleted
+        )
         is LoginUiState.SuccessLogin -> LoginSuccessScreen(
             state = uiState,
             navigateToHome = navigateToHome,
@@ -469,16 +480,32 @@ private fun TermAgreeContentItem(
 
 @Composable
 private fun RedirectLoadingScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    state: LoginUiState.SignUpLoading,
+    onAnimationCompleted: () -> Unit
 ) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(dsR.raw.loading_lottie))
+    var animationFinished by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(800L)
+        animationFinished = true
+    }
+
+    LaunchedEffect(animationFinished, state.isServerResponseReady) {
+        if (animationFinished && state.isServerResponseReady) {
+            onAnimationCompleted()
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(color = Color.White)
     ) {
         Column(
-            modifier = modifier
-                .wrapContentSize()
+            modifier = Modifier
+                .fillMaxWidth()
                 .align(Alignment.TopCenter)
         ) {
             LoginMainInfo(
@@ -486,6 +513,14 @@ private fun RedirectLoadingScreen(
                 subTitle = "로그인하고 있어요"
             )
         }
+
+        LottieAnimation(
+            composition = composition,
+            iterations = LottieConstants.IterateForever,
+            modifier = Modifier
+                .size(164.dp)
+                .align(Alignment.Center)
+        )
     }
 }
 
@@ -694,11 +729,11 @@ fun rememberKakaoLoginManager(
     onSuccess: (String) -> Unit
 ): KakaoLoginManager {
     val context = LocalContext.current
-    return KakaoLoginManager(context, object : LoginManager.CallbackListener {
+    return remember { KakaoLoginManager(context, object : LoginManager.CallbackListener {
         override fun onSuccess(token: String) {
             onSuccess(token)
         }
-    })
+    }) }
 }
 
 @Composable
@@ -706,11 +741,13 @@ fun rememberGoogleLoginManager(
     onSuccess: (String) -> Unit
 ): GoogleLoginManager {
     val context = LocalContext.current
-    return GoogleLoginManager(context, object : LoginManager.CallbackListener {
-        override fun onSuccess(token: String) {
-            onSuccess(token)
-        }
-    })
+    return remember {
+        GoogleLoginManager(context, object : LoginManager.CallbackListener {
+            override fun onSuccess(token: String) {
+                onSuccess(token)
+            }
+        })
+    }
 }
 
 
@@ -730,7 +767,10 @@ fun LoginScreenPreview() {
 @Preview
 @Composable
 fun RedirectLoadingScreenPreview() {
-    RedirectLoadingScreen()
+    RedirectLoadingScreen(
+        state = LoginUiState.SignUpLoading(),
+        onAnimationCompleted = {}
+    )
 }
 
 @Preview

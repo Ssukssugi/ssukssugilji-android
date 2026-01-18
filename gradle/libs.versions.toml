@@ -60,6 +60,9 @@ kakao = "2.20.6"
 ## Naver
 naver = "5.10.0"
 
+## Lottie
+lottie = "6.6.2"
+
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -136,6 +139,9 @@ kakao-login = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao"
 
 ## Naver
 naver-login = { group = "com.navercorp.nid", name = "oauth", version.ref = "naver" }
+
+## Lottie
+lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
 
 ## Google
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }

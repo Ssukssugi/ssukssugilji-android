@@ -114,7 +114,7 @@ class LoginViewModel @Inject constructor(
         val loginType = this.loginType ?: return
         viewModelScope.launch {
             _uiState.value = state.copy(isShownTermsAgree = false)
-            _uiState.value = LoginUiState.SignUpLoading
+            _uiState.value = LoginUiState.SignUpLoading()
             loginRepository.applyTermsAgreement(
                 socialId = socialId,
                 emailAddress = emailAddress,
@@ -122,15 +122,31 @@ class LoginViewModel @Inject constructor(
                 isMarketingAgree = state.termsState.marketingTerms
             ).handle(
                 onSuccess = {
-                    _uiState.value = LoginUiState.SuccessLogin(
+                    val successState = LoginUiState.SuccessLogin(
                         type = loginType,
                         isMarketingReceiveAccepted = state.termsState.marketingTerms,
                         isRegisteredUser = false
                     )
+                    val currentState = _uiState.value as? LoginUiState.SignUpLoading
+                    if (currentState != null) {
+                        _uiState.value = currentState.copy(
+                            isServerResponseReady = true,
+                            serverResponse = successState
+                        )
+                    } else {
+                        _uiState.value = successState
+                    }
                 },
                 onError = {
                 }
             )
+        }
+    }
+
+    fun onAnimationCompleted() {
+        val state = uiState.value as? LoginUiState.SignUpLoading ?: return
+        if (state.isServerResponseReady && state.serverResponse != null) {
+            _uiState.value = state.serverResponse
         }
     }
 

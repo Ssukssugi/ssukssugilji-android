@@ -13,7 +13,11 @@ sealed interface LoginUiState {
         val termsState: TermsAgreeState = TermsAgreeState()
     ) : LoginUiState
 
-    data object SignUpLoading : LoginUiState
+    @Immutable
+    data class SignUpLoading(
+        val isServerResponseReady: Boolean = false,
+        val serverResponse: SuccessLogin? = null
+    ) : LoginUiState
 
     @Immutable
     data class SuccessLogin(
