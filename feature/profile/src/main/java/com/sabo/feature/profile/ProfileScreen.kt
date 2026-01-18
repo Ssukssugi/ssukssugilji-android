@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sabo.core.designsystem.R
+import com.sabo.core.designsystem.component.NetworkErrorScreen
 import com.sabo.core.designsystem.component.TopSnackBar
 import com.sabo.core.designsystem.component.rememberSnackBarState
 import com.sabo.core.designsystem.theme.DiaryColorsPalette
@@ -70,21 +71,36 @@ internal fun ProfileScreen(
         TopAppBar(
             onClickSetting = onClickSetting
         )
-        ProfileContent(
-            name = state.name,
-            onClick = onClickProfile
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        LinkItem(
-            iconRes = R.drawable.icon_mail_faq,
-            title = "의견 보내기",
-            onClick = onClickFAQ
-        )
-        LinkItem(
-            iconRes = R.drawable.icon_policy_document,
-            title = "약관 및 정책",
-            onClick = onClickPolicy
-        )
+
+        when (val content = state.profileContent) {
+            is ProfileContent.Loading -> Unit
+
+            is ProfileContent.Data -> {
+                ProfileInfo(
+                    name = content.name,
+                    onClick = onClickProfile
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                LinkItem(
+                    iconRes = R.drawable.icon_mail_faq,
+                    title = "의견 보내기",
+                    onClick = onClickFAQ
+                )
+                LinkItem(
+                    iconRes = R.drawable.icon_policy_document,
+                    title = "약관 및 정책",
+                    onClick = onClickPolicy
+                )
+            }
+
+            is ProfileContent.NetworkError -> {
+                NetworkErrorScreen(
+                    event = content.error,
+                    onRetry = viewModel::onRetryClicked,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
     }
 
     TopSnackBar(
@@ -125,7 +141,7 @@ private fun TopAppBar(
 }
 
 @Composable
-private fun ProfileContent(
+private fun ProfileInfo(
     name: String,
     onClick: (String) -> Unit = {}
 ) {
@@ -208,9 +224,9 @@ private fun TopAppBarPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun ProfileContentPreview() {
+private fun ProfileInfoPreview() {
     SsukssukDiaryTheme {
-        ProfileContent(name = "쑥쑥집사")
+        ProfileInfo(name = "쑥쑥집사")
     }
 }
 
