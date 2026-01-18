@@ -569,7 +569,7 @@ private fun LoginSuccessScreen(
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(coroutineScope) {
-        if (state.isMarketingReceiveAccepted) {
+        if (state.isMarketingReceiveAccepted == null) {
             delay(200L)
             if (state.isRegisteredUser) {
                 navigateToHome()
@@ -610,8 +610,9 @@ private fun LoginSuccessScreen(
         }
     }
 
-    if (state.isMarketingReceiveAccepted.not()) {
+    state.isMarketingReceiveAccepted?.let {
         MarketingDeniedDialog(
+            isAccepted = it,
             onDismiss = {
                 if (state.isRegisteredUser) {
                     navigateToHome()
@@ -625,6 +626,7 @@ private fun LoginSuccessScreen(
 
 @Composable
 private fun MarketingDeniedDialog(
+    isAccepted: Boolean,
     onDismiss: () -> Unit = {}
 ) {
     val now = rememberSaveable { LocalDateTime.now() }
@@ -646,7 +648,7 @@ private fun MarketingDeniedDialog(
                 .padding(top = 16.dp, bottom = 20.dp)
         ) {
             Text(
-                text = "마케팅정보 앱 푸시 알림 거부 안내",
+                text = "마케팅정보 앱 푸시 알림 ${if (isAccepted) "동의" else "거부"} 안내",
                 style = DiaryTypography.bodyLargeBold,
                 color = DiaryColorsPalette.current.gray800,
                 modifier = Modifier
@@ -806,6 +808,8 @@ private fun TermsAgreeDialogPreview() {
 @Composable
 private fun MarketingDeniedDialogPreview() {
     SsukssukDiaryTheme {
-        MarketingDeniedDialog()
+        MarketingDeniedDialog(
+            isAccepted = false
+        )
     }
 }

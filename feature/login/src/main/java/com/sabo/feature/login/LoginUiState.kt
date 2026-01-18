@@ -22,7 +22,7 @@ sealed interface LoginUiState {
     @Immutable
     data class SuccessLogin(
         val type: LoginType,
-        val isMarketingReceiveAccepted: Boolean = true,
+        val isMarketingReceiveAccepted: Boolean? = null,
         val isRegisteredUser: Boolean = false
     ) : LoginUiState
 }
